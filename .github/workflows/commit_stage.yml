@@ -1,11 +1,12 @@
 name: commit stage
 
 on:
+on:
   push:
-    branches: [main]
+    branches:
+      - main
+    tags: ['*']
   pull_request:
-    branches: [main]
-  tags: ['*']
   # This is to catch new releases of VS Code which could cause the extension to break
   schedule:
     - cron: 0 0 * * *

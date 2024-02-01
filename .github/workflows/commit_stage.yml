@@ -1,7 +1,6 @@
 name: commit stage
 
 on:
-on:
   push:
     branches:
       - main

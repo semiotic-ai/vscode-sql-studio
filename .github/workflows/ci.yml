@@ -103,12 +103,12 @@ jobs:
 
       - if: matrix.target != 'universal'
         name: Install dependencies (with binaries)
-        run: pnpm ci
+        run: npm ci
         env:
           npm_config_arch: ${{ matrix.npm_config_arch }}
       - if: matrix.target == 'universal'
         name: Install dependencies (without binaries)
-        run: pnpm ci
+        run: npm ci
         env:
           BINDL_SKIP: "true"
       - run: npx semantic-release --extends ./package.release.config.js

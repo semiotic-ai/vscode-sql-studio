@@ -52,72 +52,72 @@ jobs:
       with:
         run: pnpm test
 
-build:
-  strategy:
-    fail-fast: false
-    matrix:
-      include:
-        - os: windows-latest
-          target: win32-x64
-          npm_config_arch: x64
-        - os: windows-latest
-          target: win32-ia32
-          npm_config_arch: ia32
-        - os: windows-latest
-          target: win32-arm64
-          npm_config_arch: arm
-        - os: ubuntu-latest
-          target: linux-x64
-          npm_config_arch: x64
-        - os: ubuntu-latest
-          target: linux-arm64
-          npm_config_arch: arm64
-        - os: ubuntu-latest
-          target: linux-armhf
-          npm_config_arch: arm
-        - os: ubuntu-latest
-          target: alpine-x64
-          npm_config_arch: x64
-        - os: macos-latest
-          target: darwin-x64
-          npm_config_arch: x64
-        - os: macos-latest
-          target: darwin-arm64
-          npm_config_arch: arm64
-        - os: ubuntu-latest
-          target: universal
-  runs-on: ${{ matrix.os }}
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 21.x
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: win32-x64
+            npm_config_arch: x64
+          - os: windows-latest
+            target: win32-ia32
+            npm_config_arch: ia32
+          - os: windows-latest
+            target: win32-arm64
+            npm_config_arch: arm
+          - os: ubuntu-latest
+            target: linux-x64
+            npm_config_arch: x64
+          - os: ubuntu-latest
+            target: linux-arm64
+            npm_config_arch: arm64
+          - os: ubuntu-latest
+            target: linux-armhf
+            npm_config_arch: arm
+          - os: ubuntu-latest
+            target: alpine-x64
+            npm_config_arch: x64
+          - os: macos-latest
+            target: darwin-x64
+            npm_config_arch: x64
+          - os: macos-latest
+            target: darwin-arm64
+            npm_config_arch: arm64
+          - os: ubuntu-latest
+            target: universal
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21.x
 
-    - uses: pnpm/action-setup@v2
-      name: Install pnpm
-      with:
-        version: 8
-        run_install: true
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: true
 
-    - if: matrix.target != 'universal'
-      name: Install dependencies (with binaries)
-      run: pnpm ci
-      env:
-        npm_config_arch: ${{ matrix.npm_config_arch }}
-    - if: matrix.target == 'universal'
-      name: Install dependencies (without binaries)
-      run: pnpm ci
-      env:
-        BINDL_SKIP: "true"
-    - run: npx semantic-release --extends ./package.release.config.js
-      env:
-        VSCE_TARGET: ${{ matrix.target }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        OVSX_PAT: ${{ secrets.OVSX_PAT }}
-    - uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.target }}
-        path: "*.vsix"
+      - if: matrix.target != 'universal'
+        name: Install dependencies (with binaries)
+        run: pnpm ci
+        env:
+          npm_config_arch: ${{ matrix.npm_config_arch }}
+      - if: matrix.target == 'universal'
+        name: Install dependencies (without binaries)
+        run: pnpm ci
+        env:
+          BINDL_SKIP: "true"
+      - run: npx semantic-release --extends ./package.release.config.js
+        env:
+          VSCE_TARGET: ${{ matrix.target }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: "*.vsix"

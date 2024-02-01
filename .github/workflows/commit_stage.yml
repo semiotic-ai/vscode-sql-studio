@@ -27,5 +27,5 @@ jobs:
     - run: npm install
     - name: Run headless test
       uses: coactions/setup-xvfb@v1
-        with:
+      with:
         run: npm test

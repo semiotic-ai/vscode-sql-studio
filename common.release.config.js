@@ -42,7 +42,14 @@ module.exports = {
           },
         },
       ],
-      "@semantic-release/changelog",
+      [
+        "@semantic-release/changelog", 
+        {
+            "changelogTitle": "# Changelog"
+        },
+      ],
+      
     ],
+    branches: ["main"],
     preset: "conventionalcommits",
   };

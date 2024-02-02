@@ -113,7 +113,7 @@ jobs:
         run: pnpm install
         env:
           BINDL_SKIP: "true"
-      - run: npx semantic-release --extends ./package.release.config.js
+      - run: pnpm execute semantic-release --extends ./package.release.config.js
         env:
           VSCE_TARGET: ${{ matrix.target }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

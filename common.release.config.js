@@ -1,3 +1,4 @@
+// common.release.config.js
 module.exports = {
     plugins: [
       [

@@ -43,6 +43,7 @@
     "@typescript-eslint/parser": "^6.19.1",
     "@vscode/test-cli": "^0.0.4",
     "@vscode/test-electron": "^2.3.9",
+    "conventional-changelog-conventionalcommits": "^7.0.2",
     "eslint": "^8.56.0",
     "semantic-release": "^23.0.0",
     "semantic-release-stop-before-publish": "^1.0.0",

@@ -65,6 +65,8 @@ jobs:
           - os: ubuntu-latest
             target: universal
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Setup Volta, Node and NPM

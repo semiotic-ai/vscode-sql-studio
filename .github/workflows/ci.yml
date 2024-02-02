@@ -18,17 +18,17 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Setup Volta, Node and NPM
-      uses: volta-cli/action@v4
-    - run: npm ci
-      env:
-        npm_config_arch: x64
-    - name: Run headless test
-      uses: coactions/setup-xvfb@v1
-      with:
-        run: npm test
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Volta, Node and NPM
+        uses: volta-cli/action@v4
+      - run: npm ci
+        env:
+          npm_config_arch: x64
+      - name: Run headless test
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npm test
 
   build:
     strategy:
@@ -77,7 +77,7 @@ jobs:
         name: Install dependencies (without binaries)
         run: npm ci
         env:
-          BINDL_SKIP: "true"
+          BINDL_SKIP: 'true'
       - run: npx semantic-release --extends ./package.release.config.js
         env:
           VSCE_TARGET: ${{ matrix.target }}
@@ -87,7 +87,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
-          path: "*.vsix"
+          path: '*.vsix'
 
   release:
     if: github.event_name != 'schedule'
@@ -101,7 +101,7 @@ jobs:
         uses: volta-cli/action@v4
       - run: npm ci
         env:
-          BINDL_SKIP: "true"
+          BINDL_SKIP: 'true'
       - uses: actions/download-artifact@v3
       # Only run on push events or pull requests coming from the same repository, except from dependabot
       - run: npx semantic-release --extends ./publish.release.config.js

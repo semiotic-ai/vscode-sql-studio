@@ -97,8 +97,6 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GH_TOKEN }}
       - name: Setup Volta, Node and NPM
         uses: volta-cli/action@v4
       - run: npm ci

@@ -1,5 +1,8 @@
 // package.release.config.js
+const common = require("./common.release.config.js");
+
 module.exports = {
+    ...common,
     branches: ["main"],
     plugins: [
       '@semantic-release/commit-analyzer',

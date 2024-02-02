@@ -3,6 +3,7 @@
   "displayName": "Semiotic SQL Studio",
   "description": "A SQL interface for The Graph Protocol managed by Semiotic Labs",
   "version": "0.0.1",
+  "publisher": "SemioticLabs",
   "engines": {
     "vscode": "^1.86.0"
   },

@@ -1,4 +1,8 @@
 {
 	"out": "./docs",
-	"entryPoints": ["./src/extension.ts"]
+	"entryPoints": ["./src"],
+	"entryPointStrategy": "expand",
+	"plugin": ["typedoc-theme-hierarchy"],
+	"theme": "hierarchy",
+	"name": "Semiotic SQL Studio"
 }

@@ -33,7 +33,8 @@
 		"test": "vscode-test",
 		"release": "semantic-release",
 		"check-format": "prettier --check .",
-		"prepare": "husky"
+		"prepare": "husky",
+		"docs": "typedoc"
 	},
 	"devDependencies": {
 		"@semantic-release/changelog": "^6.0.3",
@@ -56,6 +57,7 @@
 		"semantic-release-stop-before-publish": "^1.0.0",
 		"semantic-release-vsce": "^5.6.4",
 		"ts-loader": "^9.5.1",
+		"typedoc": "^0.25.7",
 		"typescript": "^5.3.3",
 		"webpack": "^5.90.0",
 		"webpack-cli": "^5.1.4"

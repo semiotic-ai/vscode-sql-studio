@@ -96,7 +96,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Setup Volta, Node and NPM
         uses: volta-cli/action@v4
       - run: npm ci
@@ -110,3 +111,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
+
+  docs:
+    if: github.event_name != 'schedule'
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Volta, Node and NPM
+        uses: volta-cli/action@v4
+      - run: npm ci
+      - name: Build docs
+        run: npm run docs
+      - name: Deploy docs
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        with:
+          folder: docs

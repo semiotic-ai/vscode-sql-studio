@@ -17,6 +17,42 @@
 			{
 				"command": "semiotic-sql-studio.helloWorld",
 				"title": "Hello World"
+			},
+			{
+				"command": "subgraphs.loadMoreSubgraphs",
+				"title": "Load More",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "subgraph-explorer",
+					"title": "Subgraph Explorer",
+					"icon": "resources/the-graph.svg"
+				}
+			]
+		},
+		"views": {
+			"subgraph-explorer": [
+				{
+					"id": "subgraph-available",
+					"name": "Available Subgraphs"
+				},
+				{
+					"id": "subgraph-columns",
+					"name": "Subgraph columns"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "subgraph-columns",
+				"contents": "In order to view an specific subgraph columns, select a SQL enabled subgraph.",
+				"when": "workbenchState == empty"
 			}
 		]
 	},
@@ -62,6 +98,10 @@
 		"typescript": "^5.3.3",
 		"webpack": "^5.90.0",
 		"webpack-cli": "^5.1.4"
+	},
+	"dependencies": {
+		"change-case": "^5.4.1",
+		"graphql": "^16.8.1"
 	},
 	"volta": {
 		"node": "20.11.0",

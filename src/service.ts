@@ -241,7 +241,8 @@ async function CallGraphQL<B, R>(endpoint: string, body: B): Promise<R> {
 		method: 'POST'
 	});
 
-	const json_response: R = (await response.json()) as R;
+	// @ts-ignore
+	const json_response: R = (await response.json()) as R; 
 
 	return json_response;
 }

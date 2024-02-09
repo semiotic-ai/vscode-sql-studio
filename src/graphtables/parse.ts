@@ -89,12 +89,12 @@ function parseDBType(fieldType: NamedTypeNode): DBType | undefined {
 
 function parseIDType(fieldType: TypeNode): IdType {
 	if (fieldType.kind !== Kind.NON_NULL_TYPE)
-		throw new Error(`ID field must be a non-nullable type.`);
+		{throw new Error(`ID field must be a non-nullable type.`);}
 
 	fieldType = fieldType.type;
 
 	if (fieldType.kind !== Kind.NAMED_TYPE)
-		throw new Error(`ID field must be ID, Bytes, Int8 or String type.`);
+		{throw new Error(`ID field must be ID, Bytes, Int8 or String type.`);}
 
 	switch (fieldType.name.value) {
 		case 'ID':
@@ -153,7 +153,7 @@ function parseNamedType(
 		parseReferenceType(fieldType, schema) ||
 		parseEnumType(fieldType, schema);
 
-	if (type !== undefined) return type;
+	if (type !== undefined) {return type;}
 
 	throw new Error(`Item type of the list must be a scalar or enum type.`);
 }
@@ -202,15 +202,12 @@ function parseRelation(field: FieldDefinitionNode): Relation {
 
 	const type = field.type.kind !== Kind.NON_NULL_TYPE ? field.type : field.type.type;
 
-	if (type.kind !== Kind.LIST_TYPE) throw new Error(`Relation field must be a list type.`);
+	if (type.kind !== Kind.LIST_TYPE) {throw new Error(`Relation field must be a list type.`);}
 
-	if (type.type.kind !== Kind.NON_NULL_TYPE)
-		throw new Error(`Relation field must be a list of non-nullable type.`);
+	const table_type = type.type.kind !== Kind.NON_NULL_TYPE ? type.type : type.type.type;
 
-	if (type.type.type.kind !== Kind.NAMED_TYPE)
-		throw new Error(`Relation field must be a list of non-nullable known/named type.`);
-
-	const table_type = type.type.type;
+	if (table_type.kind !== Kind.NAMED_TYPE)
+		{throw new Error(`Relation field must be a list of non-nullable known/named type.`);}
 
 	const table = snakeCase(table_type.name.value);
 
@@ -219,7 +216,7 @@ function parseRelation(field: FieldDefinitionNode): Relation {
 	);
 
 	if (derivedFrom === undefined)
-		throw new Error(`Relation field must have a derivedFrom directive.`);
+		{throw new Error(`Relation field must have a derivedFrom directive.`);}
 
 	const column = snakeCase(parseOjectField(derivedFrom, 'field', Kind.STRING));
 
@@ -280,15 +277,15 @@ function parseOjectField(
 	let field: ConstValueNode | undefined = undefined;
 
 	if (obj.kind === Kind.DIRECTIVE)
-		field = obj.arguments?.find((arg) => arg.name.value === name)?.value;
+		{field = obj.arguments?.find((arg) => arg.name.value === name)?.value;}
 	else if (obj.kind === Kind.OBJECT)
-		field = obj.fields?.find((field) => field.name.value === name)?.value;
+		{field = obj.fields?.find((field) => field.name.value === name)?.value;}
 
 	if (field === undefined)
-		throw new Error(`Argument ${name} is required for full text search column.`);
+		{throw new Error(`Argument ${name} is required for full text search column.`);}
 
-	if (field.kind === kind) return field.value;
-	else throw new Error(`Argument ${name} must be a ${kind} for full text search column.`);
+	if (field.kind === kind) {return field.value;}
+	else {throw new Error(`Argument ${name} must be a ${kind} for full text search column.`);}
 }
 
 function parseFullTextDirective(directive: ConstDirectiveNode): { table: string; column: Column } {
@@ -341,7 +338,7 @@ function getFullTexts(document: DocumentNode): { [key: string]: Column[] } {
 		document.definitions
 			.filter((def) => def.kind === Kind.OBJECT_TYPE_DEFINITION)
 			.map((def) => def as ObjectTypeDefinitionNode)
-			.find((def) => def.name.value == SCHEMA_TYPE_NAME)
+			.find((def) => def.name.value === SCHEMA_TYPE_NAME)
 			?.directives?.filter((dir) => dir.name.value === FULLTEXT_DIRECTIVE_NAME)
 			.map(parseFullTextDirective)
 			.reduce((acc: { [key: string]: Column[] }, value) => {

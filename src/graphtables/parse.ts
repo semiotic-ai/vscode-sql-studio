@@ -1,4 +1,5 @@
-import { snakeCase } from 'change-case';
+import { snakeCase } from './snake';
+
 import {
 	parse as parseDocument,
 	Kind,
@@ -66,7 +67,7 @@ interface ImplementationTypeNode extends InterfaceTypeDefinitionNode {
 interface Schema {
 	objects: Map<string, ObjectTypeDefinitionNode | ImplementationTypeNode>;
 	enums: Map<string, EnumTypeDefinitionNode>;
-	fulltext: Map<string, Map<string,Column>>;
+	fulltext: Map<string, Map<string, Column>>;
 }
 
 function parseDBType(fieldType: NamedTypeNode): DBType | undefined {
@@ -123,7 +124,6 @@ function parseScalarType(fieldType: NamedTypeNode): ScalarType | undefined {
 }
 
 function parseEnumType(fieldType: NamedTypeNode, schema: Schema): EnumType | undefined {
-
 	const target = schema.enums.get(fieldType.name.value);
 
 	if (target === undefined) {
@@ -131,13 +131,10 @@ function parseEnumType(fieldType: NamedTypeNode, schema: Schema): EnumType | und
 	}
 
 	return { kind: TypeKind.Enum, name: snakeCase(target.name.value) };
-
 }
 
 function parseReferenceType(fieldType: NamedTypeNode, schema: Schema): ReferenceType | undefined {
-
 	if (schema.objects.has(fieldType.name.value)) {
-
 		const target = schema.objects.get(fieldType.name.value);
 
 		if (target === undefined) {
@@ -153,11 +150,12 @@ function parseReferenceType(fieldType: NamedTypeNode, schema: Schema): Reference
 		}
 		const dbType = parseIDType(id_field_type);
 
-		const tables = target.kind === Kind.OBJECT_TYPE_DEFINITION ?
-			[snakeCase(target.name.value)] : target.references.map((ref) => snakeCase(ref));
+		const tables =
+			target.kind === Kind.OBJECT_TYPE_DEFINITION
+				? [snakeCase(target.name.value)]
+				: target.references.map((ref) => snakeCase(ref));
 
 		return { kind: TypeKind.Reference, tables, column: ID_FIELD_NAME, dbType };
-
 	}
 
 	return undefined;
@@ -192,7 +190,7 @@ function parseListType(fieldType: ListTypeNode, schema: Schema): ListType {
 	return { kind: TypeKind.List, itemType };
 }
 
-function parseColumn(field: FieldDefinitionNode, schema: Schema): [string,Column] {
+function parseColumn(field: FieldDefinitionNode, schema: Schema): [string, Column] {
 	const name = snakeCase(field.name.value);
 	const description = field.description?.value;
 
@@ -221,7 +219,6 @@ function parseColumn(field: FieldDefinitionNode, schema: Schema): [string,Column
 }
 
 function parseRelation(field: FieldDefinitionNode): Relation {
-
 	const name = snakeCase(field.name.value);
 
 	const type = field.type.kind !== Kind.NON_NULL_TYPE ? field.type : field.type.type;
@@ -248,19 +245,17 @@ function parseRelation(field: FieldDefinitionNode): Relation {
 
 	const column = snakeCase(parseOjectField(derivedFrom, 'field', Kind.STRING));
 
-	return { name, table, column};
+	return { name, table, column };
 }
 
-function parseTable(table: ObjectTypeDefinitionNode, schema: Schema): [string,Table] {
-
+function parseTable(table: ObjectTypeDefinitionNode, schema: Schema): [string, Table] {
 	const name = snakeCase(table.name.value);
 
-	const columns:Map<string,Column> = new Map();
+	const columns: Map<string, Column> = new Map();
 
 	if (isImmutableEntity(table)) {
 		columns.set(BLOCK_COLUMN_NAME, BlockColumn);
-	}
-	else {
+	} else {
 		columns.set(BLOCK_RANGE_COLUMN_NAME, BlockRangeColumn);
 	}
 
@@ -275,21 +270,26 @@ function parseTable(table: ObjectTypeDefinitionNode, schema: Schema): [string,Ta
 		.map((field) => parseColumn(field, schema))
 		.forEach(([name, column]) => columns.set(name, column));
 
-	const relations:Map<string,Relation[]> = new Map();
+	const relations: Map<string, Relation[]> = new Map();
 
-	relations.set(ID_FIELD_NAME,
-		table.fields?.filter((field) => isDerivedField(field)).map(parseRelation) || []);
+	relations.set(
+		ID_FIELD_NAME,
+		table.fields?.filter((field) => isDerivedField(field)).map(parseRelation) || []
+	);
 
-	return [name,{
-		columns,
-		relations
-	}];
+	return [
+		name,
+		{
+			columns,
+			relations
+		}
+	];
 }
 
-export function parseEnum(enum_type: EnumTypeDefinitionNode): [string,string[]] {
+export function parseEnum(enum_type: EnumTypeDefinitionNode): [string, string[]] {
 	const name = snakeCase(enum_type.name.value);
 	const values = enum_type.values?.map((value) => value.name.value) || [];
-	return [name, values ];
+	return [name, values];
 }
 
 function parseOjectField(
@@ -371,7 +371,7 @@ export function parse(raw: string): Layout {
 
 	const objects: Map<string, ObjectTypeDefinitionNode | ImplementationTypeNode> = new Map();
 	const enums: Map<string, EnumTypeDefinitionNode> = new Map();
-	const fulltext: Map<string, Map<string,Column>> = new Map();
+	const fulltext: Map<string, Map<string, Column>> = new Map();
 
 	document.definitions.forEach((def) => {
 		if (def.kind === Kind.OBJECT_TYPE_DEFINITION) {
@@ -381,7 +381,7 @@ export function parse(raw: string): Layout {
 				obj.directives
 					?.filter((dir) => dir.name.value === FULLTEXT_DIRECTIVE_NAME)
 					.map(parseFullTextDirective)
-					.forEach(([table_name,column_name,column]) => {
+					.forEach(([table_name, column_name, column]) => {
 						if (fulltext.has(table_name)) {
 							fulltext.get(table_name)?.set(column_name, column);
 						} else {
@@ -415,10 +415,10 @@ export function parse(raw: string): Layout {
 	};
 
 	// Parse graphql enum objects into database enums
-	const layout_enums:Map<string,string[]> = new Map();
+	const layout_enums: Map<string, string[]> = new Map();
 
 	for (const [name, value] of schema.enums.entries()) {
-		const [enum_name,enum_values] = parseEnum(value);
+		const [enum_name, enum_values] = parseEnum(value);
 		layout_enums.set(enum_name, enum_values);
 	}
 
@@ -426,13 +426,13 @@ export function parse(raw: string): Layout {
 
 	for (const [name, value] of schema.objects.entries()) {
 		if (name !== SCHEMA_TYPE_NAME && value.kind === Kind.OBJECT_TYPE_DEFINITION) {
-			const [table_name,table_value] = parseTable(value, schema);
+			const [table_name, table_value] = parseTable(value, schema);
 			layout_tables.set(table_name, table_value);
 		}
 	}
 
 	return {
-		tables:layout_tables,
-		enums:layout_enums
+		tables: layout_tables,
+		enums: layout_enums
 	};
 }

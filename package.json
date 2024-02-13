@@ -13,7 +13,7 @@
 	"activationEvents": [
 		"onEditSession:scheme:gsql"
 	],
-	"main": "./dist/extension",
+	"main": "./dist/extension.js",
 	"extensionDependencies": [
 		"vscode.sql"
 	],
@@ -367,7 +367,6 @@
 		"webpack-cli": "^5.1.4"
 	},
 	"dependencies": {
-		"change-case": "^5.4.1",
 		"graphql": "^16.8.1"
 	},
 	"volta": {

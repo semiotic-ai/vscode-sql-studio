@@ -157,14 +157,14 @@ export class SubgraphColumnsProvider implements vscode.TreeDataProvider<vscode.T
 		if (!this.layout) {
 			return [];
 		}
-		let items = [];
+		const items: vscode.TreeItem[] = [];
 		if (element?.label) {
-			const table = this.layout.tables.find((t) => element.label === t.name)?.columns;
-			if (!table) {
+			const columns = this.layout.tables.get(element.label as string)?.columns;
+			if (!columns) {
 				return [];
 			}
 
-			for (const column of table) {
+			for (const [column_name, column] of columns) {
 				function getType(type: ColumnType): string {
 					switch (type.kind) {
 						case TypeKind.Scalar:
@@ -178,11 +178,11 @@ export class SubgraphColumnsProvider implements vscode.TreeDataProvider<vscode.T
 							return type.dbType;
 					}
 				}
-				items.push(new Column(column.name, getType(column.type)));
+				items.push(new Column(column_name, getType(column.type)));
 			}
 		} else {
-			for (const table of this.layout.tables) {
-				items.push(new Table(table.name));
+			for (const [table_name, table] of this.layout.tables) {
+				items.push(new Table(table_name));
 			}
 		}
 		return items;

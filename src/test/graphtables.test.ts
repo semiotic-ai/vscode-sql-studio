@@ -14,6 +14,8 @@ import {
 	TypeKind
 } from '../graphtables/layout';
 import { DBType } from '../graphtables/db';
+import { readFileSync } from 'fs';
+import path from 'path';
 
 suite('basic', () => {
 	const simple_schema = `
@@ -168,41 +170,67 @@ suite('relation', () => {
 		assert.strictEqual((ref_type as ReferenceType).dbType, DBType.Text));
 });
 
-// suite('fulltext', () => {
+suite('fulltext', () => {
+	const fulltext_schema = `
+    type SomeFulltextTable @entity {
+        id: ID!,
+        symbol: String!,
+        name: String!,
+    }
 
-//     const fulltext_schema = `
-//     type SomeFulltextTable @entity {
-//         id: ID!,
-//         symbol: String!,
-//         name: String!,
-//     }
+    type _Schema_
+        @fulltext(
+            name: "FulltextField"
+            language: tr
+            algorithm: rank
+            include: [
+            {
+                entity: "SomeFulltextTable"
+                fields: [{ name: "symbol" }, { name: "name" }, { name: "id" }]
+            }
+            ]
+        )
+`;
 
-//     type _Schema_
-//         @fulltext(
-//             name: "FulltextField"
-//             language: tr
-//             algorithm: rank
-//             include: [
-//             {
-//                 entity: "SomeFulltextTable"
-//                 fields: [{ name: "symbol" }, { name: "name" }, { name: "id" }]
-//             }
-//             ]
-//         )
-// `;
+	const layout = parse(fulltext_schema);
+	const expected_table_name = 'some_fulltext_table';
+	const expected_column_name = 'fulltext_field';
 
-//     const layout = parse(fulltext_schema);
+	const fulltext_column = layout.tables
+		.get(expected_table_name)!
+		.columns.get(expected_column_name)!;
 
-//     const fulltext_column = layout.tables.get("some_full_text_table")!.columns.get("fulltext_field");
+	test('column is defined', () => assert.notStrictEqual(fulltext_column, undefined));
+	test('column type is `TextSearchType`', () =>
+		assert.strictEqual(fulltext_column.type.kind, TypeKind.TextSearch));
+	test('column db type is `tSVector`', () =>
+		assert.strictEqual((fulltext_column.type as TextSearchType).dbType, DBType.TextSearch));
+	test('column full text language is `tr`', () =>
+		assert.strictEqual((fulltext_column.type as TextSearchType).language, 'tr'));
+	test('column full text algorithm is `rank`', () =>
+		assert.strictEqual((fulltext_column.type as TextSearchType).algorithm, 'rank'));
+	test('column full text columns are `symbol`, `name` and `id`', () =>
+		assert.deepEqual((fulltext_column.type as TextSearchType).columns, ['symbol', 'name', 'id']));
+});
 
-//     test('column is defined', () => assert.notStrictEqual(fulltext_column,undefined));
-//     test('column type is `TextSearchType`', () => assert.strictEqual(fulltext_column!.type.kind,TypeKind.TextSearch));
-//     test('column db type is `tSVector`', () => assert.strictEqual((fulltext_column!.type as TextSearchType).dbType,DBType.TextSearch));
-//     test('column full text language is `tr`', () => assert.strictEqual((fulltext_column!.type as TextSearchType).language,'tr'));
-//     test('column full text algorithm is `rank`', () => assert.strictEqual((fulltext_column!.type as TextSearchType).algorithm,'rank'));
-//     test('column full text columns are `symbol`, `name` and `id`', () => assert.strictEqual((fulltext_column!.type as TextSearchType).columns,['symbol', 'name', 'id']));
-
-// });
+suite('real life samples', () => {
+	[
+		'schema.graphql',
+		'schema2.graphql',
+		'schema3.graphql',
+		'schema4.graphql',
+		'schema5.graphql'
+	].forEach((schema_file) => {
+		test(schema_file, () => {
+			const graphql_schema = readFileSync(
+				path.join(__dirname, '../../src/test/samples/' + schema_file),
+				'utf8'
+			);
+			const layout = parse(graphql_schema);
+			assert.notStrictEqual(layout.tables.size, 0);
+		});
+	});
+});
 
 // describe.each(["schema.graphql", "schema2.graphql", "schema3.graphql"])('real world parse %s', (schema_file) => {
 //     test('table count greater 0', () => {

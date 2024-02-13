@@ -140,13 +140,20 @@ suite('relation', () => {
         id: ID!,
         parentField: SomeRelationParentTable!
     }
+
+	type SomeOneToOneRelationParentTable @entity {
+		id: ID!,
+		child: SomeRelationChildTable @derivedFrom(field: "parentField")
+	}
+
 `;
 
 	const layout = parse(relation_schema);
 	const expected_parent_table_name = 'some_relation_parent_table';
 	const expected_child_table_name = 'some_relation_child_table';
+	const expected_one_to_one_parent_table_name = 'some_one_to_one_relation_parent_table';
 
-	test('tables are parsed', () => assert.strictEqual(layout.tables.size, 2));
+	test('tables are parsed', () => assert.strictEqual(layout.tables.size, 3));
 
 	const relations = layout.tables.get(expected_parent_table_name)!.relations.get(ID_FIELD_NAME)!;
 
@@ -157,6 +164,14 @@ suite('relation', () => {
 		assert.strictEqual(relations[0].table, expected_child_table_name));
 	test('parent to child column name is `parent_field`', () =>
 		assert.strictEqual(relations[0].column, 'parent_field'));
+	test('parent to child rel type is `many`', () => assert.strictEqual(relations[0].type, 'many'));
+
+	const one_to_one_relations = layout.tables
+		.get(expected_one_to_one_parent_table_name)!
+		.relations.get(ID_FIELD_NAME)!;
+
+	test('one to one rel type is `one`', () =>
+		assert.strictEqual(one_to_one_relations[0].type, 'one'));
 
 	const ref_type = layout.tables.get(expected_child_table_name)!.columns.get('parent_field')!.type;
 

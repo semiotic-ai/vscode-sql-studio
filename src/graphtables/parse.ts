@@ -13,7 +13,8 @@ import {
 	type ListTypeNode,
 	type ConstDirectiveNode,
 	type ConstValueNode,
-	type ConstObjectValueNode
+	type ConstObjectValueNode,
+	type InterfaceTypeDefinitionNode
 } from 'graphql';
 
 import {
@@ -33,35 +34,39 @@ import {
 	FULLTEXT_DIRECTIVE_NAME,
 	ID_FIELD_NAME,
 	SCHEMA_TYPE_NAME,
+	VIRTUAL_ID_COLUMN_NAME,
+	BLOCK_RANGE_COLUMN_NAME,
+	BLOCK_COLUMN_NAME,
 	isDerivedField,
 	isImmutableEntity
 } from './graph';
 
 const PrimaryKeyColumn: Column = {
-	name: 'vid',
 	type: { kind: TypeKind.Scalar, dbType: DBType.BigSerial },
 	isPrimary: true,
 	nullable: false
 };
 
 const BlockRangeColumn: Column = {
-	name: 'block_range',
 	type: { kind: TypeKind.Scalar, dbType: DBType.Int4Range },
 	isPrimary: false,
 	nullable: false
 };
 
 const BlockColumn: Column = {
-	name: 'block$',
 	type: { kind: TypeKind.Scalar, dbType: DBType.Integer },
 	isPrimary: false,
 	nullable: false
 };
 
+interface ImplementationTypeNode extends InterfaceTypeDefinitionNode {
+	references: string[];
+}
+
 interface Schema {
-	objects: { [key: string]: ObjectTypeDefinitionNode };
-	enums: { [key: string]: EnumTypeDefinitionNode };
-	fulltext: { [key: string]: Column[] };
+	objects: Map<string, ObjectTypeDefinitionNode | ImplementationTypeNode>;
+	enums: Map<string, EnumTypeDefinitionNode>;
+	fulltext: Map<string, Map<string,Column>>;
 }
 
 function parseDBType(fieldType: NamedTypeNode): DBType | undefined {
@@ -118,29 +123,41 @@ function parseScalarType(fieldType: NamedTypeNode): ScalarType | undefined {
 }
 
 function parseEnumType(fieldType: NamedTypeNode, schema: Schema): EnumType | undefined {
-	if (Object.prototype.hasOwnProperty.call(schema.enums, fieldType.name.value)) {
-		return { kind: TypeKind.Enum, name: snakeCase(fieldType.name.value) };
+
+	const target = schema.enums.get(fieldType.name.value);
+
+	if (target === undefined) {
+		return undefined;
 	}
 
-	return undefined;
+	return { kind: TypeKind.Enum, name: snakeCase(target.name.value) };
+
 }
 
 function parseReferenceType(fieldType: NamedTypeNode, schema: Schema): ReferenceType | undefined {
-	if (Object.prototype.hasOwnProperty.call(schema.objects, fieldType.name.value)) {
-		const target = schema.objects[fieldType.name.value];
-		const id_field_type = target.fields?.find((field) => field.name.value === ID_FIELD_NAME)?.type;
+
+	if (schema.objects.has(fieldType.name.value)) {
+
+		const target = schema.objects.get(fieldType.name.value);
+
+		if (target === undefined) {
+			return undefined;
+		}
+
+		const id_field_type = target?.fields?.find((field) => field.name.value === ID_FIELD_NAME)?.type;
 
 		if (id_field_type === undefined) {
 			throw new Error(
 				`Reference entity ${fieldType.name.value} must have a ${ID_FIELD_NAME} field`
 			);
 		}
-
-		const table = snakeCase(fieldType.name.value);
-
 		const dbType = parseIDType(id_field_type);
 
-		return { kind: TypeKind.Reference, table, column: ID_FIELD_NAME, dbType };
+		const tables = target.kind === Kind.OBJECT_TYPE_DEFINITION ?
+			[snakeCase(target.name.value)] : target.references.map((ref) => snakeCase(ref));
+
+		return { kind: TypeKind.Reference, tables, column: ID_FIELD_NAME, dbType };
+
 	}
 
 	return undefined;
@@ -175,19 +192,21 @@ function parseListType(fieldType: ListTypeNode, schema: Schema): ListType {
 	return { kind: TypeKind.List, itemType };
 }
 
-function parseColumn(field: FieldDefinitionNode, schema: Schema): Column {
+function parseColumn(field: FieldDefinitionNode, schema: Schema): [string,Column] {
 	const name = snakeCase(field.name.value);
 	const description = field.description?.value;
 
 	if (name === ID_FIELD_NAME) {
 		const dbType = parseIDType(field.type);
-		return {
+		return [
 			name,
-			type: { kind: TypeKind.Scalar, dbType },
-			nullable: false,
-			description,
-			isPrimary: false
-		};
+			{
+				type: { kind: TypeKind.Scalar, dbType },
+				nullable: false,
+				description,
+				isPrimary: false
+			}
+		];
 	}
 
 	const nullable = field.type.kind !== Kind.NON_NULL_TYPE;
@@ -198,10 +217,11 @@ function parseColumn(field: FieldDefinitionNode, schema: Schema): Column {
 			? parseListType(fieldType, schema)
 			: parseNamedType(fieldType, schema);
 
-	return { name, type, isPrimary: false, nullable, description };
+	return [name, { type, isPrimary: false, nullable, description }];
 }
 
 function parseRelation(field: FieldDefinitionNode): Relation {
+
 	const name = snakeCase(field.name.value);
 
 	const type = field.type.kind !== Kind.NON_NULL_TYPE ? field.type : field.type.type;
@@ -228,53 +248,48 @@ function parseRelation(field: FieldDefinitionNode): Relation {
 
 	const column = snakeCase(parseOjectField(derivedFrom, 'field', Kind.STRING));
 
-	return { name, table, column };
+	return { name, table, column};
 }
 
-function parseTable(table: ObjectTypeDefinitionNode, schema: Schema): Table {
+function parseTable(table: ObjectTypeDefinitionNode, schema: Schema): [string,Table] {
+
 	const name = snakeCase(table.name.value);
 
-	const blockColumn = isImmutableEntity(table) ? BlockColumn : BlockRangeColumn;
+	const columns:Map<string,Column> = new Map();
 
-	const columns = [PrimaryKeyColumn, blockColumn]
-		.concat(
-			table.fields
-				?.filter((field) => !isDerivedField(field))
-				.map((field) => parseColumn(field, schema)) || []
-		)
-		.concat(schema.fulltext[name] || []);
+	if (isImmutableEntity(table)) {
+		columns.set(BLOCK_COLUMN_NAME, BlockColumn);
+	}
+	else {
+		columns.set(BLOCK_RANGE_COLUMN_NAME, BlockRangeColumn);
+	}
 
-	const id_field_relations =
-		table.fields?.filter((field) => isDerivedField(field)).map(parseRelation) || [];
+	columns.set(VIRTUAL_ID_COLUMN_NAME, PrimaryKeyColumn);
 
-	const relations: { [key: string]: Relation[] } = {};
+	for (const [column_name, column] of schema.fulltext.get(name)?.entries() || []) {
+		columns.set(column_name, column);
+	}
 
-	relations[ID_FIELD_NAME] = id_field_relations;
+	table.fields
+		?.filter((field) => !isDerivedField(field))
+		.map((field) => parseColumn(field, schema))
+		.forEach(([name, column]) => columns.set(name, column));
 
-	return {
-		name,
+	const relations:Map<string,Relation[]> = new Map();
+
+	relations.set(ID_FIELD_NAME,
+		table.fields?.filter((field) => isDerivedField(field)).map(parseRelation) || []);
+
+	return [name,{
 		columns,
 		relations
-	};
+	}];
 }
 
-function getDefinitions<T extends TypeDefinitionNode>(
-	document: DocumentNode,
-	kind: Kind
-): { [key: string]: T } {
-	return document.definitions
-		.filter((def) => def.kind === kind)
-		.map((def) => def as T)
-		.reduce((acc: { [key: string]: T }, def: T) => {
-			acc[def.name.value] = def;
-			return acc;
-		}, {});
-}
-
-export function parseEnum(enum_type: EnumTypeDefinitionNode): { name: string; values: string[] } {
+export function parseEnum(enum_type: EnumTypeDefinitionNode): [string,string[]] {
 	const name = snakeCase(enum_type.name.value);
 	const values = enum_type.values?.map((value) => value.name.value) || [];
-	return { name, values };
+	return [name, values ];
 }
 
 function parseOjectField(
@@ -301,7 +316,7 @@ function parseOjectField(
 	}
 }
 
-function parseFullTextDirective(directive: ConstDirectiveNode): { table: string; column: Column } {
+function parseFullTextDirective(directive: ConstDirectiveNode): [string, string, Column] {
 	const column_name = snakeCase(parseOjectField(directive, 'name', Kind.STRING));
 	const language = parseOjectField(directive, 'language', Kind.ENUM);
 	const algorithm = parseOjectField(directive, 'algorithm', Kind.ENUM);
@@ -335,32 +350,15 @@ function parseFullTextDirective(directive: ConstDirectiveNode): { table: string;
 		return snakeCase(parseOjectField(value, 'name', Kind.STRING));
 	});
 
-	return {
-		table: table_name,
-		column: {
-			name: column_name,
+	return [
+		table_name,
+		column_name,
+		{
 			type: { kind: TypeKind.TextSearch, dbType: DBType.TextSearch, language, algorithm, columns },
 			isPrimary: false,
 			nullable: true
 		}
-	};
-}
-
-function getFullTexts(document: DocumentNode): { [key: string]: Column[] } {
-	const result =
-		document.definitions
-			.filter((def) => def.kind === Kind.OBJECT_TYPE_DEFINITION)
-			.map((def) => def as ObjectTypeDefinitionNode)
-			.find((def) => def.name.value === SCHEMA_TYPE_NAME)
-			?.directives?.filter((dir) => dir.name.value === FULLTEXT_DIRECTIVE_NAME)
-			.map(parseFullTextDirective)
-			.reduce((acc: { [key: string]: Column[] }, value) => {
-				const columns = acc[value.table] || [];
-				columns.push(value.column);
-				acc[value.table] = columns;
-				return acc;
-			}, {}) || {};
-	return result;
+	];
 }
 
 /**
@@ -371,28 +369,70 @@ function getFullTexts(document: DocumentNode): { [key: string]: Column[] } {
 export function parse(raw: string): Layout {
 	const document = parseDocument(raw);
 
+	const objects: Map<string, ObjectTypeDefinitionNode | ImplementationTypeNode> = new Map();
+	const enums: Map<string, EnumTypeDefinitionNode> = new Map();
+	const fulltext: Map<string, Map<string,Column>> = new Map();
+
+	document.definitions.forEach((def) => {
+		if (def.kind === Kind.OBJECT_TYPE_DEFINITION) {
+			const obj = def as ObjectTypeDefinitionNode;
+			objects.set(obj.name.value, obj);
+			if (obj.name.value === SCHEMA_TYPE_NAME) {
+				obj.directives
+					?.filter((dir) => dir.name.value === FULLTEXT_DIRECTIVE_NAME)
+					.map(parseFullTextDirective)
+					.forEach(([table_name,column_name,column]) => {
+						if (fulltext.has(table_name)) {
+							fulltext.get(table_name)?.set(column_name, column);
+						} else {
+							fulltext.set(table_name, new Map([[column_name, column]]));
+						}
+					});
+			}
+		} else if (def.kind === Kind.ENUM_TYPE_DEFINITION) {
+			const obj = def as EnumTypeDefinitionNode;
+			enums.set(obj.name.value, obj);
+		} else if (def.kind === Kind.INTERFACE_TYPE_DEFINITION) {
+			const obj = def as ImplementationTypeNode;
+			obj.references = document.definitions
+				.filter(
+					(def) =>
+						def.kind === Kind.OBJECT_TYPE_DEFINITION &&
+						def.interfaces &&
+						def.interfaces.some((impl) => impl.name.value === obj.name.value)
+				)
+				.map((def) => def as ObjectTypeDefinitionNode)
+				.map((def) => def.name.value);
+			objects.set(obj.name.value, obj);
+		}
+	});
+
 	//Hashmaps to easily access schema objects
 	const schema: Schema = {
-		objects: getDefinitions(document, Kind.OBJECT_TYPE_DEFINITION),
-		enums: getDefinitions(document, Kind.ENUM_TYPE_DEFINITION),
-		fulltext: getFullTexts(document)
+		objects,
+		enums,
+		fulltext
 	};
 
 	// Parse graphql enum objects into database enums
-	const enums = Object.values(schema.enums)
-		.map(parseEnum)
-		.reduce((acc: { [key: string]: string[] }, enum_def) => {
-			acc[enum_def.name] = enum_def.values;
-			return acc;
-		}, {});
+	const layout_enums:Map<string,string[]> = new Map();
 
-	// Parse graphql object types into database tables excluding POI and Schema table.
-	const tables = Object.values(schema.objects)
-		.filter((def) => def.name.value !== SCHEMA_TYPE_NAME)
-		.map((def) => parseTable(def, schema));
+	for (const [name, value] of schema.enums.entries()) {
+		const [enum_name,enum_values] = parseEnum(value);
+		layout_enums.set(enum_name, enum_values);
+	}
+
+	const layout_tables = new Map<string, Table>();
+
+	for (const [name, value] of schema.objects.entries()) {
+		if (name !== SCHEMA_TYPE_NAME && value.kind === Kind.OBJECT_TYPE_DEFINITION) {
+			const [table_name,table_value] = parseTable(value, schema);
+			layout_tables.set(table_name, table_value);
+		}
+	}
 
 	return {
-		tables,
-		enums
+		tables:layout_tables,
+		enums:layout_enums
 	};
 }

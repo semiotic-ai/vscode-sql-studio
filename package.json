@@ -10,13 +10,70 @@
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [],
-	"main": "./dist/extension.js",
+	"activationEvents": [
+		"onEditSession:scheme:gsql"
+	],
+	"main": "./dist/extension",
+	"extensionDependencies": [
+		"vscode.sql"
+	],
 	"contributes": {
+		"languages": [
+			{
+				"id": "gsql",
+				"extensions": [
+					".gsql"
+				],
+				"aliases": [
+					"GSQL"
+				],
+				"configuration": "./syntaxes/gsql.configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "gsql",
+				"scopeName": "source.gsql",
+				"path": "./syntaxes/GSQL.plist"
+			}
+		],
+		"outputChannels": [
+			"GSQL"
+		],
+		"snippets": [
+			{
+				"language": "gsql",
+				"path": "./snippets/gsql.json"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "extension.gsql.runQuery",
+					"when": "editorLangId == gsql"
+				}
+			]
+		},
 		"commands": [
 			{
-				"command": "semiotic-sql-studio.helloWorld",
-				"title": "Hello World"
+				"command": "extension.gsql.runQuery",
+				"title": "%extension.gsql.runQuery%",
+				"category": "GSQL"
+			},
+			{
+				"command": "extension.gsql.cancelQuery",
+				"title": "%extension.gsql.cancelQuery%",
+				"category": "GSQL"
+			},
+			{
+				"command": "extension.gsql.chooseSubgraph",
+				"title": "%extension.gsql.chooseSubgraph%",
+				"category": "GSQL"
+			},
+			{
+				"command": "extension.gsql.newQuery",
+				"title": "%extension.gsql.newQuery%",
+				"category": "GSQL"
 			},
 			{
 				"command": "subgraphs.loadMoreSubgraphs",
@@ -25,6 +82,20 @@
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
 				}
+			}
+		],
+		"keybindings": [
+			{
+				"command": "extension.gsql.runQuery",
+				"key": "ctrl+m ctrl+r",
+				"mac": "cmd+m cmd+r",
+				"when": "editorTextFocus && editorLangId == 'gsql'"
+			},
+			{
+				"command": "extension.gsql.chooseSubgraph",
+				"key": "ctrl+m ctrl+c",
+				"mac": "cmd+m cmd+c",
+				"when": "editorTextFocus && editorLangId == 'gsql'"
 			}
 		],
 		"viewsContainers": {
@@ -54,7 +125,203 @@
 				"contents": "In order to view an specific subgraph columns, select a SQL enabled subgraph.",
 				"when": "workbenchState == empty"
 			}
-		]
+		],
+		"configuration": {
+			"type": "object",
+			"title": "GSQL configuration",
+			"gsql.gateway": {
+				"type": "string",
+				"description": "%gsql.gateway%",
+				"default": "http://eth.rubik.com.tr:8000/subgraphs/name",
+				"scope": "resource"
+			},
+			"gsql.maxRecentSubgraphs": {
+				"type": "number",
+				"default": 5,
+				"description": "%gsql.maxRecentSubgraphs%",
+				"scope": "window"
+			},
+			"gsql.subgraphs": {
+				"type": "array",
+				"default": [
+					{
+						"name": "{{put-subgraph-name-here}}"
+					}
+				],
+				"description": "%gsql.subgraphs%",
+				"items": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string",
+							"default": "{{put-subgraph-name-here}}",
+							"description": "%gsql.subgraph.name%"
+						}
+					}
+				},
+				"scope": "resource"
+			},
+			"gsql.shortcuts": {
+				"type": "object",
+				"description": "%gsql.shortcuts%",
+				"default": {
+					"_comment": "Short cuts must follow the format (ctrl)+(shift)+(alt)+[key]",
+					"event.toggleResultPane": "ctrl+alt+r",
+					"event.toggleMessagePane": "ctrl+alt+y",
+					"event.prevGrid": "ctrl+up",
+					"event.nextGrid": "ctrl+down",
+					"event.copySelection": "ctrl+c",
+					"event.copyWithHeaders": "",
+					"event.maximizeGrid": "",
+					"event.selectAll": "",
+					"event.saveAsJSON": "",
+					"event.saveAsCSV": "",
+					"event.saveAsExcel": ""
+				},
+				"scope": "resource"
+			},
+			"gsql.messagesDefaultOpen": {
+				"type": "boolean",
+				"description": "%gsql.messagesDefaultOpen%",
+				"default": true,
+				"scope": "resource"
+			},
+			"gsql.resultsFontFamily": {
+				"type": "string",
+				"description": "%gsql.resultsFontFamily%",
+				"default": "-apple-system,BlinkMacSystemFont,Segoe WPC,Segoe UI,HelveticaNeue-Light,Ubuntu,Droid Sans,sans-serif",
+				"scope": "resource"
+			},
+			"gsql.resultsFontSize": {
+				"type": "number",
+				"description": "%gsql.resultsFontSize%",
+				"default": 13,
+				"scope": "resource"
+			},
+			"gsql.saveAsCsv.includeHeaders": {
+				"type": "boolean",
+				"description": "%gsql.saveAsCsv.includeHeaders%",
+				"default": true,
+				"scope": "resource"
+			},
+			"gsql.copyIncludeHeaders": {
+				"type": "boolean",
+				"description": "%gsql.copyIncludeHeaders%",
+				"default": false,
+				"scope": "resource"
+			},
+			"gsql.copyRemoveNewLine": {
+				"type": "boolean",
+				"description": "%gsql.copyRemoveNewLine%",
+				"default": true,
+				"scope": "resource"
+			},
+			"gsql.showBatchTime": {
+				"type": "boolean",
+				"description": "%gsql.showBatchTime%",
+				"default": false,
+				"scope": "resource"
+			},
+			"gsql.splitPaneSelection": {
+				"type": "string",
+				"description": "%gsql.splitPaneSelection%",
+				"default": "next",
+				"enum": [
+					"next",
+					"current",
+					"end"
+				],
+				"scope": "resource"
+			},
+			"gsql.format.alignColumnDefinitionsInColumns": {
+				"type": "boolean",
+				"description": "%gsql.format.alignColumnDefinitionsInColumns%",
+				"default": false,
+				"scope": "window"
+			},
+			"gsql.format.datatypeCasing": {
+				"type": "string",
+				"description": "%gsql.format.datatypeCasing%",
+				"default": "none",
+				"enum": [
+					"none",
+					"uppercase",
+					"lowercase"
+				],
+				"scope": "window"
+			},
+			"gsql.format.keywordCasing": {
+				"type": "string",
+				"description": "%gsql.format.keywordCasing%",
+				"default": "none",
+				"enum": [
+					"none",
+					"uppercase",
+					"lowercase"
+				],
+				"scope": "window"
+			},
+			"gsql.format.placeCommasBeforeNextStatement": {
+				"type": "boolean",
+				"description": "%gsql.format.placeCommasBeforeNextStatement%",
+				"default": false,
+				"scope": "window"
+			},
+			"gsql.format.placeSelectStatementReferencesOnNewLine": {
+				"type": "boolean",
+				"description": "%gsql.format.placeSelectStatementReferencesOnNewLine%",
+				"default": false,
+				"scope": "window"
+			},
+			"gsql.applyLocalization": {
+				"type": "boolean",
+				"description": "%gsql.applyLocalization%",
+				"default": false,
+				"scope": "window"
+			},
+			"gsql.query.displayBitAsNumber": {
+				"type": "boolean",
+				"default": true,
+				"description": "%gsql.query.displayBitAsNumber%",
+				"scope": "window"
+			},
+			"gsql.intelliSense.enableIntelliSense": {
+				"type": "boolean",
+				"default": true,
+				"description": "%gsql.intelliSense.enableIntelliSense%",
+				"scope": "window"
+			},
+			"gsql.intelliSense.enableErrorChecking": {
+				"type": "boolean",
+				"default": true,
+				"description": "%gsql.intelliSense.enableErrorChecking%",
+				"scope": "window"
+			},
+			"gsql.intelliSense.enableSuggestions": {
+				"type": "boolean",
+				"default": true,
+				"description": "%gsql.intelliSense.enableSuggestions%",
+				"scope": "window"
+			},
+			"gsql.intelliSense.enableQuickInfo": {
+				"type": "boolean",
+				"default": true,
+				"description": "%gsql.intelliSense.enableQuickInfo%",
+				"scope": "window"
+			},
+			"gsql.intelliSense.lowerCaseSuggestions": {
+				"type": "boolean",
+				"default": false,
+				"description": "%gsql.intelliSense.lowerCaseSuggestions%",
+				"scope": "window"
+			},
+			"gsql.persistQueryResultTabs": {
+				"type": "boolean",
+				"default": false,
+				"description": "%gsql.persistQueryResultTabs%",
+				"scope": "window"
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",

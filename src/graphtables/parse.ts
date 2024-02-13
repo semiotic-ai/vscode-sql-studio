@@ -221,16 +221,17 @@ function parseColumn(field: FieldDefinitionNode, schema: Schema): [string, Colum
 function parseRelation(field: FieldDefinitionNode): Relation {
 	const name = snakeCase(field.name.value);
 
-	const type = field.type.kind !== Kind.NON_NULL_TYPE ? field.type : field.type.type;
+	let table_type = field.type.kind !== Kind.NON_NULL_TYPE ? field.type : field.type.type;
 
-	if (type.kind !== Kind.LIST_TYPE) {
-		throw new Error(`Relation field must be a list type.`);
+	const type = table_type.kind === Kind.NAMED_TYPE ? 'one' : 'many';
+
+	if (table_type.kind === Kind.LIST_TYPE) {
+		table_type =
+			table_type.type.kind !== Kind.NON_NULL_TYPE ? table_type.type : table_type.type.type;
 	}
 
-	const table_type = type.type.kind !== Kind.NON_NULL_TYPE ? type.type : type.type.type;
-
 	if (table_type.kind !== Kind.NAMED_TYPE) {
-		throw new Error(`Relation field must be a list of non-nullable known/named type.`);
+		throw new Error(`Relation field must be a (list) non-nullable known/named type.`);
 	}
 
 	const table = snakeCase(table_type.name.value);
@@ -245,7 +246,7 @@ function parseRelation(field: FieldDefinitionNode): Relation {
 
 	const column = snakeCase(parseOjectField(derivedFrom, 'field', Kind.STRING));
 
-	return { name, table, column };
+	return { name, table, column, type };
 }
 
 function parseTable(table: ObjectTypeDefinitionNode, schema: Schema): [string, Table] {

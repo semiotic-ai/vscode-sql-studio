@@ -127,6 +127,10 @@ export interface Relation {
 	 * Child column name in the database
 	 */
 	column: string;
+	/**
+	 * Parent table name in the database
+	 */
+	type: 'one' | 'many';
 }
 
 /**
@@ -136,11 +140,11 @@ export interface Table {
 	/**
 	 * Table columns
 	 */
-	columns: Map<string,Column>;
+	columns: Map<string, Column>;
 	/**
 	 * Table parent-child relations by column
 	 */
-	relations: Map<string,Relation[]>;
+	relations: Map<string, Relation[]>;
 }
 
 /**
@@ -150,9 +154,9 @@ export interface Layout {
 	/**
 	 * Layout tables
 	 */
-	tables: Map<string,Table>;
+	tables: Map<string, Table>;
 	/**
 	 * Layout enums
 	 */
-	enums: Map<string,string[]>;
+	enums: Map<string, string[]>;
 }

@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import * as path from 'path';
 import { TreeItem } from 'vscode';
 import { GetLayout, getSubgraphs } from './service';

@@ -81,6 +81,13 @@
 					"title": "Subgraph Explorer",
 					"icon": "resources/the-graph.svg"
 				}
+			],
+			"panel": [
+				{
+					"id": "results",
+					"title": "Graph SQL Result",
+					"icon": "resources/the-graph.svg"
+				}
 			]
 		},
 		"views": {
@@ -92,6 +99,15 @@
 				{
 					"id": "subgraphSchema",
 					"name": "Subgraph columns"
+				}
+			],
+			"results": [
+				{
+					"id": "tabularResult",
+					"type": "webview",
+					"contextualTitle": "Graph SQL Tabular Results",
+					"name": "Graph SQL Tabular Results",
+					"visibility": "collapsed"
 				}
 			]
 		},

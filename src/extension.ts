@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { SubgraphColumnsProvider, SubgraphProvider } from './subgraphs-provider';
 import { ExecuteSQL } from './service';
+import { ResultsProvider } from './results';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -33,6 +34,12 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(subgraphSchemaView);
+
+	const resultsProvider = new ResultsProvider(context.extensionUri);
+
+	const resultView = vscode.window.registerWebviewViewProvider('tabularResult', resultsProvider);
+
+	context.subscriptions.push(resultView);
 
 	const runQueryCommand = vscode.commands.registerTextEditorCommand('query.runQuery', async () => {
 		let subgraph_path: string | undefined = undefined;

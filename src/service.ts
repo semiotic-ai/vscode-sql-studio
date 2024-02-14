@@ -329,7 +329,7 @@ const SQL_QUERY_TEMPLATE: ISubgraphQuery = {
 	extensions: {}
 };
 
-interface IQueryResult {
+export interface IQueryResult {
 	readonly data: {
 		readonly sql: {
 			readonly rowCount: number;

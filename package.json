@@ -23,8 +23,15 @@
 		"menus": {
 			"editor/context": [
 				{
-					"command": "extension.runQuery",
+					"command": "query.runQuery",
 					"when": "editorTextFocus && editorLangId == 'sql'"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "subgraphs.newQuery",
+					"when": "view == subgraphs",
+					"group": "query"
 				}
 			]
 		},
@@ -61,7 +68,7 @@
 				"when": "editorTextFocus && editorLangId == 'sql'"
 			},
 			{
-				"command": "extension.gsql.chooseSubgraph",
+				"command": "subgraphs.chooseSubgraph",
 				"key": "ctrl+m ctrl+c",
 				"mac": "cmd+m cmd+c",
 				"when": "editorTextFocus && editorLangId == 'sql'"
@@ -70,39 +77,40 @@
 		"viewsContainers": {
 			"activitybar": [
 				{
-					"id": "subgraph-explorer",
+					"id": "subgraphExplorer",
 					"title": "Subgraph Explorer",
 					"icon": "resources/the-graph.svg"
 				}
 			]
 		},
 		"views": {
-			"subgraph-explorer": [
+			"subgraphExplorer": [
 				{
-					"id": "subgraph-available",
+					"id": "subgraphs",
 					"name": "Available Subgraphs"
 				},
 				{
-					"id": "subgraph-columns",
+					"id": "subgraphSchema",
 					"name": "Subgraph columns"
 				}
 			]
 		},
 		"viewsWelcome": [
 			{
-				"view": "subgraph-columns",
+				"view": "subgraphSchema",
 				"contents": "In order to view an specific subgraph columns, select a SQL enabled subgraph.",
 				"when": "workbenchState == empty"
 			}
 		],
 		"configuration": {
-			"type": "object",
 			"title": "GRAPHSQL configuration",
-			"graphsql.gateway": {
-				"type": "string",
-				"description": "Gateway",
-				"default": "http://eth.rubik.com.tr:8000/subgraphs/name",
-				"scope": "resource"
+			"properties": {
+				"graphsql.gateway": {
+					"type": "string",
+					"description": "Gateway",
+					"default": "http://eth.rubik.com.tr:8000/subgraphs/name",
+					"scope": "resource"
+				}
 			}
 		}
 	},

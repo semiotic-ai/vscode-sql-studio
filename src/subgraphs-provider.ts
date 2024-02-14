@@ -120,19 +120,21 @@ export class SubgraphColumnsProvider implements vscode.TreeDataProvider<vscode.T
 	emitter: vscode.EventEmitter<vscode.TreeItem | undefined | void>;
 	onDidChangeTreeData: vscode.Event<void | vscode.TreeItem | vscode.TreeItem[] | null | undefined>;
 	// tables: { [name: string]: { [colunm: string]: string } };
-	layout: Layout | undefined;
+	subgraph_layout: Layout | undefined;
+	subgraph_name: string | undefined;
 
 	constructor(context: vscode.ExtensionContext) {
 		this.emitter = new vscode.EventEmitter();
 		this.onDidChangeTreeData = this.emitter.event;
+
 		// this.tables = {};
 	}
 
-	async updateSelectedSubgraph(subgraph?: string) {
-		if (subgraph) {
+	async updateSelectedSubgraph(subgraph_id?: string, name?: string) {
+		if (subgraph_id) {
 			try {
-				this.layout = await this.fetchLayout(subgraph);
-
+				this.subgraph_layout = await this.fetchLayout(subgraph_id);
+				this.subgraph_name = name;
 				// this.tables = {
 				// 	test: {
 				// 		id: 'ID',
@@ -154,12 +156,12 @@ export class SubgraphColumnsProvider implements vscode.TreeDataProvider<vscode.T
 	}
 
 	async getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
-		if (!this.layout) {
+		if (!this.subgraph_layout) {
 			return [];
 		}
 		const items: vscode.TreeItem[] = [];
 		if (element?.label) {
-			const columns = this.layout.tables.get(element.label as string)?.columns;
+			const columns = this.subgraph_layout.tables.get(element.label as string)?.columns;
 			if (!columns) {
 				return [];
 			}
@@ -181,7 +183,7 @@ export class SubgraphColumnsProvider implements vscode.TreeDataProvider<vscode.T
 				items.push(new Column(column_name, getType(column.type)));
 			}
 		} else {
-			for (const [table_name, table] of this.layout.tables) {
+			for (const [table_name, table] of this.subgraph_layout.tables) {
 				items.push(new Table(table_name));
 			}
 		}

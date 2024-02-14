@@ -2,27 +2,58 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { SubgraphColumnsProvider, SubgraphProvider } from './subgraphs-provider';
+import { ExecuteSQL } from './service';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	const subgraphsAvailable = vscode.window.createTreeView('subgraph-available', {
+	const subgraphsView = vscode.window.createTreeView('subgraphs', {
 		treeDataProvider: new SubgraphProvider(context)
 	});
 
-	context.subscriptions.push(subgraphsAvailable);
+	context.subscriptions.push(subgraphsView);
 
 	const subgraphColumnsProvider = new SubgraphColumnsProvider(context);
 
-	vscode.window.createTreeView('subgraph-columns', {
+	const subgraphSchemaView = vscode.window.createTreeView('subgraphSchema', {
 		treeDataProvider: subgraphColumnsProvider
 	});
 
-	subgraphsAvailable.onDidChangeSelection(async (e) => {
-		await subgraphColumnsProvider.updateSelectedSubgraph(e.selection[0].id);
+	subgraphsView.onDidChangeSelection(async (e) => {
+		const subgraph_name = e.selection[0].label as string;
+		const subgraph_id = e.selection[0].id;
+		await subgraphColumnsProvider.updateSelectedSubgraph(subgraph_id, subgraph_name);
 	});
 
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(subgraphSchemaView);
+
+	const newQueryCommand = vscode.commands.registerCommand('subgraphs.newQuery', async () => {
+		const document = await vscode.workspace.openTextDocument({ language: 'sql' });
+		const editor = await vscode.window.showTextDocument(document);
+	});
+
+	context.subscriptions.push(subgraphSchemaView);
+
+	const runQueryCommand = vscode.commands.registerTextEditorCommand('query.runQuery', async () => {
+		let subgraph_path: string | undefined = undefined;
+
+		switch (subgraphColumnsProvider.subgraph_name?.toLowerCase()) {
+			case 'substreams uniswap v3 ethereum':
+				subgraph_path = 'tumay/uniswap-v3';
+				break;
+			case 'odos v2':
+				subgraph_path = 'odos/v2';
+				break;
+		}
+
+		const query = vscode.window.activeTextEditor?.document.getText();
+
+		if (subgraph_path && query) {
+			const gateway = vscode.workspace.getConfiguration('graphsql').get('gateway');
+			const endpoint = gateway + '/' + subgraph_path;
+			const result = await ExecuteSQL(endpoint, query);
+		}
+	});
 }
 
 // This method is called when your extension is deactivated

@@ -238,7 +238,8 @@ async function CallGraphQL<B, R>(endpoint: string, body: B): Promise<R> {
 			'content-type': 'application/json'
 		},
 		body: JSON.stringify(body),
-		method: 'POST'
+		method: 'POST',
+		signal: AbortSignal.timeout(5 * 60 * 1000) // 5 minutes
 	});
 
 	// @ts-ignore

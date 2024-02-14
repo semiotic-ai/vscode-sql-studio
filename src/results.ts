@@ -43,20 +43,8 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 	}
 
 	private _getHtmlForWebview(webview: vscode.Webview) {
-		// Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
-		const scriptUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(this._extensionUri, 'resources/media', 'main.js')
-		);
-
-		// Do the same for the stylesheet.
-		const styleResetUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(this._extensionUri, 'resources/media', 'reset.css')
-		);
-		const styleVSCodeUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(this._extensionUri, 'resources/media', 'vscode.css')
-		);
-		const styleMainUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(this._extensionUri, 'resources/media', 'main.css')
+		const baseUri = webview.asWebviewUri(
+			vscode.Uri.joinPath(this._extensionUri, 'resources/media/')
 		);
 
 		// Use a nonce to only allow a specific script to be run.
@@ -75,17 +63,17 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
 
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<base href="${baseUri}" target="_blank">
 
-				<link href="${styleResetUri}" rel="stylesheet">
-				<link href="${styleVSCodeUri}" rel="stylesheet">
-				<link href="${styleMainUri}" rel="stylesheet">
-				<link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
-				<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
-
+				<link href="reset.css" rel="stylesheet">
+				<link href="vscode.css" rel="stylesheet">
+				<link href="datatable.css" rel="stylesheet">
+				<link href="main.css" rel="stylesheet">
 				<title>Query Result</title>
 			</head>
 			<body>
-				<script nonce="${nonce}" src="${scriptUri}"></script>
+				<div id="tableContainer"></div>
+				<script nonce="${nonce}" src="main.js" type="module"></script>
 			</body>
 			</html>`;
 	}

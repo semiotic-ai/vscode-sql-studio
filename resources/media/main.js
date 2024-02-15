@@ -11,18 +11,59 @@ import * as simpleDatatables from './datatable.js';
 
 	// Handle messages sent from the extension to the webview
 	window.addEventListener('message', (event) => {
-		const data = event.data.result.data.sql; // The json data that the extension sent
-		data.rows = data.rows.map((r) => Object.values(r));
-		updateDataTable(data);
-		vscode.setState(data); // Save the current state
+		const message = event.data; // The JSON data our extension sent
+
+		if (message.type === 'start') {
+			onExecutionStart();
+			return;
+		} else if (message.type === 'finish') {
+			const data = message.data.data.sql;
+			data.rows = data.rows.map((r) => Object.values(r));
+			onExecutionFinish(data);
+			return;
+		} else if (message.type === 'error') {
+			onExecutionError(message.data);
+		}
 	});
 
-	function updateDataTable(data) {
-		const datatable = new window.simpleDatatables.DataTable('#tableContainer', {
+	const queryMessages = document.getElementById('queryMessages');
+	const tableContainer = document.getElementById('tableContainer');
+
+	let datatable = null;
+
+	function onExecutionStart() {
+		if (datatable) {
+			datatable.destroy();
+			datatable = null;
+		}
+
+		queryMessages.innerHTML = '<div class="executing">Executing</div>';
+	}
+
+	function onExecutionError(error) {
+		if (datatable) {
+			datatable.destroy();
+			datatable = null;
+		}
+
+		queryMessages.innerHTML = `<div class="error">${error}</div>`;
+	}
+
+	function onExecutionFinish(data) {
+		if (datatable) {
+			datatable.destroy();
+			datatable = null;
+		}
+
+		queryMessages.innerHTML = '';
+
+		datatable = new window.simpleDatatables.DataTable('#tableContainer', {
 			data: {
 				headings: data.columns,
 				data: data.rows
 			}
 		});
+
+		vscode.setState(data);
 	}
 })();

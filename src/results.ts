@@ -1,10 +1,12 @@
 import * as vscode from 'vscode';
-import { IQueryResult } from './service';
+import { IQueryResult, ExecuteSQL } from './service';
 
 export class ResultsProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'tabularResult';
 
 	private _view?: vscode.WebviewView;
+
+	private abortController?: AbortController;
 
 	constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -34,10 +36,30 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 		});
 	}
 
-	public async renderResult(result?: IQueryResult): Promise<boolean> {
+	public async execute(enpoint: string, query: string) {
+		if (this.abortController) {
+			this.abortController.abort();
+		}
+		this.abortController = new AbortController();
+
+		await this.posMessage({ type: 'start' });
+
+		const signal = this.abortController.signal;
+
+		const result = await ExecuteSQL(enpoint, query, signal);
+
+		await this.posMessage({ type: 'finish', data: result });
+
+		this.abortController = undefined;
+	}
+
+	private async posMessage(message: {
+		type: 'start' | 'finish' | 'error';
+		data?: IQueryResult | string;
+	}): Promise<boolean> {
 		if (this._view) {
 			this._view.show?.(true);
-			return await this._view.webview.postMessage({ result: result });
+			return await this._view.webview.postMessage(message);
 		}
 		return false;
 	}
@@ -73,6 +95,7 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 			</head>
 			<body>
 				<div id="tableContainer"></div>
+				<div id="queryMessages"></div>
 				<script nonce="${nonce}" src="main.js" type="module"></script>
 			</body>
 			</html>`;

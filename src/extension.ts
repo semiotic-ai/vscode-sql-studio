@@ -58,8 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if (subgraph_path && query) {
 			const gateway = vscode.workspace.getConfiguration('graphsql').get('gateway');
 			const endpoint = gateway + '/' + subgraph_path;
-			const result = await ExecuteSQL(endpoint, query);
-			await resultsProvider.renderResult(result);
+			await resultsProvider.execute(endpoint, query);
 		}
 	});
 }

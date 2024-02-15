@@ -230,7 +230,7 @@ export async function getSubgraphs(first: number, skip: number): Promise<ISubgra
 	}));
 }
 
-async function CallGraphQL<B, R>(endpoint: string, body: B): Promise<R> {
+async function CallGraphQL<B, R>(endpoint: string, body: B, abortSignal?: AbortSignal): Promise<R> {
 	const response = await fetch(endpoint, {
 		headers: {
 			accept: 'application/graphql-response+json, application/json, multipart/mixed',
@@ -239,7 +239,7 @@ async function CallGraphQL<B, R>(endpoint: string, body: B): Promise<R> {
 		},
 		body: JSON.stringify(body),
 		method: 'POST',
-		signal: AbortSignal.timeout(5 * 60 * 1000) // 5 minutes
+		signal: abortSignal
 	});
 
 	// @ts-ignore
@@ -346,12 +346,16 @@ export interface IQueryResult {
  * @param query SQL query to execute
  * @returns result of the query
  */
-export async function ExecuteSQL(endpoint: string, query: string): Promise<IQueryResult> {
+export async function ExecuteSQL(
+	endpoint: string,
+	query: string,
+	abortSignal?: AbortSignal
+): Promise<IQueryResult> {
 	const body = CheapCopy(SQL_QUERY_TEMPLATE);
 
 	body.variables.query = query;
 
-	const json_response: IQueryResult = await CallGraphQL(endpoint, body);
+	const json_response: IQueryResult = await CallGraphQL(endpoint, body, abortSignal);
 
 	return json_response;
 }

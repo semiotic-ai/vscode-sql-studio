@@ -1,9 +1,10 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { SubgraphColumnsProvider, SubgraphProvider } from './subgraphs-provider';
+import { SubgraphSchemaProvider, SubgraphProvider } from './subgraphs-provider';
 import { ExecuteSQL } from './service';
 import { ResultsProvider } from './results';
+import { SqlDocumentDropProvider } from './sqldoc';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -14,16 +15,17 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(subgraphsView);
 
-	const subgraphColumnsProvider = new SubgraphColumnsProvider(context);
+	const subgraphSchemaProvider = new SubgraphSchemaProvider(context);
 
 	const subgraphSchemaView = vscode.window.createTreeView('subgraphSchema', {
-		treeDataProvider: subgraphColumnsProvider
+		treeDataProvider: subgraphSchemaProvider,
+		dragAndDropController: subgraphSchemaProvider
 	});
 
 	subgraphsView.onDidChangeSelection(async (e) => {
 		const subgraph_name = e.selection[0].label as string;
 		const subgraph_id = e.selection[0].id;
-		await subgraphColumnsProvider.updateSelectedSubgraph(subgraph_id, subgraph_name);
+		await subgraphSchemaProvider.updateSelectedSubgraph(subgraph_id, subgraph_name);
 	});
 
 	context.subscriptions.push(subgraphSchemaView);
@@ -44,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const runQueryCommand = vscode.commands.registerTextEditorCommand('query.runQuery', async () => {
 		let subgraph_path: string | undefined = undefined;
 
-		switch (subgraphColumnsProvider.subgraph_name?.toLowerCase()) {
+		switch (subgraphSchemaProvider.subgraph_name?.toLowerCase()) {
 			case 'substreams uniswap v3 ethereum':
 				subgraph_path = 'tumay/uniswap-v3';
 				break;
@@ -61,6 +63,14 @@ export function activate(context: vscode.ExtensionContext) {
 			await resultsProvider.execute(endpoint, query);
 		}
 	});
+
+	context.subscriptions.push(runQueryCommand);
+
+	const selector: vscode.DocumentSelector = { language: 'sql' };
+
+	context.subscriptions.push(
+		vscode.languages.registerDocumentDropEditProvider(selector, new SqlDocumentDropProvider())
+	);
 }
 
 // This method is called when your extension is deactivated

@@ -115,9 +115,41 @@ class Subgraph extends vscode.TreeItem {
 	};
 }
 
-export class SubgraphColumnsProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-	emitter: vscode.EventEmitter<vscode.TreeItem | undefined | void>;
-	onDidChangeTreeData: vscode.Event<void | vscode.TreeItem | vscode.TreeItem[] | null | undefined>;
+class SchemaTable extends vscode.TreeItem {
+	constructor(public readonly label: string) {
+		super(label, vscode.TreeItemCollapsibleState.Collapsed);
+		this.id = label;
+	}
+
+	iconPath = {
+		light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
+		dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
+	};
+}
+
+class SchemaColumn extends vscode.TreeItem {
+	constructor(
+		public readonly label: string,
+		public readonly type: string
+	) {
+		super(label, vscode.TreeItemCollapsibleState.None);
+		// this.id = label;
+		this.description = type;
+	}
+
+	iconPath = {
+		light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
+		dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
+	};
+}
+
+type SchemaItem = SchemaTable | SchemaColumn;
+
+export class SubgraphSchemaProvider
+	implements vscode.TreeDataProvider<SchemaItem>, vscode.TreeDragAndDropController<SchemaItem>
+{
+	emitter: vscode.EventEmitter<SchemaItem | undefined | void>;
+	onDidChangeTreeData: vscode.Event<void | SchemaItem | SchemaItem[] | null | undefined>;
 	// tables: { [name: string]: { [colunm: string]: string } };
 	subgraph_layout: Layout | undefined;
 	subgraph_name: string | undefined;
@@ -127,6 +159,31 @@ export class SubgraphColumnsProvider implements vscode.TreeDataProvider<vscode.T
 		this.onDidChangeTreeData = this.emitter.event;
 
 		// this.tables = {};
+	}
+
+	dropMimeTypes: readonly string[] = [];
+	dragMimeTypes: readonly string[] = ['text/plain'];
+
+	public async handleDrag?(
+		source: readonly SchemaItem[],
+		dataTransfer: vscode.DataTransfer,
+		token: vscode.CancellationToken
+	): Promise<void> {
+		if (source.length !== 1) {
+			return;
+		}
+
+		const item = source[0];
+
+		dataTransfer.set('text/plain', new vscode.DataTransferItem(item.label));
+	}
+
+	public async handleDrop?(
+		target: SchemaItem | undefined,
+		dataTransfer: vscode.DataTransfer,
+		token: vscode.CancellationToken
+	): Promise<void> {
+		return;
 	}
 
 	async updateSelectedSubgraph(subgraph_id?: string, name?: string) {
@@ -154,11 +211,11 @@ export class SubgraphColumnsProvider implements vscode.TreeDataProvider<vscode.T
 		return element;
 	}
 
-	async getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
+	async getChildren(element?: SchemaItem): Promise<SchemaItem[]> {
 		if (!this.subgraph_layout) {
 			return [];
 		}
-		const items: vscode.TreeItem[] = [];
+		const items: SchemaItem[] = [];
 		if (element?.label) {
 			const columns = this.subgraph_layout.tables.get(element.label as string)?.columns;
 			if (!columns) {
@@ -179,11 +236,11 @@ export class SubgraphColumnsProvider implements vscode.TreeDataProvider<vscode.T
 							return type.dbType;
 					}
 				}
-				items.push(new Column(column_name, getType(column.type)));
+				items.push(new SchemaColumn(column_name, getType(column.type)));
 			}
 		} else {
 			for (const [table_name, table] of this.subgraph_layout.tables) {
-				items.push(new Table(table_name));
+				items.push(new SchemaTable(table_name));
 			}
 		}
 		return items;
@@ -202,32 +259,4 @@ export class SubgraphColumnsProvider implements vscode.TreeDataProvider<vscode.T
 
 		return data;
 	}
-}
-
-class Table extends vscode.TreeItem {
-	constructor(public readonly label: string) {
-		super(label, vscode.TreeItemCollapsibleState.Collapsed);
-		this.id = label;
-	}
-
-	iconPath = {
-		light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
-		dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
-	};
-}
-
-class Column extends vscode.TreeItem {
-	constructor(
-		public readonly label: string,
-		public readonly type: string
-	) {
-		super(label, vscode.TreeItemCollapsibleState.None);
-		// this.id = label;
-		this.description = type;
-	}
-
-	iconPath = {
-		light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
-		dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
-	};
 }

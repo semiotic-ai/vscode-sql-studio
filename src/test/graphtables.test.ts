@@ -37,7 +37,7 @@ suite('basic', () => {
 
 	test('single table parsed', () => assert.strictEqual(layout.tables.size, 1));
 
-	const table = layout.tables.get('some_complex_table_erc20_name');
+	const table = layout.tables.get('some_complex_table_erc_20_name');
 
 	test('table name is snake case', () => assert.notStrictEqual(table, undefined));
 	test('column count is 11', () => assert.strictEqual(table!.columns.size, 11));
@@ -84,7 +84,7 @@ suite('basic', () => {
 		{ name: 'bytes_field', expected: DBType.Bytea },
 		{ name: 'big_decimal_field', expected: DBType.Numeric },
 		{ name: 'int_field', expected: DBType.Integer },
-		{ name: 'int8_field', expected: DBType.Int8 },
+		{ name: 'int_8_field', expected: DBType.Int8 },
 		{ name: 'string_field', expected: DBType.Text }
 	];
 
@@ -113,19 +113,19 @@ suite('enum', () => {
     }
 `;
 
-	const expected_enum_name = 'some_complex_named_erc20';
+	const expected_enum_name = 'some_complex_named_erc_20';
 	const expected_table_name = 'some_enum_table';
 
 	const layout = parse(enum_schema);
 
 	test('is parsed', () => assert.strictEqual(layout.enums.size, 1));
-	test('name is `some_complex_named_erc20`', () =>
+	test('name is `some_complex_named_erc_20`', () =>
 		assert.strictEqual(layout.enums.has(expected_enum_name), true));
 
 	const enum_column = layout.tables.get(expected_table_name)!.columns.get('enum_field')!;
 
 	test('column type is `EnumType`', () => assert.strictEqual(enum_column.type.kind, TypeKind.Enum));
-	test('column enum name is `some_complex_named_erc20`', () =>
+	test('column enum name is `some_complex_named_erc_20`', () =>
 		assert.strictEqual((enum_column.type as EnumType).name, expected_enum_name));
 });
 

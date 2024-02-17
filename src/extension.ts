@@ -23,9 +23,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	subgraphsView.onDidChangeSelection(async (e) => {
-		const subgraph_name = e.selection[0].label as string;
-		const subgraph_id = e.selection[0].id;
-		await subgraphSchemaProvider.updateSelectedSubgraph(subgraph_id, subgraph_name);
+		const subgraphInfo = e.selection[0];
+		await subgraphSchemaProvider.updateSelectedSubgraph(subgraphInfo.info);
 	});
 
 	context.subscriptions.push(subgraphSchemaView);
@@ -46,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const runQueryCommand = vscode.commands.registerTextEditorCommand('query.runQuery', async () => {
 		let subgraph_path: string | undefined = undefined;
 
-		switch (subgraphSchemaProvider.subgraph_name?.toLowerCase()) {
+		switch (subgraphSchemaProvider.subgraphInfo?.displayName.toLowerCase()) {
 			case 'substreams uniswap v3 ethereum':
 				subgraph_path = 'tumay/uniswap-v3';
 				break;
@@ -60,7 +59,8 @@ export function activate(context: vscode.ExtensionContext) {
 		if (subgraph_path && query) {
 			const gateway = vscode.workspace.getConfiguration('graphsql').get('gateway');
 			const endpoint = gateway + '/' + subgraph_path;
-			await resultsProvider.execute(endpoint, query);
+			const subgraphImage = subgraphSchemaProvider.subgraphInfo?.image || '';
+			await resultsProvider.execute(endpoint, query, subgraphImage);
 		}
 	});
 

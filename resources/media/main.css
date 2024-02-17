@@ -7,9 +7,21 @@ body {
 #container {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	justify-content: center;
 	height: 100vh;
+}
+
+.message {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+.subgraph {
+	padding: 0.5em;
+	width: 10em;
+	height: 10em;
 }
 
 /* HTML: <div class="loader"></div> */
@@ -17,10 +29,19 @@ body {
 	--s: 25px;
 	--g: 5px;
 
-	width: calc(2 * (1.353 * var(--s) + var(--g)));
-	aspect-ratio: 1;
-	background:
-		linear-gradient(#ff1818 0 0) left/50% 100% no-repeat,
+	width: calc(3 * (1.353 * var(--s) + var(--g)));
+	display: grid;
+	justify-items: end;
+	aspect-ratio: 3;
+	overflow: hidden;
+	--_m: linear-gradient(90deg, #0000, #000 15px calc(100% - 15px), #0000);
+	-webkit-mask: var(--_m);
+	mask: var(--_m);
+}
+.loading:before {
+	content: '';
+	width: 200%;
+	background: linear-gradient(90deg, #ff1818 50%, #0000 0),
 		conic-gradient(
 			from -90deg at var(--s) calc(0.353 * var(--s)),
 			#fff 135deg,
@@ -37,42 +58,17 @@ body {
 		conic-gradient(from -90deg at right var(--g) bottom var(--g), #000 90deg, #0000 0);
 	-webkit-mask: var(--_m);
 	mask: var(--_m);
-	background-size: 50% 50%;
-	-webkit-mask-size: 50% 50%;
-	mask-size: 50% 50%;
+	background-size:
+		calc(100% / 3) 100%,
+		calc(100% / 6) 100%;
+	-webkit-mask-size: calc(100% / 6) 100%;
+	mask-size: calc(100% / 6) 100%;
 	-webkit-mask-composite: source-in;
 	mask-composite: intersect;
-	animation: l9 1.5s infinite;
+	animation: l10 1s infinite linear;
 }
-@keyframes l9 {
-	0%,
-	12.5% {
-		background-position:
-			0% 0%,
-			0 0;
-	}
-	12.6%,
-	37.5% {
-		background-position:
-			100% 0%,
-			0 0;
-	}
-	37.6%,
-	62.5% {
-		background-position:
-			100% 100%,
-			0 0;
-	}
-	62.6%,
-	87.5% {
-		background-position:
-			0% 100%,
-			0 0;
-	}
-	87.6%,
-	100% {
-		background-position:
-			0% 0%,
-			0 0;
+@keyframes l10 {
+	to {
+		transform: translate(calc(100% / 3));
 	}
 }

@@ -36,13 +36,13 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 		});
 	}
 
-	public async execute(enpoint: string, query: string) {
+	public async execute(enpoint: string, query: string, subgraphImage: string) {
 		if (this.abortController) {
 			this.abortController.abort();
 		}
 		this.abortController = new AbortController();
 
-		await this.posMessage({ type: 'start' });
+		await this.posMessage({ type: 'start', data: subgraphImage });
 
 		const signal = this.abortController.signal;
 
@@ -82,7 +82,7 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 					and only allow scripts that have a specific nonce.
 					(See the 'webview-sample' extension sample for img-src content security policy examples)
 				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}'; img-src 'self' ${webview.cspSource} https://api.thegraph.com/;">
 
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<base href="${baseUri}" target="_blank">
@@ -94,8 +94,7 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 				<title>Query Result</title>
 			</head>
 			<body>
-				<div id="tableContainer"></div>
-				<div id="queryMessages"></div>
+				<div id="container"></div>
 				<script nonce="${nonce}" src="main.js" type="module"></script>
 			</body>
 			</html>`;

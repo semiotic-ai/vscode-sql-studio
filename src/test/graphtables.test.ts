@@ -234,7 +234,8 @@ suite('real life samples', () => {
 		'schema2.graphql',
 		'schema3.graphql',
 		'schema4.graphql',
-		'schema5.graphql'
+		'schema5.graphql',
+		'schema6.graphql'
 	].forEach((schema_file) => {
 		test(schema_file, () => {
 			const graphql_schema = readFileSync(

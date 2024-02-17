@@ -1,27 +1,43 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { TreeItem } from 'vscode';
-import { GetLayout, getSubgraphs } from './service';
+import { GetLayout, ISubgraphInfo, getSubgraphs } from './service';
 import { ColumnType, Layout, TypeKind } from './graphtables/layout';
 
 const PAGE_SIZE = 20;
 const LOAD_MORE_COMMAND = 'subgraphs.loadMoreSubgraphs';
 
-const moreButton = () => {
-	const item = new TreeItem(`More...`, vscode.TreeItemCollapsibleState.None);
-	item.iconPath = new vscode.ThemeIcon(`add`);
-	item.command = {
-		command: LOAD_MORE_COMMAND,
-		title: 'Load more'
-	};
+class SubgraphItem extends vscode.TreeItem {
+	constructor(
+		public readonly info?: ISubgraphInfo,
+		public readonly collapsibleState?: vscode.TreeItemCollapsibleState
+	) {
+		const label = info?.displayName || 'More...';
+		const state = collapsibleState || vscode.TreeItemCollapsibleState.None;
+		super(label, state);
+		this.tooltip = info ? `${this.label}-${info.currentVersion}` : 'Load more';
+		this.description = info ? info.currentVersion : 'Load more';
+		this.iconPath = new vscode.ThemeIcon(`database`);
 
+		if (!info) {
+			this.command = {
+				command: LOAD_MORE_COMMAND,
+				title: 'Load more'
+			};
+			this.iconPath = new vscode.ThemeIcon(`add`);
+		}
+	}
+}
+
+const moreButton = () => {
+	const item = new SubgraphItem(undefined, vscode.TreeItemCollapsibleState.None);
 	return item;
 };
 
-export class SubgraphProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-	emitter: vscode.EventEmitter<vscode.TreeItem | undefined | void>;
+export class SubgraphProvider implements vscode.TreeDataProvider<SubgraphItem> {
+	emitter: vscode.EventEmitter<SubgraphItem | undefined | void>;
 	onDidChangeTreeData?:
-		| vscode.Event<void | vscode.TreeItem | vscode.TreeItem[] | null | undefined>
+		| vscode.Event<void | SubgraphItem | SubgraphItem[] | null | undefined>
 		| undefined;
 	cache: { [key: string]: object[] };
 
@@ -39,12 +55,12 @@ export class SubgraphProvider implements vscode.TreeDataProvider<vscode.TreeItem
 		context.subscriptions.push(loadMoreSubgraphs);
 	}
 
-	getTreeItem(element: Subgraph): vscode.TreeItem {
+	getTreeItem(element: SubgraphItem): SubgraphItem {
 		return element;
 	}
 
-	async getChildren(element?: Subgraph): Promise<vscode.TreeItem[]> {
-		let items: vscode.TreeItem[] = await this.fetchSubgraphs(false);
+	async getChildren(element?: SubgraphItem): Promise<SubgraphItem[]> {
+		let items: SubgraphItem[] = await this.fetchSubgraphs(false);
 		items.push(moreButton());
 		return items;
 	}
@@ -73,13 +89,7 @@ export class SubgraphProvider implements vscode.TreeDataProvider<vscode.TreeItem
 			if (data.length > 0) {
 				// Here, I am mapping to UserItem, which is type of `TreeView`
 				const items = data.map(
-					(item) =>
-						new Subgraph(
-							item.deploymentSchemaId,
-							item.displayName,
-							item.currentVersion,
-							vscode.TreeItemCollapsibleState.None
-						)
+					(item) => new SubgraphItem(item, vscode.TreeItemCollapsibleState.None)
 				);
 				if (this.cache[key]) {
 					this.cache[key].push(...items);
@@ -94,25 +104,6 @@ export class SubgraphProvider implements vscode.TreeDataProvider<vscode.TreeItem
 		// Return a copy
 		return this.cache[key].slice(0);
 	}
-}
-
-class Subgraph extends vscode.TreeItem {
-	constructor(
-		public id: string,
-		public readonly label: string,
-		private version: string,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState
-	) {
-		super(label, collapsibleState);
-		// this.id = deploymentId;
-		this.tooltip = `${this.label}-${this.version}`;
-		this.description = this.version;
-	}
-
-	iconPath = {
-		light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
-		dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
-	};
 }
 
 class SchemaTable extends vscode.TreeItem {
@@ -151,8 +142,8 @@ export class SubgraphSchemaProvider
 	emitter: vscode.EventEmitter<SchemaItem | undefined | void>;
 	onDidChangeTreeData: vscode.Event<void | SchemaItem | SchemaItem[] | null | undefined>;
 	// tables: { [name: string]: { [colunm: string]: string } };
-	subgraph_layout: Layout | undefined;
-	subgraph_name: string | undefined;
+	subgraphLayout: Layout | undefined;
+	subgraphInfo: ISubgraphInfo | undefined;
 
 	constructor(context: vscode.ExtensionContext) {
 		this.emitter = new vscode.EventEmitter();
@@ -186,18 +177,11 @@ export class SubgraphSchemaProvider
 		return;
 	}
 
-	async updateSelectedSubgraph(subgraph_id?: string, name?: string) {
-		if (subgraph_id) {
+	async updateSelectedSubgraph(subgraphInfo?: ISubgraphInfo) {
+		if (subgraphInfo) {
 			try {
-				this.subgraph_layout = await this.fetchLayout(subgraph_id);
-				this.subgraph_name = name;
-				// this.tables = {
-				// 	test: {
-				// 		id: 'ID',
-				// 		name: 'string',
-				// 		total_value: 'uint256'
-				// 	}
-				// };
+				this.subgraphLayout = await this.fetchLayout(subgraphInfo.deploymentSchemaId);
+				this.subgraphInfo = subgraphInfo;
 				this.refresh();
 			} catch (error) {
 				vscode.window.showInformationMessage(
@@ -207,17 +191,17 @@ export class SubgraphSchemaProvider
 		}
 	}
 
-	getTreeItem(element: Subgraph): vscode.TreeItem {
+	getTreeItem(element: SchemaItem): SchemaItem {
 		return element;
 	}
 
 	async getChildren(element?: SchemaItem): Promise<SchemaItem[]> {
-		if (!this.subgraph_layout) {
+		if (!this.subgraphLayout) {
 			return [];
 		}
 		const items: SchemaItem[] = [];
 		if (element?.label) {
-			const columns = this.subgraph_layout.tables.get(element.label as string)?.columns;
+			const columns = this.subgraphLayout.tables.get(element.label as string)?.columns;
 			if (!columns) {
 				return [];
 			}
@@ -239,7 +223,7 @@ export class SubgraphSchemaProvider
 				items.push(new SchemaColumn(column_name, getType(column.type)));
 			}
 		} else {
-			for (const [table_name, table] of this.subgraph_layout.tables) {
+			for (const [table_name, table] of this.subgraphLayout.tables) {
 				items.push(new SchemaTable(table_name));
 			}
 		}

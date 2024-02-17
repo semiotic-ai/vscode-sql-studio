@@ -35,19 +35,18 @@ export const IMMUTABLE_ARGUMENT_NAME = 'immutable';
 
 /**
  * Virtual ID column name
-*/
+ */
 export const VIRTUAL_ID_COLUMN_NAME = 'vid';
 
 /**
  * Block range column name for mutable entities
-*/
+ */
 export const BLOCK_RANGE_COLUMN_NAME = 'block_range';
 
 /**
  * Block column name for immutable entities
-*/
+ */
 export const BLOCK_COLUMN_NAME = 'block$';
-
 
 /**
  * Checks if the field is a derived list of child objects

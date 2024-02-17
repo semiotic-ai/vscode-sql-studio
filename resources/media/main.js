@@ -37,7 +37,7 @@ import * as simpleDatatables from './datatable.js';
 			datatable = null;
 		}
 
-		queryMessages.innerHTML = '<div class="executing">Executing</div>';
+		queryMessages.innerHTML = '<div class="loading"></div>';
 	}
 
 	function onExecutionError(error) {

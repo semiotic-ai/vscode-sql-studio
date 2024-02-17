@@ -110,29 +110,29 @@ type Party @entity {
   isClosed: Boolean
 
   # Members
-  members: [UserParty!]! @derivedFrom(field: \"party\")
+  members: [UserParty!]! @derivedFrom(field: "party")
   membersCount: Int!
 
   # JoinRequets
-  requests: [JoinRequest!]! @derivedFrom(field: \"party\")
+  requests: [JoinRequest!]! @derivedFrom(field: "party")
 
   # PartyTokenGate
-  partyTokenGate: PartyTokenGate @derivedFrom(field: \"party\")
+  partyTokenGate: PartyTokenGate @derivedFrom(field: "party")
 
   # Investments
   trackedAssets: [Asset!]!
-  investments: [Investment!]! @derivedFrom(field: \"party\")
+  investments: [Investment!]! @derivedFrom(field: "party")
 
   # Investment cost (deposits, withdrawals)
-  investmentCost: InvestmentCost @derivedFrom(field: \"party\")
+  investmentCost: InvestmentCost @derivedFrom(field: "party")
 
   # Party state
   shares: ShareState!
-  sharesHistory: [ShareState!]! @derivedFrom(field: \"party\")
+  sharesHistory: [ShareState!]! @derivedFrom(field: "party")
   portfolio: PortfolioState!
-  portfolioHistory: [PortfolioState!]! @derivedFrom(field: \"party\")
+  portfolioHistory: [PortfolioState!]! @derivedFrom(field: "party")
   state: PartyState!
-  stateHistory: [PartyState!]! @derivedFrom(field: \"party\")
+  stateHistory: [PartyState!]! @derivedFrom(field: "party")
   firstInvestmentState: PartyState
 
   # Last activity
@@ -145,14 +145,14 @@ type User @entity {
 
   partyOwner: Boolean!
   partyOwnerSince: BigInt
-  partyOwning: [Party!]! @derivedFrom(field: \"creator\")
+  partyOwning: [Party!]! @derivedFrom(field: "creator")
 
   investor: Boolean!
   investorSince: BigInt
-  investments: [Investment!]! @derivedFrom(field: \"investor\")
+  investments: [Investment!]! @derivedFrom(field: "investor")
 
-  parties: [UserParty!] @derivedFrom(field: \"user\")
-  requests: [JoinRequest!] @derivedFrom(field: \"user\")
+  parties: [UserParty!] @derivedFrom(field: "user")
+  requests: [JoinRequest!] @derivedFrom(field: "user")
 }
 
 type UserParty @entity {
@@ -171,7 +171,7 @@ type UserParty @entity {
 type PartyTokenGate @entity {
   id: Bytes! # Address of the Party
   party: Party!
-  tokens: [TokenGate!] @derivedFrom(field: \"partyTokenGate\")
+  tokens: [TokenGate!] @derivedFrom(field: "partyTokenGate")
   updatedAt: BigInt!
 }
 
@@ -193,7 +193,7 @@ type Investment @entity {
   investor: User!
   shares: BigDecimal!
   state: InvestmentState!
-  stateHistory: [InvestmentState!]! @derivedFrom(field: \"investment\")
+  stateHistory: [InvestmentState!]! @derivedFrom(field: "investment")
 }
 
 type InvestmentState @entity {
@@ -266,8 +266,8 @@ type InvestmentCost @entity {
   withUncalculatedPrices: Boolean!
 
   # Relations
-  deposits: [SharesBoughtEvent!]! @derivedFrom(field: \"investmentCost\")
-  withdrawals: [SharesRedeemedEvent!]! @derivedFrom(field: \"investmentCost\")
+  deposits: [SharesBoughtEvent!]! @derivedFrom(field: "investmentCost")
+  withdrawals: [SharesRedeemedEvent!]! @derivedFrom(field: "investmentCost")
 }
 
 type Asset @entity {
@@ -279,7 +279,7 @@ type Asset @entity {
   firstSeen: BigInt!
   # For Network stats
   networkAssetHolding: NetworkAssetHolding!
-  networkAssetHoldingHistory: [NetworkAssetHolding!]! @derivedFrom(field: \"asset\")
+  networkAssetHoldingHistory: [NetworkAssetHolding!]! @derivedFrom(field: "asset")
 }
 
 type TokenSwap @entity {
@@ -336,7 +336,7 @@ type Network @entity {
   id: ID!
   timestamp: BigInt!
   state: NetworkState!
-  stateHistory: [NetworkState!]! @derivedFrom(field: \"network\")
+  stateHistory: [NetworkState!]! @derivedFrom(field: "network")
 }
 
 type NetworkState @entity {

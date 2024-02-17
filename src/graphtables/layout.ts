@@ -42,7 +42,7 @@ export interface ReferenceType {
 	/**
 	 * Name of the relation parent table
 	 */
-	readonly table: string;
+	readonly tables: string[];
 	/**
 	 * Name of the relation parent column
 	 */
@@ -94,10 +94,6 @@ export type ColumnType = ScalarType | EnumType | ReferenceType | ListType | Text
  */
 export interface Column {
 	/**
-	 * Column name in the database
-	 */
-	readonly name: string;
-	/**
 	 * Column type
 	 */
 	readonly type: ColumnType;
@@ -131,6 +127,10 @@ export interface Relation {
 	 * Child column name in the database
 	 */
 	column: string;
+	/**
+	 * Parent table name in the database
+	 */
+	type: 'one' | 'many';
 }
 
 /**
@@ -138,17 +138,13 @@ export interface Relation {
  */
 export interface Table {
 	/**
-	 * Table name in the database
-	 */
-	name: string;
-	/**
 	 * Table columns
 	 */
-	columns: Column[];
+	columns: Map<string, Column>;
 	/**
 	 * Table parent-child relations by column
 	 */
-	relations: { [key: string]: Relation[] };
+	relations: Map<string, Relation[]>;
 }
 
 /**
@@ -158,9 +154,9 @@ export interface Layout {
 	/**
 	 * Layout tables
 	 */
-	tables: Table[];
+	tables: Map<string, Table>;
 	/**
 	 * Layout enums
 	 */
-	enums: { [key: string]: string[] };
+	enums: Map<string, string[]>;
 }

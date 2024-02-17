@@ -9,7 +9,7 @@ interface ISubgraphQuery {
 }
 
 const SEARCH_TEMPLATE: ISubgraphQuery = {
-	query: `query SearchbyName($search:String!) {  
+	query: `query SearchbyName($search:String!) {
 		subgraphMetadataSearch(first:20,text:$search)
 		{
 		  id,
@@ -230,7 +230,7 @@ export async function getSubgraphs(first: number, skip: number): Promise<ISubgra
 	}));
 }
 
-async function CallGraphQL<B, R>(endpoint: string, body: B): Promise<R> {
+async function CallGraphQL<B, R>(endpoint: string, body: B, abortSignal?: AbortSignal): Promise<R> {
 	const response = await fetch(endpoint, {
 		headers: {
 			accept: 'application/graphql-response+json, application/json, multipart/mixed',
@@ -238,13 +238,20 @@ async function CallGraphQL<B, R>(endpoint: string, body: B): Promise<R> {
 			'content-type': 'application/json'
 		},
 		body: JSON.stringify(body),
-		method: 'POST'
+		method: 'POST',
+		signal: abortSignal
 	});
 
-	// @ts-ignore
-	const json_response: R = (await response.json()) as R;
+	const json_response: any = await response.json();
 
-	return json_response;
+	if (Object.hasOwn(json_response, 'errors')) {
+		throw new Error(json_response.errors.map((e: any) => e.message).join('\n'));
+	}
+
+	//@ts-ignore
+	const result: R = json_response as R;
+
+	return result;
 }
 
 /**
@@ -316,23 +323,23 @@ export async function GetLayout(endpoint: string, deploymentSchemaId: string): P
 	return result;
 }
 
-const EDGE_N_NODE_INDEXER = 'http://34.172.27.121/subgraphs/name/collections-matic-mainnet';
-
 const SQL_QUERY_TEMPLATE: ISubgraphQuery = {
-	query: `query ExecuteSQL($query: String!) {
-        _sql(query: $query) {
-          rows
-          columns
+	query: `query SQL($query: String!) {
+        sql(input:{query : $query}) {
+			rowCount,
+			rows,
+			columns
         }
     }`,
 	variables: { query: '' },
-	operationName: 'ExecuteSQL',
+	operationName: 'SQL',
 	extensions: {}
 };
 
-interface IQueryResult {
+export interface IQueryResult {
 	readonly data: {
-		readonly _sql: {
+		readonly sql: {
+			readonly rowCount: number;
 			readonly rows: [{ (key: string): string | number }];
 			readonly columns: string[];
 		};
@@ -340,16 +347,21 @@ interface IQueryResult {
 }
 
 /**
- * Executes a SQL query (for MVP E&N graph-node is used)
+ * Executes a SQL query on a SQL enabled graph-node
+ * @param endpoint url of the graphql endpoint of subgraph
  * @param query SQL query to execute
  * @returns result of the query
  */
-export async function ExecuteSQL(query: string): Promise<[{ (key: string): string | number }]> {
+export async function ExecuteSQL(
+	endpoint: string,
+	query: string,
+	abortSignal?: AbortSignal
+): Promise<IQueryResult> {
 	const body = CheapCopy(SQL_QUERY_TEMPLATE);
 
 	body.variables.query = query;
 
-	const json_response: IQueryResult = await CallGraphQL(EDGE_N_NODE_INDEXER, body);
+	const json_response: IQueryResult = await CallGraphQL(endpoint, body, abortSignal);
 
-	return json_response.data._sql.rows;
+	return json_response;
 }

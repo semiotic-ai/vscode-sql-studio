@@ -8,15 +8,52 @@
 		"vscode": "^1.86.0"
 	},
 	"categories": [
+		"Programming Languages",
+		"Data Science",
 		"Other"
 	],
-	"activationEvents": [],
+	"activationEvents": [
+		"onLanguage:sql"
+	],
 	"main": "./dist/extension.js",
+	"extensionDependencies": [
+		"vscode.sql"
+	],
 	"contributes": {
+		"menus": {
+			"editor/context": [
+				{
+					"command": "query.runQuery",
+					"when": "editorTextFocus && editorLangId == 'sql'"
+				},
+				{
+					"command": "query.cancelQuery",
+					"when": "editorTextFocus && editorLangId == 'sql'"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "subgraphs.newQuery",
+					"when": "view == subgraphs",
+					"group": "query"
+				}
+			]
+		},
 		"commands": [
 			{
-				"command": "semiotic-sql-studio.helloWorld",
-				"title": "Hello World"
+				"command": "query.runQuery",
+				"title": "Run query",
+				"category": "GRAPHSQL"
+			},
+			{
+				"command": "query.cancelQuery",
+				"title": "Cancel query",
+				"category": "GRAPHSQL"
+			},
+			{
+				"command": "subgraphs.newQuery",
+				"title": "new query",
+				"category": "GRAPHSQL"
 			},
 			{
 				"command": "subgraphs.loadMoreSubgraphs",
@@ -27,34 +64,84 @@
 				}
 			}
 		],
+		"keybindings": [
+			{
+				"command": "query.runQuery",
+				"key": "ctrl+m ctrl+r",
+				"mac": "cmd+m cmd+r",
+				"when": "editorTextFocus && editorLangId == 'sql'"
+			},
+			{
+				"command": "query.cancelQuery",
+				"key": "ctrl+m ctrl+c",
+				"mac": "cmd+m cmd+c",
+				"when": "editorTextFocus && editorLangId == 'sql'"
+			}
+		],
 		"viewsContainers": {
 			"activitybar": [
 				{
-					"id": "subgraph-explorer",
+					"id": "subgraphExplorer",
 					"title": "Subgraph Explorer",
+					"icon": "resources/the-graph.svg"
+				}
+			],
+			"panel": [
+				{
+					"id": "results",
+					"title": "Graph SQL Result",
 					"icon": "resources/the-graph.svg"
 				}
 			]
 		},
 		"views": {
-			"subgraph-explorer": [
+			"subgraphExplorer": [
 				{
-					"id": "subgraph-available",
+					"id": "subgraphs",
 					"name": "Available Subgraphs"
 				},
 				{
-					"id": "subgraph-columns",
+					"id": "subgraphSchema",
 					"name": "Subgraph columns"
+				}
+			],
+			"results": [
+				{
+					"id": "tabularResult",
+					"type": "webview",
+					"contextualTitle": "Graph SQL Tabular Results",
+					"name": "Graph SQL Tabular Results",
+					"visibility": "collapsed"
 				}
 			]
 		},
 		"viewsWelcome": [
 			{
-				"view": "subgraph-columns",
+				"view": "subgraphSchema",
 				"contents": "In order to view an specific subgraph columns, select a SQL enabled subgraph.",
 				"when": "workbenchState == empty"
 			}
-		]
+		],
+		"configuration": {
+			"title": "GRAPHSQL configuration",
+			"properties": {
+				"graphsql.gateway": {
+					"type": "string",
+					"description": "Gateway",
+					"default": "http://eth.rubik.com.tr:8000/subgraphs/name",
+					"scope": "resource"
+				},
+				"graphsql.paths": {
+					"type": "object",
+					"description": "Mapping of lower case subgraph names to their endpoints relative paths.",
+					"default": {
+						"substreams uniswap v3 ethereum": "tumay/uniswap-v3",
+						"odos-v2-ethereum": "odos/v2"
+					},
+					"scope": "resource"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",
@@ -100,8 +187,9 @@
 		"webpack-cli": "^5.1.4"
 	},
 	"dependencies": {
-		"change-case": "^5.4.1",
-		"graphql": "^16.8.1"
+		"@vscode/codicons": "^0.0.35",
+		"graphql": "^16.8.1",
+		"simple-datatables": "^9.0.0"
 	},
 	"volta": {
 		"node": "20.11.0",

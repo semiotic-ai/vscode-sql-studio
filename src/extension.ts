@@ -1,39 +1,63 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { SubgraphColumnsProvider, SubgraphProvider } from './subgraphs-provider';
+import { SubgraphSchemaProvider, SubgraphProvider } from './subgraphs-provider';
+import { ExecuteSQL } from './service';
+import { ResultsProvider } from './results';
+import { SqlDocumentDropProvider } from './sqldoc';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "semiotic-sql-studio" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('semiotic-sql-studio.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Semiotic SQL Studio!');
-	});
-
-	const subgraphsAvailable = vscode.window.createTreeView('subgraph-available', {
+	const subgraphsView = vscode.window.createTreeView('subgraphs', {
 		treeDataProvider: new SubgraphProvider(context)
 	});
 
-	const subgraphColumnsProvider = new SubgraphColumnsProvider(context);
+	context.subscriptions.push(subgraphsView);
 
-	vscode.window.createTreeView('subgraph-columns', {
-		treeDataProvider: subgraphColumnsProvider
+	const subgraphSchemaProvider = new SubgraphSchemaProvider(context);
+
+	const subgraphSchemaView = vscode.window.createTreeView('subgraphSchema', {
+		treeDataProvider: subgraphSchemaProvider,
+		dragAndDropController: subgraphSchemaProvider
 	});
 
-	subgraphsAvailable.onDidChangeSelection(async (e) => {
-		await subgraphColumnsProvider.updateSelectedSubgraph(e.selection[0].id);
+	subgraphsView.onDidChangeSelection(async (e) => {
+		const subgraphInfo = e.selection[0];
+		await subgraphSchemaProvider.updateSelectedSubgraph(subgraphInfo.info);
 	});
 
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(subgraphSchemaView);
+
+	const newQueryCommand = vscode.commands.registerCommand('subgraphs.newQuery', async () => {
+		const document = await vscode.workspace.openTextDocument({ language: 'sql' });
+		const editor = await vscode.window.showTextDocument(document);
+	});
+
+	context.subscriptions.push(subgraphSchemaView);
+
+	const resultsProvider = new ResultsProvider(context.extensionUri);
+
+	const resultView = vscode.window.registerWebviewViewProvider('tabularResult', resultsProvider);
+
+	context.subscriptions.push(resultView);
+
+	const runQueryCommand = vscode.commands.registerTextEditorCommand('query.runQuery', async () => {
+		const query = vscode.window.activeTextEditor?.document.getText();
+		await resultsProvider.execute(query, subgraphSchemaProvider.subgraphInfo);
+	});
+
+	context.subscriptions.push(runQueryCommand);
+
+	const cancelQueryCommand = vscode.commands.registerTextEditorCommand('query.cancelQuery', () => {
+		resultsProvider.cancel();
+	});
+
+	const selector: vscode.DocumentSelector = { language: 'sql' };
+
+	context.subscriptions.push(
+		vscode.languages.registerDocumentDropEditProvider(selector, new SqlDocumentDropProvider())
+	);
 }
 
 // This method is called when your extension is deactivated

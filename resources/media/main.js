@@ -1,10 +1,10 @@
 //@ts-nocheck
 
-import * as simpleDatatables from './datatable.js';
-
 // This script will be run within the webview itself
 // It cannot access the main VS Code APIs directly.
 (function () {
+	const vscode = acquireVsCodeApi();
+
 	const container = document.getElementById('container');
 	container.datatable = null;
 
@@ -13,7 +13,6 @@ import * as simpleDatatables from './datatable.js';
 			container.datatable.destroy();
 			container.datatable = null;
 		}
-
 		container.innerHTML = '';
 	}
 
@@ -25,7 +24,7 @@ import * as simpleDatatables from './datatable.js';
 		if (message.type === 'start') {
 			container.innerHTML = `
 			<div class="message">
-				<div class="subgraph"><img src="${message.data}" alt="subgraph logo" /></div>
+				<img src="${message.data}" alt="subgraph logo" class="subgraph"/>
 				<div class="loading"></div>
 				<div class="value">Executing your query...</div>
 			</div>
@@ -34,8 +33,6 @@ import * as simpleDatatables from './datatable.js';
 			const result = message.data.data.sql;
 			result.rows = result.rows.map((r) => Object.values(r));
 			rendeResult(result);
-		} else if (message.type === 'error') {
-			queryMessages.innerHTML = `<div class="message"><div class="error">${message.data}</div></div>`;
 		}
 	});
 
@@ -48,6 +45,22 @@ import * as simpleDatatables from './datatable.js';
 		});
 
 		container.datatable = datatable;
-		vscode.setState(result);
+
+		const button = document.createElement('button');
+		button.id = 'exportButton';
+		button.classList.add('export');
+		button.classList.add('icon');
+		button.innerHTML = '<i class="codicon codicon-save"></i> CSV';
+
+		button.addEventListener('click', () => {
+			const result = window.simpleDatatables.exportCSV(container.datatable, {
+				lineDelimiter: '\n',
+				columnDelimiter: ';'
+			});
+			vscode.postMessage(result);
+		});
+
+		const search = document.getElementsByClassName('datatable-top')[0];
+		search.append(button);
 	}
 })();

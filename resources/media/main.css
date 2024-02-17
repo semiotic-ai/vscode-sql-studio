@@ -10,6 +10,27 @@ body {
 	height: 100vh;
 }
 
+.export {
+	display: block;
+	width: 10em;
+	height: 2em;
+	float: right;
+}
+
+.icon {
+	width: 140px;
+	padding: 20px;
+	font-size: 14px;
+	display: flex;
+	flex-direction: row;
+	text-align: center;
+}
+
+.icon .codicon {
+	font-size: 32px;
+	padding-bottom: 16px;
+}
+
 .message {
 	display: flex;
 	flex-direction: column;
@@ -19,9 +40,12 @@ body {
 }
 
 .subgraph {
-	padding: 0.5em;
+	margin: 0.5em;
 	width: 10em;
 	height: 10em;
+	border-radius: 1em;
+	border: #666 solid 0.2em;
+	display: block;
 }
 
 /* HTML: <div class="loader"></div> */
@@ -41,7 +65,7 @@ body {
 .loading:before {
 	content: '';
 	width: 200%;
-	background: linear-gradient(90deg, #ff1818 50%, #0000 0),
+	background: linear-gradient(90deg, #25da3dbd 50%, #0000 0),
 		conic-gradient(
 			from -90deg at var(--s) calc(0.353 * var(--s)),
 			#fff 135deg,

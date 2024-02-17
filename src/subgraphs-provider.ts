@@ -24,7 +24,7 @@ class SubgraphItem extends vscode.TreeItem {
 				command: LOAD_MORE_COMMAND,
 				title: 'Load more'
 			};
-			this.iconPath = new vscode.ThemeIcon(`add`);
+			this.iconPath = new vscode.ThemeIcon(`more`);
 		}
 	}
 }
@@ -110,12 +110,8 @@ class SchemaTable extends vscode.TreeItem {
 	constructor(public readonly label: string) {
 		super(label, vscode.TreeItemCollapsibleState.Collapsed);
 		this.id = label;
+		this.iconPath = new vscode.ThemeIcon('symbol-class');
 	}
-
-	iconPath = {
-		light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
-		dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
-	};
 }
 
 class SchemaColumn extends vscode.TreeItem {
@@ -128,10 +124,7 @@ class SchemaColumn extends vscode.TreeItem {
 		this.description = type;
 	}
 
-	iconPath = {
-		light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
-		dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
-	};
+	iconPath = new vscode.ThemeIcon('symbol-field');
 }
 
 type SchemaItem = SchemaTable | SchemaColumn;
@@ -199,9 +192,16 @@ export class SubgraphSchemaProvider
 		if (!this.subgraphLayout) {
 			return [];
 		}
+
 		const items: SchemaItem[] = [];
-		if (element?.label) {
-			const columns = this.subgraphLayout.tables.get(element.label as string)?.columns;
+
+		if (!element) {
+			for (const [table_name, table] of this.subgraphLayout.tables) {
+				items.push(new SchemaTable(table_name));
+			}
+		} else if (element instanceof SchemaTable) {
+			const columns = this.subgraphLayout.tables.get(element.label)?.columns;
+
 			if (!columns) {
 				return [];
 			}
@@ -222,11 +222,8 @@ export class SubgraphSchemaProvider
 				}
 				items.push(new SchemaColumn(column_name, getType(column.type)));
 			}
-		} else {
-			for (const [table_name, table] of this.subgraphLayout.tables) {
-				items.push(new SchemaTable(table_name));
-			}
 		}
+
 		return items;
 	}
 

@@ -25,6 +25,10 @@
 				{
 					"command": "query.runQuery",
 					"when": "editorTextFocus && editorLangId == 'sql'"
+				},
+				{
+					"command": "query.cancelQuery",
+					"when": "editorTextFocus && editorLangId == 'sql'"
 				}
 			],
 			"view/item/context": [
@@ -38,12 +42,12 @@
 		"commands": [
 			{
 				"command": "query.runQuery",
-				"title": "run query",
+				"title": "Run query",
 				"category": "GRAPHSQL"
 			},
 			{
 				"command": "query.cancelQuery",
-				"title": "cancel query",
+				"title": "Cancel query",
 				"category": "GRAPHSQL"
 			},
 			{
@@ -68,7 +72,7 @@
 				"when": "editorTextFocus && editorLangId == 'sql'"
 			},
 			{
-				"command": "subgraphs.chooseSubgraph",
+				"command": "query.cancelQuery",
 				"key": "ctrl+m ctrl+c",
 				"mac": "cmd+m cmd+c",
 				"when": "editorTextFocus && editorLangId == 'sql'"
@@ -126,6 +130,15 @@
 					"description": "Gateway",
 					"default": "http://eth.rubik.com.tr:8000/subgraphs/name",
 					"scope": "resource"
+				},
+				"graphsql.paths": {
+					"type": "object",
+					"description": "Mapping of lower case subgraph names to their endpoints relative paths.",
+					"default": {
+						"substreams uniswap v3 ethereum": "tumay/uniswap-v3",
+						"odos-v2-ethereum": "odos/v2"
+					},
+					"scope": "resource"
 				}
 			}
 		}
@@ -174,7 +187,9 @@
 		"webpack-cli": "^5.1.4"
 	},
 	"dependencies": {
-		"graphql": "^16.8.1"
+		"@vscode/codicons": "^0.0.35",
+		"graphql": "^16.8.1",
+		"simple-datatables": "^9.0.0"
 	},
 	"volta": {
 		"node": "20.11.0",

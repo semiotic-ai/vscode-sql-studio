@@ -242,10 +242,16 @@ async function CallGraphQL<B, R>(endpoint: string, body: B, abortSignal?: AbortS
 		signal: abortSignal
 	});
 
-	// @ts-ignore
-	const json_response: R = (await response.json()) as R;
+	const json_response: any = await response.json();
 
-	return json_response;
+	if (Object.hasOwn(json_response, 'errors')) {
+		throw new Error(json_response.errors.map((e: any) => e.message).join('\n'));
+	}
+
+	//@ts-ignore
+	const result: R = json_response as R;
+
+	return result;
 }
 
 /**

@@ -43,28 +43,15 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(resultView);
 
 	const runQueryCommand = vscode.commands.registerTextEditorCommand('query.runQuery', async () => {
-		let subgraph_path: string | undefined = undefined;
-
-		switch (subgraphSchemaProvider.subgraphInfo?.displayName.toLowerCase()) {
-			case 'substreams uniswap v3 ethereum':
-				subgraph_path = 'tumay/uniswap-v3';
-				break;
-			case 'odos v2':
-				subgraph_path = 'odos/v2';
-				break;
-		}
-
 		const query = vscode.window.activeTextEditor?.document.getText();
-
-		if (subgraph_path && query) {
-			const gateway = vscode.workspace.getConfiguration('graphsql').get('gateway');
-			const endpoint = gateway + '/' + subgraph_path;
-			const subgraphImage = subgraphSchemaProvider.subgraphInfo?.image || '';
-			await resultsProvider.execute(endpoint, query, subgraphImage);
-		}
+		await resultsProvider.execute(query, subgraphSchemaProvider.subgraphInfo);
 	});
 
 	context.subscriptions.push(runQueryCommand);
+
+	const cancelQueryCommand = vscode.commands.registerTextEditorCommand('query.cancelQuery', () => {
+		resultsProvider.cancel();
+	});
 
 	const selector: vscode.DocumentSelector = { language: 'sql' };
 

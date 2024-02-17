@@ -11,24 +11,21 @@ body {
 }
 
 .export {
-	display: block;
-	width: 10em;
-	height: 2em;
+	width: 6em;
+	height: 2.4em;
 	float: right;
+	margin-right: 1em;
 }
 
 .icon {
-	width: 140px;
-	padding: 20px;
-	font-size: 14px;
 	display: flex;
 	flex-direction: row;
 	text-align: center;
+	padding: 0.6em;
 }
 
 .icon .codicon {
-	font-size: 32px;
-	padding-bottom: 16px;
+	margin-right: 0.4em;
 }
 
 .message {

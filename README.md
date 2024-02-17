@@ -1,18 +1,25 @@
 # semiotic-sql-studio README
 
-Sql studio enables developoers to query SQL enabled subgraphs. See graph protocol sql data services for more information.
+Sql studio enables developers to query SQL enabled subgraphs. See graph protocol sql data services for more information.
+
+## Demo
+
+![Demo](images/features.gif)
 
 ## Features
 
-[List most signalled subgraps and respective database schema](images/subgraph-schema.png)
-
-> Supports drag and drop fron schema tables and columns to sql text.
-
-[Write sql with autocomplete and syntax checking](images/sql-support.png)
-
-[Execute queries](images/sql-execution.png)
-
-[View or export results](images/results.png)
+- View most signalled subgraps on the network
+- Use `New Query` menu for creating an sql document
+- View subgraph database layout
+- Supports drag and drop database table and columns into sql text editor
+- Code coloring
+- `Run Query` menu and `ctrl+m ctrl+r` to excute.
+- `Cancel Query` menu and `ctrl+m ctrl+c` to cancel execution.
+- View execution status
+- View result table with
+  - Sort by clicking column names
+  - Search all text
+  - Export to CSV
 
 ## Requirements
 

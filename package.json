@@ -43,6 +43,10 @@
 				{
 					"command": "query.cancelQuery",
 					"when": "editorTextFocus && editorLangId == 'sql'"
+				},
+				{
+					"command": "query.showResults",
+					"when": "editorTextFocus && editorLangId == 'sql'"
 				}
 			],
 			"view/item/context": [
@@ -62,6 +66,11 @@
 			{
 				"command": "query.cancelQuery",
 				"title": "Cancel query",
+				"category": "GRAPHSQL"
+			},
+			{
+				"command": "query.showResults",
+				"title": "Show Results",
 				"category": "GRAPHSQL"
 			},
 			{
@@ -90,6 +99,18 @@
 				"key": "ctrl+m ctrl+c",
 				"mac": "cmd+m cmd+c",
 				"when": "editorTextFocus && editorLangId == 'sql'"
+			},
+			{
+				"command": "query.showResults",
+				"key": "ctrl+m ctrl+n",
+				"mac": "cmd+m cmd+n",
+				"when": "editorTextFocus && editorLangId == 'sql'"
+			},
+			{
+				"command": "subgraphs.loadMoreSubgraphs",
+				"key": "ctrl+m ctrl+l",
+				"mac": "cmd+m cmd+l",
+				"when": "view == subgraphs"
 			}
 		],
 		"viewsContainers": {
@@ -125,7 +146,7 @@
 					"type": "webview",
 					"contextualTitle": "Graph SQL Tabular Results",
 					"name": "Graph SQL Tabular Results",
-					"visibility": "collapsed"
+					"visibility": "visible"
 				}
 			]
 		},

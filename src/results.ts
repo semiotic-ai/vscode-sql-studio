@@ -64,8 +64,8 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 			const result = await ExecuteSQL(enpoint, query!, this.abortController.signal);
 			await this.posMessage({ type: 'finish', data: result });
 		} catch (error: any) {
-			vscode.window.showErrorMessage(error.message);
-			await this.posMessage({ type: 'finish', data: error.message });
+			await vscode.window.showErrorMessage(error.message);
+			await this.posMessage({ type: 'clear' });
 		} finally {
 			this.abortController = undefined;
 		}
@@ -79,11 +79,10 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 	}
 
 	private async posMessage(message: {
-		type: 'start' | 'finish' | 'error';
+		type: 'start' | 'finish' | 'clear';
 		data?: IQueryResult | string;
 	}): Promise<boolean> {
 		if (this._view) {
-			this._view.show?.(true);
 			return await this._view.webview.postMessage(message);
 		}
 		return false;

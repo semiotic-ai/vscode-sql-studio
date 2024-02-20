@@ -34,6 +34,8 @@ export function activate(context: vscode.ExtensionContext) {
 		const editor = await vscode.window.showTextDocument(document);
 	});
 
+	context.subscriptions.push(newQueryCommand);
+
 	context.subscriptions.push(subgraphSchemaView);
 
 	const resultsProvider = new ResultsProvider(context.extensionUri);
@@ -43,11 +45,22 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(resultView);
 
 	const runQueryCommand = vscode.commands.registerTextEditorCommand('query.runQuery', async () => {
+		await vscode.commands.executeCommand('tabularResult.focus');
+		await vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup');
 		const query = vscode.window.activeTextEditor?.document.getText();
 		await resultsProvider.execute(query, subgraphSchemaProvider.subgraphInfo);
 	});
 
 	context.subscriptions.push(runQueryCommand);
+
+	const showResultsCommand = vscode.commands.registerTextEditorCommand(
+		'query.showResults',
+		async () => {
+			await vscode.commands.executeCommand('tabularResult.focus');
+		}
+	);
+
+	context.subscriptions.push(showResultsCommand);
 
 	const cancelQueryCommand = vscode.commands.registerTextEditorCommand('query.cancelQuery', () => {
 		resultsProvider.cancel();
@@ -58,6 +71,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.languages.registerDocumentDropEditProvider(selector, new SqlDocumentDropProvider())
 	);
+
+	vscode.commands.executeCommand('tabularResult.focus');
 }
 
 // This method is called when your extension is deactivated

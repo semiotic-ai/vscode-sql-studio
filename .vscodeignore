@@ -12,3 +12,7 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+
+# Include webview dependencies
+!node_modules/@vscode/codicons/dist/**
+!node_modules/simple-datatables/dist/**

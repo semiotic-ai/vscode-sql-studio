@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.0.0...v1.0.1) (2024-02-20)
+
+
+### Bug Fixes
+
+* **publish:** trigger publish ([0acf7b8](https://github.com/semiotic-ai/vscode-sql-studio/commit/0acf7b8565a60f5bbc7c29636f27eedcecf5b717))
+
 ## 1.0.0 (2024-02-17)
 
 ### Features

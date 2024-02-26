@@ -75,7 +75,7 @@
 			},
 			{
 				"command": "subgraphs.newQuery",
-				"title": "new query",
+				"title": "New Query",
 				"category": "GRAPHSQL"
 			},
 			{

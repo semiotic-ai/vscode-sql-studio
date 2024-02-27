@@ -26,9 +26,6 @@
 		"Data Science",
 		"Other"
 	],
-	"activationEvents": [
-		"onLanguage:gsql"
-	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"menus": {
@@ -88,20 +85,20 @@
 			{
 				"command": "query.runQuery",
 				"key": "ctrl+m ctrl+r",
-				"mac": "ctrl+F5",
-				"when": "editorTextFocus && editorLangId == 'sql'"
+				"mac": "cmd+m cmd+r",
+				"when": "editorTextFocus && editorLangId == 'gsql'"
 			},
 			{
 				"command": "query.cancelQuery",
 				"key": "ctrl+m ctrl+c",
 				"mac": "cmd+m cmd+c",
-				"when": "editorTextFocus && editorLangId == 'sql'"
+				"when": "editorTextFocus && editorLangId == 'gsql'"
 			},
 			{
 				"command": "query.showResults",
 				"key": "ctrl+m ctrl+n",
 				"mac": "cmd+m cmd+n",
-				"when": "editorTextFocus && editorLangId == 'sql'"
+				"when": "editorTextFocus && editorLangId == 'gsql'"
 			},
 			{
 				"command": "subgraphs.loadMoreSubgraphs",

@@ -12,7 +12,7 @@ import {
 	SignatureHelpProvider,
 	TextDocument
 } from 'vscode';
-import { Layout } from '../graphtables/layout';
+import { Column, ColumnType, Layout, TypeKind } from '../graphtables/layout';
 
 const languageCompletionItems = [
 	new CompletionItem('SELECT', CompletionItemKind.Keyword),
@@ -54,8 +54,28 @@ const languageCompletionItems = [
 	new CompletionItem('ASC', CompletionItemKind.Keyword),
 	new CompletionItem('DESC', CompletionItemKind.Keyword),
 	new CompletionItem('VALUES', CompletionItemKind.Keyword),
-	new CompletionItem('NOT NULL', CompletionItemKind.Keyword)
+	new CompletionItem('NOT NULL', CompletionItemKind.Keyword),
+	new CompletionItem('WITH', CompletionItemKind.Keyword)
 ];
+
+function getColumnTypeDescription(type: ColumnType): string {
+	switch (type.kind) {
+		case TypeKind.Scalar:
+			return type.dbType;
+		case TypeKind.Enum:
+			return 'enum(' + type.name + ')';
+		case TypeKind.Reference:
+			return type.dbType;
+		case TypeKind.List:
+			return getColumnTypeDescription(type.itemType) + '[]';
+		case TypeKind.TextSearch:
+			return type.dbType;
+	}
+}
+
+function getColumnDescription(column: Column): string {
+	return getColumnTypeDescription(column.type) + (column.nullable ? '' : ' not null');
+}
 
 export class GraphSQLProvider
 	implements SignatureHelpProvider, CompletionItemProvider<CompletionItem>
@@ -76,7 +96,6 @@ export class GraphSQLProvider
 		token: CancellationToken
 	): ProviderResult<CompletionItem> {
 		console.log('resolveCompletionItem');
-
 		return undefined;
 	}
 
@@ -93,17 +112,19 @@ export class GraphSQLProvider
 	public updateLayout(layout: Layout | undefined) {
 		this.items = languageCompletionItems.slice();
 		if (layout) {
-			new Set(layout.tables.keys()).forEach((tableName) => {
-				this.items.push(new CompletionItem(tableName, CompletionItemKind.Class));
-			});
-
-			new Set(
-				Array.from(layout.tables.values())
-					.map((table) => Array.from(table.columns.keys()))
-					.flat()
-			).forEach((columnName) => {
-				this.items.push(new CompletionItem(columnName, CompletionItemKind.Field));
-			});
+			for (const [tableName, table] of layout.tables) {
+				const tableToken = new CompletionItem(tableName, CompletionItemKind.Class);
+				// Some description or comment can be used here from graphql schema
+				this.items.push(tableToken);
+				for (const [columnName, column] of table.columns) {
+					const columnToken = new CompletionItem(
+						`${tableName}.${columnName}`,
+						CompletionItemKind.Field
+					);
+					columnToken.detail = getColumnDescription(column);
+					this.items.push(columnToken);
+				}
+			}
 		}
 	}
 }

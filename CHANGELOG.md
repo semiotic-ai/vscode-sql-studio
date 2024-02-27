@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.1.1...v1.2.0) (2024-02-27)
+
+
+### Features
+
+* create a new editor when choosing a subgraph ([53837ea](https://github.com/semiotic-ai/vscode-sql-studio/commit/53837ea33f212445a3e6839212588bda8fbe51d6))
+
 ## [1.1.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.1.0...v1.1.1) (2024-02-27)
 
 ### Bug Fixes

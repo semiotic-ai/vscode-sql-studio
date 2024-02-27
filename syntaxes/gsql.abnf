@@ -1,0 +1,5 @@
+commands = command [ semicolon command ]
+command = selectcommand
+selectcommand = "SELECT " [expression ["," expression]]
+expression = "test"
+semicolon = ";"

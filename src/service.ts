@@ -90,7 +90,7 @@ export interface ISubgraphInfo {
 	readonly activeIndexerAllocations: number;
 }
 
-function CheapCopy<T>(value: T): T {
+export function CheapCopy<T>(value: T): T {
 	return JSON.parse(JSON.stringify(value));
 }
 

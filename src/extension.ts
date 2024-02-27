@@ -1,14 +1,25 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { SubgraphSchemaProvider, SubgraphProvider } from './subgraphs-provider';
+import { SubgraphSchemaProvider, SubgraphProvider } from './providers/subgraph';
 import { ExecuteSQL } from './service';
-import { ResultsProvider } from './results';
-import { SqlDocumentDropProvider } from './sqldoc';
+import { ResultsProvider } from './providers/results';
+import { SqlDocumentDropProvider } from './providers/sqldoc';
+import { GraphSQLProvider } from './providers/language';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	const languageProvider = new GraphSQLProvider();
+
+	context.subscriptions.push(
+		vscode.languages.registerCompletionItemProvider('gsql', languageProvider)
+	);
+
+	context.subscriptions.push(
+		vscode.languages.registerSignatureHelpProvider('gsql', languageProvider)
+	);
+
 	const subgraphsView = vscode.window.createTreeView('subgraphs', {
 		treeDataProvider: new SubgraphProvider(context)
 	});
@@ -25,12 +36,13 @@ export function activate(context: vscode.ExtensionContext) {
 	subgraphsView.onDidChangeSelection(async (e) => {
 		const subgraphInfo = e.selection[0];
 		await subgraphSchemaProvider.updateSelectedSubgraph(subgraphInfo.info);
+		languageProvider.updateLayout(subgraphSchemaProvider.subgraphLayout);
 	});
 
 	context.subscriptions.push(subgraphSchemaView);
 
 	const newQueryCommand = vscode.commands.registerCommand('subgraphs.newQuery', async () => {
-		const document = await vscode.workspace.openTextDocument({ language: 'sql' });
+		const document = await vscode.workspace.openTextDocument({ language: 'gsql' });
 		const editor = await vscode.window.showTextDocument(document);
 	});
 
@@ -66,7 +78,7 @@ export function activate(context: vscode.ExtensionContext) {
 		resultsProvider.cancel();
 	});
 
-	const selector: vscode.DocumentSelector = { language: 'sql' };
+	const selector: vscode.DocumentSelector = { language: 'gsql' };
 
 	context.subscriptions.push(
 		vscode.languages.registerDocumentDropEditProvider(selector, new SqlDocumentDropProvider())

@@ -2,10 +2,9 @@
 
 ## [1.0.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.0.1...v1.0.2) (2024-02-20)
 
-
 ### Bug Fixes
 
-* **results:** Exception added for required webview depencies from .vscodeignore file and auto view results panel. ([c188f4b](https://github.com/semiotic-ai/vscode-sql-studio/commit/c188f4babbea8e38c0550c68bd8799a38c74fd50))
+- **results:** Exception added for required webview depencies from .vscodeignore file and auto view results panel. ([c188f4b](https://github.com/semiotic-ai/vscode-sql-studio/commit/c188f4babbea8e38c0550c68bd8799a38c74fd50))
 
 ## [1.0.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.0.0...v1.0.1) (2024-02-20)
 

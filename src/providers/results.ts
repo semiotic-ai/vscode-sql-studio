@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { IQueryResult, ExecuteSQL, ISubgraphInfo } from './service';
+import { IQueryResult, ExecuteSQL, ISubgraphInfo } from '../service';
 
 export class ResultsProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'tabularResult';
@@ -73,8 +73,11 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 
 	public cancel() {
 		if (this.abortController) {
-			this.abortController.abort();
-			this.abortController = undefined;
+			try {
+				this.abortController.abort();
+			} finally {
+				this.abortController = undefined;
+			}
 		}
 	}
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.1.0...v1.1.1) (2024-02-27)
+
+
+### Bug Fixes
+
+* change subgraph columns to subgraph tables ([21d75b3](https://github.com/semiotic-ai/vscode-sql-studio/commit/21d75b3c548876623b7d9fbb826239cc0d699127))
+
 ## [1.1.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.0.2...v1.1.0) (2024-02-27)
 
 ### Features

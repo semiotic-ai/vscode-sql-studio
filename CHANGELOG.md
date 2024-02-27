@@ -2,16 +2,14 @@
 
 ## [1.1.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.0.2...v1.1.0) (2024-02-27)
 
-
 ### Features
 
-* **sql:** Autocomplete basic implementation ([61f53b9](https://github.com/semiotic-ai/vscode-sql-studio/commit/61f53b9eb3d12068baaafc559455ffd37cd1f480))
-
+- **sql:** Autocomplete basic implementation ([61f53b9](https://github.com/semiotic-ai/vscode-sql-studio/commit/61f53b9eb3d12068baaafc559455ffd37cd1f480))
 
 ### Bug Fixes
 
-* **sql:** Autocompletion publish trigger ([4108f87](https://github.com/semiotic-ai/vscode-sql-studio/commit/4108f874c2f20fa5deefad6770403023911ad536))
-* **sql:** Table.Column autocompletion ([e8d952e](https://github.com/semiotic-ai/vscode-sql-studio/commit/e8d952e3fc57f19aa0957426c95c6cd8143947f5))
+- **sql:** Autocompletion publish trigger ([4108f87](https://github.com/semiotic-ai/vscode-sql-studio/commit/4108f874c2f20fa5deefad6770403023911ad536))
+- **sql:** Table.Column autocompletion ([e8d952e](https://github.com/semiotic-ai/vscode-sql-studio/commit/e8d952e3fc57f19aa0957426c95c6cd8143947f5))
 
 ## [1.0.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.0.1...v1.0.2) (2024-02-20)
 

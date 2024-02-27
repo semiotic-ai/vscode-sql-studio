@@ -6,6 +6,13 @@ import { ExecuteSQL } from './service';
 import { ResultsProvider } from './providers/results';
 import { SqlDocumentDropProvider } from './providers/sqldoc';
 import { GraphSQLProvider } from './providers/language';
+import { open } from 'fs';
+
+// This function encapsulates the logic to open a new query window
+async function openNewQueryWindow() {
+	const document = await vscode.workspace.openTextDocument({ language: 'gsql' });
+	await vscode.window.showTextDocument(document);
+}
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -37,13 +44,22 @@ export function activate(context: vscode.ExtensionContext) {
 		const subgraphInfo = e.selection[0];
 		await subgraphSchemaProvider.updateSelectedSubgraph(subgraphInfo.info);
 		languageProvider.updateLayout(subgraphSchemaProvider.subgraphLayout);
+
+		const isGsqlOpen = vscode.window.visibleTextEditors.some(
+			(editor) => editor.document.languageId === 'gsql'
+		);
+
+		if (!isGsqlOpen) {
+			await openNewQueryWindow();
+		}
 	});
 
 	context.subscriptions.push(subgraphSchemaView);
 
 	const newQueryCommand = vscode.commands.registerCommand('subgraphs.newQuery', async () => {
-		const document = await vscode.workspace.openTextDocument({ language: 'gsql' });
-		const editor = await vscode.window.showTextDocument(document);
+		// const document = await vscode.workspace.openTextDocument({ language: 'gsql' });
+		// const editor = await vscode.window.showTextDocument(document);
+		await openNewQueryWindow();
 	});
 
 	context.subscriptions.push(newQueryCommand);

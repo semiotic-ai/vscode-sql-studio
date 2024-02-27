@@ -131,7 +131,7 @@
 				},
 				{
 					"id": "subgraphSchema",
-					"name": "Subgraph columns"
+					"name": "Subgraph Tables"
 				}
 			],
 			"results": [

@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
-import { TreeItem } from 'vscode';
-import { GetLayout, ISubgraphInfo, getSubgraphs } from './service';
-import { ColumnType, Layout, TypeKind } from './graphtables/layout';
+import { GetLayout, ISubgraphInfo, getSubgraphs } from '../service';
+import { ColumnType, Layout, TypeKind } from '../graphtables/layout';
 
 const PAGE_SIZE = 20;
 const LOAD_MORE_COMMAND = 'subgraphs.loadMoreSubgraphs';

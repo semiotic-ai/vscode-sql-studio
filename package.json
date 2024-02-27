@@ -27,26 +27,23 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onLanguage:sql"
+		"onLanguage:gsql"
 	],
 	"main": "./dist/extension.js",
-	"extensionDependencies": [
-		"vscode.sql"
-	],
 	"contributes": {
 		"menus": {
 			"editor/context": [
 				{
 					"command": "query.runQuery",
-					"when": "editorTextFocus && editorLangId == 'sql'"
+					"when": "editorTextFocus && editorLangId == 'gsql'"
 				},
 				{
 					"command": "query.cancelQuery",
-					"when": "editorTextFocus && editorLangId == 'sql'"
+					"when": "editorTextFocus && editorLangId == 'gsql'"
 				},
 				{
 					"command": "query.showResults",
-					"when": "editorTextFocus && editorLangId == 'sql'"
+					"when": "editorTextFocus && editorLangId == 'gsql'"
 				}
 			],
 			"view/item/context": [
@@ -91,7 +88,7 @@
 			{
 				"command": "query.runQuery",
 				"key": "ctrl+m ctrl+r",
-				"mac": "cmd+m cmd+r",
+				"mac": "ctrl+F5",
 				"when": "editorTextFocus && editorLangId == 'sql'"
 			},
 			{
@@ -176,9 +173,30 @@
 					"scope": "resource"
 				}
 			}
-		}
+		},
+		"languages": [
+			{
+				"id": "gsql",
+				"extensions": [
+					".gsql"
+				],
+				"aliases": [
+					"GraphSQL",
+					"graphsql"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "gsql",
+				"scopeName": "source.gsql",
+				"path": "./syntaxes/gsql.tmLanguage.json"
+			}
+		]
 	},
 	"scripts": {
+		"lang": "js-yaml syntaxes/gsql.tmLanguage.yaml > syntaxes/gsql.tmLanguage.json",
 		"vscode:prepublish": "npm run package",
 		"compile": "webpack",
 		"watch": "webpack --watch",
@@ -219,7 +237,8 @@
 		"typedoc-theme-hierarchy": "^4.1.2",
 		"typescript": "^5.3.3",
 		"webpack": "^5.90.0",
-		"webpack-cli": "^5.1.4"
+		"webpack-cli": "^5.1.4",
+		"yaml-loader": "^0.8.0"
 	},
 	"dependencies": {
 		"@vscode/codicons": "^0.0.35",

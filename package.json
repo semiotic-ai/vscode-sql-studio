@@ -2,10 +2,11 @@
 	"name": "semiotic-sql-studio",
 	"displayName": "Semiotic SQL Studio",
 	"description": "A SQL interface for The Graph Protocol managed by Semiotic Labs",
-	"version": "0.0.1",
+	"version": "0.0.0",
 	"publisher": "SemioticLabs",
 	"preview": true,
 	"icon": "images/extension-icon.png",
+	"private": true,
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/semiotic-ai/vscode-sql-studio.git"

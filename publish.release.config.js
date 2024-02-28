@@ -19,6 +19,7 @@ module.exports = {
 				assets: '*/*.vsix',
 				addReleases: 'bottom'
 			}
-		]
+		],
+		'@semantic-release/npm'
 	]
 };

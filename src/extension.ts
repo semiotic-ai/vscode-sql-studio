@@ -8,7 +8,8 @@ import { SqlDocumentDropProvider } from './providers/sqldoc';
 import { GraphSQLProvider } from './providers/language';
 import { open } from 'fs';
 
-// This function encapsulates the logic to open a new query window
+// This function encapsulates the logic to open a new query window with the correct
+// language type
 async function openNewQueryWindow() {
 	const document = await vscode.workspace.openTextDocument({ language: 'gsql' });
 	await vscode.window.showTextDocument(document);
@@ -27,8 +28,10 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.languages.registerSignatureHelpProvider('gsql', languageProvider)
 	);
 
+	const subgraphProvider = new SubgraphProvider(context);
+
 	const subgraphsView = vscode.window.createTreeView('subgraphs', {
-		treeDataProvider: new SubgraphProvider(context)
+		treeDataProvider: subgraphProvider
 	});
 
 	context.subscriptions.push(subgraphsView);
@@ -41,24 +44,30 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	subgraphsView.onDidChangeSelection(async (e) => {
-		const subgraphInfo = e.selection[0];
-		await subgraphSchemaProvider.updateSelectedSubgraph(subgraphInfo.info);
-		languageProvider.updateLayout(subgraphSchemaProvider.subgraphLayout);
+		if (e.selection.length > 0) {
+			const subgraphItem = e.selection[0];
+			if (!subgraphItem.info) {
+				return;
+			}
 
-		const isGsqlOpen = vscode.window.visibleTextEditors.some(
-			(editor) => editor.document.languageId === 'gsql'
-		);
+			subgraphProvider.updateSelection(subgraphItem.info);
 
-		if (!isGsqlOpen) {
-			await openNewQueryWindow();
+			await subgraphSchemaProvider.updateSelectedSubgraph(subgraphItem.info);
+			languageProvider.updateLayout(subgraphSchemaProvider.subgraphLayout);
+
+			const isGsqlOpen = vscode.window.visibleTextEditors.some(
+				(editor) => editor.document.languageId === 'gsql'
+			);
+
+			if (!isGsqlOpen) {
+				await openNewQueryWindow();
+			}
 		}
 	});
 
 	context.subscriptions.push(subgraphSchemaView);
 
 	const newQueryCommand = vscode.commands.registerCommand('subgraphs.newQuery', async () => {
-		// const document = await vscode.workspace.openTextDocument({ language: 'gsql' });
-		// const editor = await vscode.window.showTextDocument(document);
 		await openNewQueryWindow();
 	});
 

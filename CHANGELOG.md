@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.2.0...v1.3.0) (2024-02-28)
+
+
+### Features
+
+* change icon to green dot for selected subgraph ([5fa8020](https://github.com/semiotic-ai/vscode-sql-studio/commit/5fa802093d09729d8c637f148744f371e778a14e))
+
 ## [1.2.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v1.1.1...v1.2.0) (2024-02-27)
 
 

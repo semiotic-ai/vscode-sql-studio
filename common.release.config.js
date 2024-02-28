@@ -8,6 +8,15 @@ module.exports = {
 					{
 						type: 'perf',
 						release: 'patch'
+					},
+					{
+						type: 'refactor',
+						release: 'patch'
+					},
+					{
+						type: 'build',
+						scope: 'deps',
+						release: 'patch'
 					}
 				]
 			}
@@ -32,6 +41,10 @@ module.exports = {
 						{
 							type: 'revert',
 							section: 'Reverts'
+						},
+						{
+							type: 'refactor',
+							section: 'Code Refactoring'
 						},
 						{
 							type: 'build',

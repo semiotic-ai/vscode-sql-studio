@@ -2,7 +2,7 @@
 	"name": "semiotic-sql-studio",
 	"displayName": "Semiotic SQL Studio",
 	"description": "A SQL interface for The Graph Protocol managed by Semiotic Labs",
-	"version": "0.0.0",
+	"version": "0.1.0",
 	"publisher": "SemioticLabs",
 	"preview": true,
 	"icon": "images/extension-icon.png",

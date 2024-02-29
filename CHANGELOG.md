@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.1.2...v0.2.0) (2024-02-29)
+
+
+### Features
+
+* use Semiotic logo for extension ([18cf7db](https://github.com/semiotic-ai/vscode-sql-studio/commit/18cf7dbbdc289f5ac4f8f3afefefb3bc2c4b37eb))
+
 ## [0.1.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.1.1...v0.1.2) (2024-02-29)
 
 

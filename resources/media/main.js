@@ -8,6 +8,12 @@
 	const container = document.getElementById('container');
 	container.datatable = null;
 
+	const previousResult = vscode.getState();
+
+	if (previousResult) {
+		rendeResult(previousResult);
+	}
+
 	function cleanContainer() {
 		if (container.datatable) {
 			container.datatable.destroy();
@@ -33,6 +39,7 @@
 			const result = message.data.data.sql;
 			result.rows = result.rows.map((r) => Object.values(r));
 			rendeResult(result);
+			vscode.setState(result);
 		}
 	});
 

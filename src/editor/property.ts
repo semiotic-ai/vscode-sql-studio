@@ -1,4 +1,3 @@
-import { Linter } from 'eslint';
 import * as vscode from 'vscode';
 
 /**
@@ -29,7 +28,7 @@ export function getPropertyLineNumber(property: string, document: vscode.TextDoc
  * @param {string} property The property name to format.
  * @returns {string} The formatted property string.
  */
-export function makePropertyString(property: string): string {
+function makePropertyString(property: string): string {
 	const formattedPattern = /^--\+[A-Z]+: /;
 	if (formattedPattern.test(property)) {
 		return property;
@@ -87,8 +86,62 @@ export function getPropertyValue(property: string, document: vscode.TextDocument
 		return ''; // property not in doc
 	}
 
+	const valuePosition = getValuePosition(lineNumber, document);
+	return valuePosition.line.substring(valuePosition.range.start.character).trim();
+}
+
+/**
+ * Represents the position of a value within a line of text, including the line itself and the
+ * range within the VS Code document.
+ */
+interface ValuePosition {
+	line: string; // The complete line text where the value is found.
+	range: vscode.Range; // The specific range within the line that encompasses the value.
+}
+
+/**
+ * Determines the position of a value for a given property within a document. It calculates the
+ * start and end positions of the property's value based on its line number.
+ *
+ * @param {number} lineNumber The line number where the property is located.
+ * @param {vscode.TextDocument} document The document containing the property.
+ * @returns {ValuePosition} The position of the property's value, including the line text and range.
+ */
+function getValuePosition(lineNumber: number, document: vscode.TextDocument): ValuePosition {
 	const text = document.getText();
 	const line = text.split('\n')[lineNumber - 1];
-	const index = line.indexOf(': ') + 2; // + 2 skips ": "
-	return line.substring(index).trim();
+	const start = new vscode.Position(lineNumber - 1, line.indexOf(': ') + 2); // + 2 skips ": "
+	const end = new vscode.Position(lineNumber - 1, line.length);
+	const range = new vscode.Range(start, end);
+	return { line: line, range: range };
+}
+
+/**
+ * Replaces or inserts a property in the active document. If the property exists, its value is
+ * replaced with the specified information. If the property does not exist, it is added to the
+ * document along with the information.
+ *
+ * @param {string} property The property to replace or add.
+ * @param {string} information The new value for the property.
+ */
+export async function replacePropertyInEditor(property: string, information: string) {
+	const editor = vscode.window.activeTextEditor;
+	if (!editor || editor.document.languageId !== 'gsql') {
+		return; // Early return if no editor or the document is not a GSQL file
+	}
+
+	const formattedProperty = makePropertyString(property);
+
+	const lineNumber = getPropertyLineNumber(formattedProperty, editor.document);
+	if (lineNumber > -1) {
+		const valuePosition = getValuePosition(lineNumber, editor.document);
+		await editor.edit((editBuilder) => {
+			editBuilder.replace(valuePosition.range, information + '\n');
+		});
+	} else {
+		const position = new vscode.Position(0, 0);
+		await editor.edit((editBuilder) => {
+			editBuilder.insert(position, formattedProperty + information + '\n');
+		});
+	}
 }

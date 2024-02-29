@@ -83,7 +83,12 @@
 			},
 			{
 				"command": "gsqlEditor.addSubgraphId",
-				"title": "Add the selected subgraph's ID to the open GSQL file",
+				"title": "Add Subgraph ID",
+				"category": "GRAPHSQL"
+			},
+			{
+				"command": "gsqlEditor.replaceSubgraphId",
+				"title": "Replace Subgraph ID",
 				"category": "GRAPHSQL"
 			}
 		],
@@ -116,6 +121,12 @@
 				"command": "gsqlEditor.addSubgraphId",
 				"key": "ctrl+m ctrl+a",
 				"mac": "cmd+m cmd+a",
+				"when": "editorTextFocus && editorLangId == 'gsql'"
+			},
+			{
+				"command": "gsqlEditor.replaceSubgraphId",
+				"key": "ctrl+m ctrl+p",
+				"mac": "cmd+m cmd+p",
 				"when": "editorTextFocus && editorLangId == 'gsql'"
 			}
 		],

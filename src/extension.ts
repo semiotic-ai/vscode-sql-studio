@@ -6,7 +6,7 @@ import { ExecuteSQL } from './service';
 import { ResultsProvider } from './providers/results';
 import { SqlDocumentDropProvider } from './providers/sqldoc';
 import { GraphSQLProvider } from './providers/language';
-import { addPropertyToEditor } from './editor/property';
+import { addPropertyToEditor, replacePropertyInEditor } from './editor/property';
 import { open } from 'fs';
 
 // This function encapsulates the logic to open a new query window with the correct
@@ -118,6 +118,20 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 	context.subscriptions.push(addSubgraphIdCommand);
+
+	const replaceSubgraphIdCommand = vscode.commands.registerTextEditorCommand(
+		'gsqlEditor.replaceSubgraphId',
+		async () => {
+			const selectedSubgraphInfo = subgraphProvider.getSelectedSubgraph();
+			if (!selectedSubgraphInfo) {
+				return; // Early return if no subgraph is selected
+			}
+			const property = 'id';
+			const information = selectedSubgraphInfo.id;
+			await replacePropertyInEditor(property, information);
+		}
+	);
+	context.subscriptions.push(replaceSubgraphIdCommand);
 }
 
 // This method is called when your extension is deactivated

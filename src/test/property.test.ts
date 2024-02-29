@@ -2,71 +2,18 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import {
 	addPropertyToEditor,
-	getPropertyLineNumber,
-	makePropertyString,
-	getPropertyValue
+	getPropertyValue,
+	replacePropertyInEditor,
+	getPropertyLineNumber
 } from '../editor/property';
 import { resolve } from 'path';
-
-suite('makePropertyString', () => {
-	test('should return "--+: " for an empty string', () => {
-		const result = makePropertyString('');
-		assert.strictEqual(result, '--+: ');
-	});
-
-	test('should correctly format "id" into "--+ID: "', () => {
-		const result = makePropertyString('id');
-		assert.strictEqual(result, '--+ID: ');
-	});
-
-	test('should recognize and not alter already correctly formatted "--+ID: "', () => {
-		const result = makePropertyString('--+ID: ');
-		assert.strictEqual(result, '--+ID: ');
-	});
-});
-
-suite('getPropertyLineNumber', () => {
-	test('It should return the correct line number for id', async () => {
-		// Open the document you want to test
-		const uri = vscode.Uri.file(
-			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
-		);
-		const document = await vscode.workspace.openTextDocument(uri);
-		await vscode.window.showTextDocument(document);
-
-		const property = 'id';
-		const lineNumber = getPropertyLineNumber(property, document);
-		assert.strictEqual(lineNumber, 1);
-	});
-
-	test('It should return the correct line number for a --+ID: ', async () => {
-		// Open the document you want to test
-		const uri = vscode.Uri.file(
-			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
-		);
-		const document = await vscode.workspace.openTextDocument(uri);
-		await vscode.window.showTextDocument(document);
-
-		const property = '--+ID: ';
-		const lineNumber = getPropertyLineNumber(property, document);
-		assert.strictEqual(lineNumber, 1);
-	});
-
-	test('It should return -1 for a property that is not in the file', async () => {
-		// Open the document you want to test
-		const uri = vscode.Uri.file(
-			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
-		);
-		const document = await vscode.workspace.openTextDocument(uri);
-		await vscode.window.showTextDocument(document);
-
-		const property = 'fakeProp';
-		const lineNumber = getPropertyLineNumber(property, document);
-		assert.strictEqual(lineNumber, -1);
-	});
-});
+import { afterEach } from 'mocha';
 
 suite('getPropertyValue', () => {
+	afterEach(async () => {
+		await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+	});
+
 	test('It should return an empty string if the property is not in the doc', async () => {
 		// Open the document you want to test
 		const uri = vscode.Uri.file(
@@ -95,6 +42,10 @@ suite('getPropertyValue', () => {
 });
 
 suite('addPropertyToEditor', () => {
+	afterEach(async () => {
+		await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+	});
+
 	test('It should not add a property that is in the document', async () => {
 		const uri = vscode.Uri.file(
 			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
@@ -110,7 +61,6 @@ suite('addPropertyToEditor', () => {
 
 		await addPropertyToEditor(property, information, position);
 
-		console.log(editor.document.getText());
 		const newValue = getPropertyValue(property, editor.document);
 		assert.strictEqual(newValue, 'HUZDsRpEVP2AvzDCyzDHtdc64dyDxx8FQjzsmqSg4H3B');
 	});
@@ -130,8 +80,53 @@ suite('addPropertyToEditor', () => {
 
 		await addPropertyToEditor(property, information, position);
 
-		console.log(editor.document.getText());
 		const newLineNumber = getPropertyLineNumber(property, editor.document);
 		assert.strictEqual(newLineNumber, 1);
+	});
+});
+
+suite('replacePropertyInEditor', () => {
+	afterEach(async () => {
+		await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+	});
+
+	test('It should add a property if it is not in the document', async () => {
+		const uri = vscode.Uri.file(
+			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
+		);
+		const document = await vscode.workspace.openTextDocument(uri);
+		const editor = await vscode.window.showTextDocument(document);
+
+		const property = '--+FOO: ';
+		const information = 'BAR';
+
+		assert.strictEqual(getPropertyLineNumber(property, editor.document), -1);
+
+		await replacePropertyInEditor(property, information);
+
+		const fooLineNumber = getPropertyLineNumber(property, editor.document);
+		assert.strictEqual(fooLineNumber, 1);
+
+		const idLineNumber = getPropertyLineNumber('--+ID: ', editor.document);
+		assert.strictEqual(idLineNumber, 2);
+	});
+
+	test('If a property is in the document, replace its value', async () => {
+		const uri = vscode.Uri.file(
+			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
+		);
+		const document = await vscode.workspace.openTextDocument(uri);
+		const editor = await vscode.window.showTextDocument(document);
+
+		const property = '--+ID: ';
+		const information = '12345';
+		const position = new vscode.Position(0, 0);
+
+		assert.strictEqual(getPropertyLineNumber(property, editor.document), 1);
+
+		await replacePropertyInEditor(property, information);
+
+		const newValue = getPropertyValue(property, editor.document);
+		assert.strictEqual(newValue, '12345');
 	});
 });

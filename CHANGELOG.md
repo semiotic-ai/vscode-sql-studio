@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.2.0...v0.2.1) (2024-02-29)
+
+
+### Bug Fixes
+
+* increase selected subgraph icon size ([74707f0](https://github.com/semiotic-ai/vscode-sql-studio/commit/74707f010bc2e11898b795eaf47d66585eef0db1))
+
 ## [0.2.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.1.2...v0.2.0) (2024-02-29)
 
 

@@ -6,6 +6,7 @@ import { ExecuteSQL } from './service';
 import { ResultsProvider } from './providers/results';
 import { SqlDocumentDropProvider } from './providers/sqldoc';
 import { GraphSQLProvider } from './providers/language';
+import { addPropertyToEditor } from './editor/property';
 import { open } from 'fs';
 
 // This function encapsulates the logic to open a new query window with the correct
@@ -105,18 +106,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const addSubgraphIdCommand = vscode.commands.registerTextEditorCommand(
 		'gsqlEditor.addSubgraphId',
-		() => {
-			const editor = vscode.window.activeTextEditor;
-
-			if (editor) {
-				const selectedSubgraphInfo = subgraphProvider.getSelectedSubgraph();
-				const document = editor.document;
-				if (document.languageId === 'gsql' && selectedSubgraphInfo) {
-					editor.edit((editBuilder) => {
-						editBuilder.insert(new vscode.Position(0, 0), '--+ID: ' + selectedSubgraphInfo.id);
-					});
-				}
+		async () => {
+			const selectedSubgraphInfo = subgraphProvider.getSelectedSubgraph();
+			if (!selectedSubgraphInfo) {
+				return; // Early return if no subgraph is selected
 			}
+			const property = 'id';
+			const position = new vscode.Position(0, 0);
+			const information = selectedSubgraphInfo.id;
+			await addPropertyToEditor(property, information, position);
 		}
 	);
 	context.subscriptions.push(addSubgraphIdCommand);

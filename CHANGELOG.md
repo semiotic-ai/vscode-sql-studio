@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.1.1...v0.1.2) (2024-02-29)
+
+
+### Bug Fixes
+
+* Persist results after switching panels back and forth ([c80765d](https://github.com/semiotic-ai/vscode-sql-studio/commit/c80765d75a4b53a82ae2d928c05ab1992706df1e))
+
 ## [0.1.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.1.0...v0.1.1) (2024-02-29)
 
 

@@ -6,7 +6,7 @@ import {
 	replacePropertyInEditor,
 	getPropertyLineNumber
 } from '../editor/property';
-import { resolve } from 'path';
+import * as path from 'path';
 import { afterEach } from 'mocha';
 
 suite('getPropertyValue', () => {
@@ -17,7 +17,7 @@ suite('getPropertyValue', () => {
 	test('It should return an empty string if the property is not in the doc', async () => {
 		// Open the document you want to test
 		const uri = vscode.Uri.file(
-			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
+			path.join(__dirname, '..', '..', 'src', 'test', 'samples', 'query-with-properties.gsql')
 		);
 		const document = await vscode.workspace.openTextDocument(uri);
 		await vscode.window.showTextDocument(document);
@@ -30,7 +30,7 @@ suite('getPropertyValue', () => {
 	test('It should return the correct value for a property in the file', async () => {
 		// Open the document you want to test
 		const uri = vscode.Uri.file(
-			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
+			path.join(__dirname, '..', '..', 'src', 'test', 'samples', 'query-with-properties.gsql')
 		);
 		const document = await vscode.workspace.openTextDocument(uri);
 		await vscode.window.showTextDocument(document);
@@ -48,7 +48,7 @@ suite('addPropertyToEditor', () => {
 
 	test('It should not add a property that is in the document', async () => {
 		const uri = vscode.Uri.file(
-			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
+			path.join(__dirname, '..', '..', 'src', 'test', 'samples', 'query-with-properties.gsql')
 		);
 		const document = await vscode.workspace.openTextDocument(uri);
 		const editor = await vscode.window.showTextDocument(document);
@@ -67,7 +67,7 @@ suite('addPropertyToEditor', () => {
 
 	test('It should add a property that is not in the document', async () => {
 		const uri = vscode.Uri.file(
-			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
+			path.join(__dirname, '..', '..', 'src', 'test', 'samples', 'query-with-properties.gsql')
 		);
 		const document = await vscode.workspace.openTextDocument(uri);
 		const editor = await vscode.window.showTextDocument(document);
@@ -92,7 +92,7 @@ suite('replacePropertyInEditor', () => {
 
 	test('It should add a property if it is not in the document', async () => {
 		const uri = vscode.Uri.file(
-			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
+			path.join(__dirname, '..', '..', 'src', 'test', 'samples', 'query-with-properties.gsql')
 		);
 		const document = await vscode.workspace.openTextDocument(uri);
 		const editor = await vscode.window.showTextDocument(document);
@@ -113,7 +113,7 @@ suite('replacePropertyInEditor', () => {
 
 	test('If a property is in the document, replace its value', async () => {
 		const uri = vscode.Uri.file(
-			resolve(__dirname, '../../src/test/samples/query-with-properties.gsql')
+			path.join(__dirname, '..', '..', 'src', 'test', 'samples', 'query-with-properties.gsql')
 		);
 		const document = await vscode.workspace.openTextDocument(uri);
 		const editor = await vscode.window.showTextDocument(document);

@@ -54,14 +54,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 			await subgraphSchemaProvider.updateSelectedSubgraph(subgraphItem.info);
 			languageProvider.updateLayout(subgraphSchemaProvider.subgraphLayout);
-
-			const isGsqlOpen = vscode.window.visibleTextEditors.some(
-				(editor) => editor.document.languageId === 'gsql'
-			);
-
-			if (!isGsqlOpen) {
-				await openNewQueryWindow();
-			}
 		}
 	});
 

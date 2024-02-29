@@ -32,6 +32,10 @@
 		"menus": {
 			"editor/context": [
 				{
+					"command": "subgraphs.Search",
+					"when": "editorTextFocus && editorLangId == 'gsql'"
+				},
+				{
 					"command": "query.runQuery",
 					"when": "editorTextFocus && editorLangId == 'gsql'"
 				},
@@ -42,6 +46,26 @@
 				{
 					"command": "query.showResults",
 					"when": "editorTextFocus && editorLangId == 'gsql'"
+				},
+				{
+					"command": "gsqlEditor.addSubgraphId",
+					"when": "editorTextFocus && editorLangId == 'gsql'"
+				},
+				{
+					"command": "gsqlEditor.replaceSubgraphId",
+					"when": "editorTextFocus && editorLangId == 'gsql'"
+				}
+			],
+			"view/title": [
+				{
+					"command": "subgraphs.Search",
+					"when": "view == subgraphs",
+					"group": "navigation"
+				},
+				{
+					"command": "subgraphs.Load",
+					"when": "view == subgraphs",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
@@ -74,14 +98,6 @@
 				"category": "GRAPHSQL"
 			},
 			{
-				"command": "subgraphs.loadMoreSubgraphs",
-				"title": "Load More",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
 				"command": "gsqlEditor.addSubgraphId",
 				"title": "Add Subgraph ID",
 				"category": "GRAPHSQL"
@@ -89,6 +105,18 @@
 			{
 				"command": "gsqlEditor.replaceSubgraphId",
 				"title": "Replace Subgraph ID",
+				"category": "GRAPHSQL"
+			},
+			{
+				"command": "subgraphs.Search",
+				"title": "Search Subgraph by name and description",
+				"category": "GRAPHSQL",
+				"icon": "$(search)"
+			},
+			{
+				"command": "subgraphs.Load",
+				"title": "Load most signalled subgraphs",
+				"icon": "$(cloud-download)",
 				"category": "GRAPHSQL"
 			}
 		],
@@ -112,7 +140,7 @@
 				"when": "editorTextFocus && editorLangId == 'gsql'"
 			},
 			{
-				"command": "subgraphs.loadMoreSubgraphs",
+				"command": "subgraphs.Load",
 				"key": "ctrl+m ctrl+l",
 				"mac": "cmd+m cmd+l",
 				"when": "view == subgraphs"
@@ -128,6 +156,12 @@
 				"key": "ctrl+m ctrl+p",
 				"mac": "cmd+m cmd+p",
 				"when": "editorTextFocus && editorLangId == 'gsql'"
+			},
+			{
+				"command": "subgraphs.Search",
+				"key": "ctrl+m ctrl+s",
+				"mac": "cmd+m cmd+s",
+				"when": "view == subgraphs"
 			}
 		],
 		"viewsContainers": {

@@ -1,153 +1,96 @@
 import * as vscode from 'vscode';
-import { GetLayout, ISubgraphInfo, getSubgraphs } from '../service';
-import { ColumnType, Layout, TypeKind } from '../graphtables/layout';
-import * as path from 'path';
+import { getLayout, ISubgraphInfo, searchSubgraph, getSubgraphs } from '../service';
+import { ColumnType, Layout, TypeKind, Column, Table } from '../graphtables/layout';
+import path from 'path';
 
 const PAGE_SIZE = 20;
-const LOAD_MORE_COMMAND = 'subgraphs.loadMoreSubgraphs';
-
-/**
- * Represents a TreeItem within a VSCode TreeView for subgraphs.
- * It includes additional functionality to manage selection state and corresponding icon.
- */
-class SubgraphItem extends vscode.TreeItem {
-	/**
-	 * Creates an instance of a SubgraphItem.
-	 * @param {ISubgraphInfo} info Information about the subgraph, including its name and id.
-	 * @param {vscode.TreeItemCollapsibleState} collapsibleState The collapsible state of the tree item in the tree view.
-	 * @param {boolean} isSelected Indicates whether the subgraph is currently selected.
-	 */
-	constructor(
-		public readonly info?: ISubgraphInfo,
-		public readonly collapsibleState?: vscode.TreeItemCollapsibleState,
-		protected isSelected: boolean = false
-	) {
-		const label = info?.displayName || 'More...';
-		const state = collapsibleState || vscode.TreeItemCollapsibleState.None;
-		super(label, state);
-		this.tooltip = info ? `${this.label}-${info.currentVersion}` : 'Load more';
-		this.description = info ? info.currentVersion : 'Load more';
-		this.unselect();
-
-		if (!info) {
-			this.command = {
-				command: LOAD_MORE_COMMAND,
-				title: 'Load more'
-			};
-			this.iconPath = new vscode.ThemeIcon(`more`);
-		}
-	}
-
-	/**
-	 * Marks the subgraph item as selected and updates the icon to be a green dot
-	 */
-	select() {
-		this.isSelected = true;
-		this.iconPath = vscode.Uri.file(path.join(__dirname, '..', 'resources', 'green-dot.svg'));
-	}
-
-	/**
-	 * Marks the subgraph item as unselected and resets the icon to a database icon.
-	 */
-	unselect() {
-		this.isSelected = false;
-		this.iconPath = new vscode.ThemeIcon(`database`);
-	}
-}
-
-const moreButton = () => {
-	const item = new SubgraphItem(undefined, vscode.TreeItemCollapsibleState.None);
-	return item;
-};
+const DEFAULT_SUBGRAPH_ICON = new vscode.ThemeIcon(`database`);
+const SELECTED_SUBGRAPH_ICON = vscode.Uri.file(
+	path.join(__dirname, '..', 'resources', 'green-dot.svg')
+);
 
 /**
  * Provides the data and behavior for a tree view that displays subgraphs.
  */
-export class SubgraphProvider implements vscode.TreeDataProvider<SubgraphItem> {
-	emitter: vscode.EventEmitter<SubgraphItem | undefined | void>;
-	onDidChangeTreeData?:
-		| vscode.Event<void | SubgraphItem | SubgraphItem[] | null | undefined>
-		| undefined;
-	cache: { [key: string]: { [id: string]: SubgraphItem } } = {}; // Stores SubgraphItems by ID for efficient access.
-	private _selectedSubgraph?: ISubgraphInfo; // Tracks the currently selected subgraph.
+export class SubgraphView implements vscode.TreeDataProvider<ISubgraphInfo>, vscode.Disposable {
+	private readonly _view: vscode.TreeView<ISubgraphInfo>;
 
-	constructor(context: vscode.ExtensionContext) {
-		this.emitter = new vscode.EventEmitter();
-		this.onDidChangeTreeData = this.emitter.event;
-		this.cache = {};
+	private readonly _cache: Map<string, ISubgraphInfo>; // Stores SubgraphItems by ID for efficient access.
 
-		let loadMoreSubgraphs = vscode.commands.registerCommand(LOAD_MORE_COMMAND, async () => {
-			await this.fetchSubgraphs(true);
+	private readonly _dataEmitter: vscode.EventEmitter<ISubgraphInfo | void>;
+	onDidChangeTreeData: vscode.Event<ISubgraphInfo | void>;
+	private readonly _itemEmitter: vscode.EventEmitter<ISubgraphInfo | undefined>;
+	onSelectedItemChanged: vscode.Event<ISubgraphInfo | undefined>;
 
-			// Refresh the TreeView, which collects data from the cache
-			this.refresh();
+	private selected?: ISubgraphInfo;
+
+	constructor(viewId: string) {
+		this._cache = new Map();
+		this._dataEmitter = new vscode.EventEmitter();
+		this.onDidChangeTreeData = this._dataEmitter.event;
+		this._itemEmitter = new vscode.EventEmitter();
+		this.onSelectedItemChanged = this._itemEmitter.event;
+
+		this._view = vscode.window.createTreeView(viewId, {
+			treeDataProvider: this
 		});
-		context.subscriptions.push(loadMoreSubgraphs);
+
+		this._view.onDidChangeSelection((event) => {
+			this.updateSelected(event.selection[0]);
+		});
 	}
 
-	/**
-	 * Updates which subgraph is selected.
-	 * @param subgraphInfo Information about the subgraph to select.
-	 */
-	updateSelection(subgraphInfo: ISubgraphInfo) {
-		this.unsetSelectedSubgraph();
-		this.setSelectedSubgraph(subgraphInfo);
-		this.refresh();
-	}
-
-	/**
-	 * Sets the specified subgraph as selected.
-	 * @param {ISubgraphInfo} subgraphInfo The subgraph to select
-	 */
-	setSelectedSubgraph(subgraphInfo: ISubgraphInfo) {
-		if (subgraphInfo && this.cache['subgraphs'][subgraphInfo.id]) {
-			this._selectedSubgraph = subgraphInfo;
-			let newSelection = this.cache['subgraphs'][subgraphInfo.id];
-			newSelection.select();
-		} else {
-			// fallback
-			this._selectedSubgraph = undefined;
+	private updateSelected(subgraph?: ISubgraphInfo) {
+		const lastSelected = this.selected;
+		if (lastSelected?.id !== subgraph?.id) {
+			this.selected = subgraph;
+			if (lastSelected) {
+				this._dataEmitter.fire(lastSelected);
+			}
+			this._dataEmitter.fire(subgraph);
+			this._itemEmitter.fire(subgraph);
 		}
 	}
 
-	/**
-	 * Retrieves the currently selected subgraph information from the cache.
-	 * This method checks if there is a selected subgraph and if it exists within
-	 * the cache. If both conditions are met, it returns the selected subgraph's
-	 * information. Otherwise, it returns null.
-	 *
-	 * @returns {ISubgraphInfo | null} The information of the currently selected subgraph
-	 * if it exists and is found in the cache; otherwise, null.
-	 */
-	getSelectedSubgraph(): ISubgraphInfo | null {
-		if (this._selectedSubgraph && this.cache['subgraphs'][this._selectedSubgraph.id]) {
-			return this._selectedSubgraph;
-		}
-		return null;
-	}
-
-	/**
-	 * Unselects the currently selected subgraph, if any.
-	 */
-	unsetSelectedSubgraph() {
-		if (this._selectedSubgraph && this.cache['subgraphs'][this._selectedSubgraph.id]) {
-			let lastSelected = this.cache['subgraphs'][this._selectedSubgraph.id];
-			lastSelected.unselect();
+	public select(subgraph?: ISubgraphInfo) {
+		if (subgraph) {
+			if (!this._cache.has(subgraph.id)) {
+				this._cache.set(subgraph.id, subgraph);
+				this._dataEmitter.fire();
+			}
+			this._view.reveal(subgraph, { select: true, focus: true });
 		}
 	}
 
-	getTreeItem(element: SubgraphItem): SubgraphItem {
-		return element;
+	dispose() {
+		this._view.dispose();
+		this._dataEmitter.dispose();
+		this._itemEmitter.dispose();
 	}
 
-	async getChildren(element?: SubgraphItem): Promise<SubgraphItem[]> {
-		let items: SubgraphItem[] = await this.fetchSubgraphs(false);
-		items.push(moreButton());
-		return items;
+	getTreeItem(element: ISubgraphInfo): vscode.TreeItem {
+		const item = new vscode.TreeItem(element.displayName);
+		item.tooltip = `${element.displayName}-${element.currentVersion}`;
+		item.description = element.currentVersion;
+		item.iconPath =
+			this.selected?.id === element.id ? SELECTED_SUBGRAPH_ICON : DEFAULT_SUBGRAPH_ICON;
+		return item;
 	}
 
-	refresh() {
-		this.emitter.fire();
+	getParent(_: ISubgraphInfo): vscode.ProviderResult<ISubgraphInfo> {
+		return undefined;
+	}
+
+	async getChildren(_?: ISubgraphInfo): Promise<ISubgraphInfo[]> {
+		if (this._cache.size === 0) {
+			await this.fetchSubgraphs();
+		}
+		return Array.from(this._cache.values());
+	}
+
+	public async loadMore() {
+		await this.fetchSubgraphs();
+		this._dataEmitter.fire();
 	}
 
 	/**
@@ -155,8 +98,6 @@ export class SubgraphProvider implements vscode.TreeDataProvider<SubgraphItem> {
 	 * new subgraphs are fetched and added to the cache. This method also updates the selection state of each subgraph
 	 * based on the current selection.
 	 *
-	 * @param {boolean} addRows A boolean indicating whether to fetch additional subgraphs beyond those already cached.
-	 *                This is typically used for pagination or lazy loading of data.
 	 * @returns A Promise that resolves to an array of SubgraphItem instances representing the fetched subgraphs.
 	 *          Each SubgraphItem's selection state is updated to reflect whether it is the currently selected subgraph.
 	 *
@@ -172,100 +113,52 @@ export class SubgraphProvider implements vscode.TreeDataProvider<SubgraphItem> {
 	 * Note: This method assumes the existence of a global `PAGE_SIZE` constant that determines how many subgraphs are fetched
 	 * per request, and relies on the `getSubgraphs` function to actually retrieve subgraph data.
 	 */
-	async fetchSubgraphs(addRows: boolean): Promise<SubgraphItem[]> {
-		const key = 'subgraphs';
-		if (addRows || !this.cache[key]) {
-			const offset = this.cache[key] ? Object.keys(this.cache[key]).length : 0;
-			const data = await getSubgraphs(PAGE_SIZE, offset); // Simulated fetch function
+	async fetchSubgraphs() {
+		const offset = this._cache.size;
+		const data = await getSubgraphs(PAGE_SIZE, offset); // Simulated fetch function
 
-			if (data.length > 0) {
-				this.cache[key] = this.cache[key] || {};
-				data.forEach((subgraph) => {
-					const isSelected = subgraph.id === this._selectedSubgraph?.id;
-					this.cache[key][subgraph.id] = new SubgraphItem(
-						subgraph,
-						vscode.TreeItemCollapsibleState.None,
-						isSelected
-					);
-				});
-			} else {
-				vscode.window.showInformationMessage('No more items to load.');
-			}
+		if (data.length > 0) {
+			data.forEach((subgraph) => {
+				this._cache.set(subgraph.id, subgraph);
+			});
+		} else {
+			vscode.window.showInformationMessage('No more items to load.');
 		}
-
-		return Object.values(this.cache[key]); // Convert cache entries to array
 	}
 }
 
-class SchemaTable extends vscode.TreeItem {
-	constructor(public readonly label: string) {
-		super(label, vscode.TreeItemCollapsibleState.Collapsed);
-		this.id = label;
-		this.iconPath = new vscode.ThemeIcon('symbol-class');
-	}
-}
+export type SchemaObject = { name: string; parent?: string; type?: string };
 
-class SchemaColumn extends vscode.TreeItem {
-	constructor(
-		public readonly label: string,
-		public readonly type: string
-	) {
-		super(label, vscode.TreeItemCollapsibleState.None);
-		// this.id = label;
-		this.description = type;
-	}
-
-	iconPath = new vscode.ThemeIcon('symbol-field');
-}
-
-type SchemaItem = SchemaTable | SchemaColumn;
-
-export class SubgraphSchemaProvider
-	implements vscode.TreeDataProvider<SchemaItem>, vscode.TreeDragAndDropController<SchemaItem>
+export class SubgraphSchemaView
+	implements
+		vscode.TreeDataProvider<SchemaObject>,
+		vscode.TreeDragAndDropController<SchemaObject>,
+		vscode.Disposable
 {
-	emitter: vscode.EventEmitter<SchemaItem | undefined | void>;
-	onDidChangeTreeData: vscode.Event<void | SchemaItem | SchemaItem[] | null | undefined>;
-	// tables: { [name: string]: { [colunm: string]: string } };
-	subgraphLayout: Layout | undefined;
-	subgraphInfo: ISubgraphInfo | undefined;
-
-	constructor(context: vscode.ExtensionContext) {
-		this.emitter = new vscode.EventEmitter();
-		this.onDidChangeTreeData = this.emitter.event;
-
-		// this.tables = {};
-	}
-
 	dropMimeTypes: readonly string[] = [];
 	dragMimeTypes: readonly string[] = ['text/plain'];
 
-	public async handleDrag?(
-		source: readonly SchemaItem[],
-		dataTransfer: vscode.DataTransfer,
-		token: vscode.CancellationToken
-	): Promise<void> {
-		if (source.length !== 1) {
-			return;
-		}
+	private readonly _emitter: vscode.EventEmitter<void>;
+	onDidChangeTreeData?: vscode.Event<void>;
 
-		const item = source[0];
+	private readonly _view: vscode.TreeView<SchemaObject>;
 
-		dataTransfer.set('text/plain', new vscode.DataTransferItem(item.label));
+	public subgraphLayout?: Layout;
+
+	constructor(viewId: string) {
+		this._emitter = new vscode.EventEmitter();
+		this.onDidChangeTreeData = this._emitter.event;
+		this._view = vscode.window.createTreeView(viewId, {
+			treeDataProvider: this,
+			dragAndDropController: this
+		});
 	}
 
-	public async handleDrop?(
-		target: SchemaItem | undefined,
-		dataTransfer: vscode.DataTransfer,
-		token: vscode.CancellationToken
-	): Promise<void> {
-		return;
-	}
-
-	async updateSelectedSubgraph(subgraphInfo?: ISubgraphInfo) {
+	public async update(subgraphInfo?: ISubgraphInfo) {
+		this.subgraphLayout = undefined;
 		if (subgraphInfo) {
 			try {
 				this.subgraphLayout = await this.fetchLayout(subgraphInfo.deploymentSchemaId);
-				this.subgraphInfo = subgraphInfo;
 				this.refresh();
 			} catch (error) {
 				vscode.window.showInformationMessage(
@@ -275,23 +168,31 @@ export class SubgraphSchemaProvider
 		}
 	}
 
-	getTreeItem(element: SchemaItem): SchemaItem {
-		return element;
+	refresh(): void {
+		this._emitter.fire();
 	}
 
-	async getChildren(element?: SchemaItem): Promise<SchemaItem[]> {
+	getTreeItem(element: SchemaObject): vscode.TreeItem {
+		const item = new vscode.TreeItem(element.name);
+		item.id = element.parent ? `${element.parent}.${element.name}` : element.name;
+		item.iconPath = new vscode.ThemeIcon(element.parent ? 'symbol-field' : 'symbol-class');
+		item.description = element.type;
+		return item;
+	}
+
+	async getChildren(element?: SchemaObject): Promise<SchemaObject[]> {
 		if (!this.subgraphLayout) {
 			return [];
 		}
 
-		const items: SchemaItem[] = [];
+		const items: SchemaObject[] = [];
 
 		if (!element) {
 			for (const [table_name, table] of this.subgraphLayout.tables) {
-				items.push(new SchemaTable(table_name));
+				items.push({ name: table_name });
 			}
-		} else if (element instanceof SchemaTable) {
-			const columns = this.subgraphLayout.tables.get(element.label)?.columns;
+		} else if (!element.parent) {
+			const columns = this.subgraphLayout.tables.get(element.name)?.columns;
 
 			if (!columns) {
 				return [];
@@ -311,24 +212,99 @@ export class SubgraphSchemaProvider
 							return type.dbType;
 					}
 				}
-				items.push(new SchemaColumn(column_name, getType(column.type)));
+				items.push({ name: column_name, parent: element.name, type: getType(column.type) });
 			}
 		}
 
 		return items;
 	}
 
-	refresh() {
-		this.emitter.fire();
-	}
-
 	async fetchLayout(deploymentSchemaId: string): Promise<Layout> {
 		// Fetch the data from our source
-		const data = await GetLayout(
-			'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum',
-			deploymentSchemaId
-		);
+		const data = await getLayout(deploymentSchemaId);
 
 		return data;
+	}
+
+	public async handleDrag?(
+		source: readonly SchemaObject[],
+		dataTransfer: vscode.DataTransfer,
+		token: vscode.CancellationToken
+	): Promise<void> {
+		if (source.length !== 1) {
+			return;
+		}
+
+		const item = source[0];
+
+		const path = item.parent ? `${item.parent}.${item.name}` : item.name;
+
+		dataTransfer.set('text/plain', new vscode.DataTransferItem(path));
+	}
+
+	public async handleDrop?(
+		target: SchemaObject | undefined,
+		dataTransfer: vscode.DataTransfer,
+		token: vscode.CancellationToken
+	): Promise<void> {
+		return;
+	}
+
+	dispose() {
+		this._view.dispose();
+		this._emitter.dispose();
+	}
+}
+
+class SubgraphQuickPickItem implements vscode.QuickPickItem {
+	label: string;
+	description?: string | undefined;
+	detail?: string | undefined;
+	picked?: boolean | undefined;
+	info: ISubgraphInfo;
+	constructor(info: ISubgraphInfo) {
+		this.label = info.displayName;
+		this.description = info.description;
+		this.detail = info.id;
+		this.info = info;
+	}
+}
+
+export class SubgraphPicker implements vscode.Disposable {
+	private subgraphPicker: vscode.QuickPick<SubgraphQuickPickItem>;
+
+	private emitter: vscode.EventEmitter<ISubgraphInfo | undefined>;
+	public onSubgraphPicked: vscode.Event<ISubgraphInfo | undefined>;
+
+	constructor() {
+		this.subgraphPicker = vscode.window.createQuickPick<SubgraphQuickPickItem>();
+		this.subgraphPicker.placeholder = 'Search for a subgraph';
+		this.subgraphPicker.onDidChangeValue(async (value) => {
+			if (value.length > 2) {
+				const search = `'${value}'`;
+				const subgraphs = await searchSubgraph(search);
+				this.subgraphPicker.items = subgraphs.map(
+					(subgraph) => new SubgraphQuickPickItem(subgraph)
+				);
+			}
+		});
+
+		this.emitter = new vscode.EventEmitter();
+		this.onSubgraphPicked = this.emitter.event;
+
+		this.subgraphPicker.onDidAccept(() => {
+			const selected = this.subgraphPicker.selectedItems[0];
+			this.emitter.fire(selected.info);
+			this.subgraphPicker.hide();
+		});
+	}
+
+	dispose() {
+		this.subgraphPicker.dispose();
+		this.emitter.dispose();
+	}
+
+	show() {
+		this.subgraphPicker.show();
 	}
 }

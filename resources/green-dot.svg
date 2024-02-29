@@ -24,14 +24,32 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="1.0779321"
-     inkscape:cx="396.5927"
-     inkscape:cy="561.25984"
-     inkscape:window-width="1382"
-     inkscape:window-height="692"
-     inkscape:window-x="1398"
+     inkscape:cx="396.12885"
+     inkscape:cy="718.04152"
+     inkscape:window-width="2038"
+     inkscape:window-height="1392"
+     inkscape:window-x="3074"
      inkscape:window-y="40"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer1"
+     showgrid="false">
+    <inkscape:grid
+       id="grid1"
+       units="mm"
+       originx="0"
+       originy="0"
+       spacingx="0.99999998"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="false" />
+  </sodipodi:namedview>
   <defs
      id="defs1" />
   <g
@@ -39,11 +57,11 @@
      inkscape:groupmode="layer"
      id="layer1">
     <ellipse
-       style="fill:#57e700;stroke-width:0.264583;fill-opacity:1"
+       style="fill:#57e700;fill-opacity:1;stroke-width:0.867631"
        id="path1"
-       cx="89.457184"
-       cy="125.81863"
-       rx="11.862087"
-       ry="11.472393" />
+       cx="105"
+       cy="148.5"
+       rx="39.359737"
+       ry="37.179977" />
   </g>
 </svg>

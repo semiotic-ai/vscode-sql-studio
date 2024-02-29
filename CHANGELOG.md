@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.2.1...v0.3.0) (2024-02-29)
+
+
+### Features
+
+* add a command to add subgraph ID metadata to the document ([3d0dae2](https://github.com/semiotic-ai/vscode-sql-studio/commit/3d0dae2d2690a6b6fd726943656e116ce67fba65))
+
+
+### Reverts
+
+* **subgraphs:** don't open new text window when selecting a subgraph ([9029411](https://github.com/semiotic-ai/vscode-sql-studio/commit/9029411b32c3030fd3ebdb396a459369581c8cdd))
+
 ## [0.2.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.2.0...v0.2.1) (2024-02-29)
 
 

@@ -113,14 +113,14 @@
 				{
 					"id": "subgraphExplorer",
 					"title": "Subgraph Explorer",
-					"icon": "resources/the-graph.svg"
+					"icon": "resources/semiotic-icon.svg"
 				}
 			],
 			"panel": [
 				{
 					"id": "results",
 					"title": "Graph SQL Result",
-					"icon": "resources/the-graph.svg"
+					"icon": "resources/semiotic-icon.svg"
 				}
 			]
 		},

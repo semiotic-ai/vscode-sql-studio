@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { IQueryResult, ExecuteSQL, ISubgraphInfo } from '../service';
+import { IQueryResult, executeSQL, ISubgraphInfo } from '../service';
 
-export class ResultsProvider implements vscode.WebviewViewProvider {
+class ResultsProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'tabularResult';
 	private static readonly __knownPaths?: { [key: string]: string } = vscode.workspace
 		.getConfiguration('graphsql')
@@ -60,12 +60,12 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 
 			this.abortController = new AbortController();
 
-			await this.posMessage({ type: 'start', data: info.image });
-			const result = await ExecuteSQL(enpoint, query!, this.abortController.signal);
-			await this.posMessage({ type: 'finish', data: result });
+			await this.postMessage({ type: 'start', data: info.image });
+			const result = await executeSQL(enpoint, query!, this.abortController.signal);
+			await this.postMessage({ type: 'finish', data: result });
 		} catch (error: any) {
 			await vscode.window.showErrorMessage(error.message);
-			await this.posMessage({ type: 'clear' });
+			await this.postMessage({ type: 'clear' });
 		} finally {
 			this.abortController = undefined;
 		}
@@ -81,7 +81,7 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 		}
 	}
 
-	private async posMessage(message: {
+	private async postMessage(message: {
 		type: 'start' | 'finish' | 'clear';
 		data?: IQueryResult | string;
 	}): Promise<boolean> {
@@ -132,6 +132,29 @@ export class ResultsProvider implements vscode.WebviewViewProvider {
 				<script nonce="${nonce}" src="resources/media/main.js"></script>
 			</body>
 			</html>`;
+	}
+}
+
+export class ResultsView implements vscode.Disposable {
+	private readonly _provider: ResultsProvider;
+	private readonly _view: vscode.Disposable;
+
+	constructor(viewId: string, extensionUri: vscode.Uri) {
+		this._provider = new ResultsProvider(extensionUri);
+		this._view = vscode.window.registerWebviewViewProvider(viewId, this._provider);
+	}
+
+	public async execute(query?: string, info?: ISubgraphInfo) {
+		await this._provider.execute(query, info);
+	}
+
+	public cancel() {
+		this._provider.cancel();
+	}
+
+	dispose() {
+		this._provider.cancel();
+		this._view.dispose();
 	}
 }
 

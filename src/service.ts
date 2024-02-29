@@ -1,6 +1,9 @@
 import { parse } from './graphtables';
 import type { Layout } from './graphtables/layout';
 
+export const DEFAULT_SUBGRAPH_API_ENDPOINT =
+	'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum';
+
 interface ISubgraphQuery {
 	readonly query: string;
 	readonly variables: Record<string, unknown>;
@@ -9,8 +12,8 @@ interface ISubgraphQuery {
 }
 
 const SEARCH_TEMPLATE: ISubgraphQuery = {
-	query: `query SearchbyName($search:String!) {
-		subgraphMetadataSearch(first:20,text:$search)
+	query: `query SearchbyName($search:String!, $first:Int!) {
+		subgraphMetadataSearch(first:$first,text:$search,where:{ subgraph_:{id_not:null}})
 		{
 		  id,
 		  displayName,
@@ -39,7 +42,7 @@ const SEARCH_TEMPLATE: ISubgraphQuery = {
 		}
 	  }
     `,
-	variables: { search: '' },
+	variables: { search: '', first: 5 },
 	operationName: 'SearchbyName',
 	extensions: {}
 };
@@ -94,8 +97,6 @@ export function CheapCopy<T>(value: T): T {
 	return JSON.parse(JSON.stringify(value));
 }
 
-const SUBGRAPH_API_ENDPOINT =
-	'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum';
 const PAGINATED_SUBGRAPH_TEMPLATE: ISubgraphQuery = {
 	query: `query HomeSubgraphsPageContent__Subgraphs($_v0_skip: Int, $_v1_first: Int, $_v2_orderBy: Subgraph_orderBy, $_v3_orderDirection: OrderDirection, $_v4_where: Subgraph_filter, $_v5_subgraphError: _SubgraphErrorPolicy_!) {
   __typename
@@ -211,11 +212,22 @@ interface PaginatedSubgraph {
 	};
 }
 
-export async function getSubgraphs(first: number, skip: number): Promise<ISubgraphInfo[]> {
+/**
+ * Get a list of subgraphs from a graph network subgraph API endpoint sorted by the number of signalled tokens
+ * @param first number of subgraphs to return
+ * @param skip number of subgraphs to skip
+ * @param abortSignal signal to cancel the request
+ * @returns a list of `ISubgraphInfo`
+ */
+export async function getSubgraphs(
+	first: number,
+	skip: number,
+	abortSignal?: AbortSignal
+): Promise<ISubgraphInfo[]> {
 	const body = CheapCopy(PAGINATED_SUBGRAPH_TEMPLATE);
 	body.variables._v1_first = first;
 	body.variables._v0_skip = skip;
-	const response: PaginatedSubgraph = await CallGraphQL(SUBGRAPH_API_ENDPOINT, body);
+	const response: PaginatedSubgraph = await callGraphQL(body, undefined, abortSignal);
 
 	return response.data.NETWORK__subgraphs.map((subgraph) => ({
 		id: subgraph.id,
@@ -230,7 +242,13 @@ export async function getSubgraphs(first: number, skip: number): Promise<ISubgra
 	}));
 }
 
-async function CallGraphQL<B, R>(endpoint: string, body: B, abortSignal?: AbortSignal): Promise<R> {
+async function callGraphQL<B, R>(
+	body: B,
+	endpoint?: string,
+	abortSignal?: AbortSignal
+): Promise<R> {
+	endpoint = endpoint || DEFAULT_SUBGRAPH_API_ENDPOINT;
+
 	const response = await fetch(endpoint, {
 		headers: {
 			accept: 'application/graphql-response+json, application/json, multipart/mixed',
@@ -256,16 +274,21 @@ async function CallGraphQL<B, R>(endpoint: string, body: B, abortSignal?: AbortS
 
 /**
  * Search for subgraphs by name or description from a graph network subgraph API endpoint
- * @param endpoint url of the graph network subgraph API endpoint (ie: https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum)
  * @param search text to search in both display name and description of the subgraph
+ * @param endpoint url of the graph network subgraph API endpoint (ie: https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum)
+ * @param abortSignal signal to cancel the request
  * @returns a list of `ISubgraphInfo` matching the search criteria
  */
-export async function SearchSubgraph(endpoint: string, search: string): Promise<ISubgraphInfo[]> {
+export async function searchSubgraph(
+	search: string,
+	endpoint?: string,
+	abortSignal?: AbortSignal
+): Promise<ISubgraphInfo[]> {
 	const body = CheapCopy(SEARCH_TEMPLATE);
 
 	body.variables.search = search;
 
-	const json_response: ISubgraphSearchResult = await CallGraphQL(endpoint, body);
+	const json_response: ISubgraphSearchResult = await callGraphQL(body, endpoint, abortSignal);
 
 	const result: ISubgraphInfo[] = json_response.data.subgraphMetadataSearch.map((meta) => {
 		return {
@@ -307,16 +330,21 @@ interface ISchemaResponse {
 /**
  * Gets the database layout of a subgraph deployment by parsing the graphql schema based
  * on graph-node implementation
- * @param endpoint url of the graph network subgraph API endpoint (ie: https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum)
  * @param deploymentSchemaId deployment schema id of the subgraph
+ * @param endpoint url of the graph network subgraph API endpoint or use default. (ie: https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum)
+ * @param abortSignal signal to cancel the request
  * @returns database layout
  */
-export async function GetLayout(endpoint: string, deploymentSchemaId: string): Promise<Layout> {
+export async function getLayout(
+	deploymentSchemaId: string,
+	endpoint?: string,
+	abortSignal?: AbortSignal
+): Promise<Layout> {
 	const body = CheapCopy(SCHEMA_QUERY_TEMPLATE);
 
 	body.variables.deploymentSchemaId = deploymentSchemaId;
 
-	const json_response: ISchemaResponse = await CallGraphQL(endpoint, body);
+	const json_response: ISchemaResponse = await callGraphQL(body, endpoint, abortSignal);
 
 	const result = parse(json_response.data.subgraphDeploymentSchema.schema);
 
@@ -350,9 +378,10 @@ export interface IQueryResult {
  * Executes a SQL query on a SQL enabled graph-node
  * @param endpoint url of the graphql endpoint of subgraph
  * @param query SQL query to execute
+ * @param abortSignal signal to cancel the request
  * @returns result of the query
  */
-export async function ExecuteSQL(
+export async function executeSQL(
 	endpoint: string,
 	query: string,
 	abortSignal?: AbortSignal
@@ -361,7 +390,7 @@ export async function ExecuteSQL(
 
 	body.variables.query = query;
 
-	const json_response: IQueryResult = await CallGraphQL(endpoint, body, abortSignal);
+	const json_response: IQueryResult = await callGraphQL(body, endpoint, abortSignal);
 
 	return json_response;
 }

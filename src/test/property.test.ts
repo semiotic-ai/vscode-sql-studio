@@ -7,10 +7,10 @@ import {
 	getPropertyLineNumber
 } from '../editor/property';
 import * as path from 'path';
-import { afterEach } from 'mocha';
+import { teardown } from 'mocha';
 
 suite('getPropertyValue', () => {
-	afterEach(async () => {
+	teardown(async () => {
 		await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
 	});
 
@@ -42,7 +42,7 @@ suite('getPropertyValue', () => {
 });
 
 suite('addPropertyToEditor', () => {
-	afterEach(async () => {
+	teardown(async () => {
 		await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
 	});
 
@@ -86,7 +86,7 @@ suite('addPropertyToEditor', () => {
 });
 
 suite('replacePropertyInEditor', () => {
-	afterEach(async () => {
+	teardown(async () => {
 		await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
 	});
 

@@ -4,7 +4,7 @@
 // It cannot access the main VS Code APIs directly.
 (function () {
 	const vscode = acquireVsCodeApi();
-
+	const DataTable = window.simpleDatatables.DataTable;
 	const container = document.getElementById('container');
 	container.datatable = null;
 
@@ -37,10 +37,45 @@
 	});
 
 	function rendeResult(result) {
-		const datatable = new window.simpleDatatables.DataTable(container, {
+		const datatable = new DataTable(container, {
 			data: {
 				headings: result.columns,
 				data: result.rows
+			},
+			rowRender: (row, tr, index) => {
+				// This is for exporting a single dimension array
+				row.cells.forEach((cell, i) => {
+					if (cell.data.length > 0 && !Object.hasOwn(cell.data[0], 'nodeName')) {
+						cell.text = `[${cell.data.join(', ')}]`;
+					}
+				});
+
+				// This is for rendering a single dimension array
+				tr.childNodes.forEach((td, i) => {
+					if (td.childNodes.length > 0 && !Object.hasOwn(td.childNodes[0], 'nodeName')) {
+						td.childNodes = [
+							{
+								nodeName: 'details',
+								attributes: { class: 'datatable-array' },
+								childNodes: [
+									{
+										nodeName: 'summary',
+										childNodes: [{ nodeName: '#text', data: td.childNodes[0] }]
+									}
+								].concat(
+									td.childNodes.slice(1).map((content) => {
+										return {
+											nodeName: 'div',
+											childNodes: [{ nodeName: '#text', data: content }]
+										};
+									})
+								)
+							}
+						];
+					}
+				});
+
+				return tr;
 			}
 		});
 

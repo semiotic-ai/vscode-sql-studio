@@ -93,3 +93,11 @@ body {
 		transform: translate(calc(100% / 3));
 	}
 }
+
+.datatable-array SUMMARY {
+	width: max-content;
+}
+
+.datatable-array DIV {
+	padding-left: 13px;
+}

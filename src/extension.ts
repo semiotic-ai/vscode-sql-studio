@@ -102,6 +102,24 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	vscode.commands.executeCommand('tabularResult.focus');
+
+	const addSubgraphIdCommand = vscode.commands.registerTextEditorCommand(
+		'gsqlEditor.addSubgraphId',
+		() => {
+			const editor = vscode.window.activeTextEditor;
+
+			if (editor) {
+				const selectedSubgraphInfo = subgraphProvider.getSelectedSubgraph();
+				const document = editor.document;
+				if (document.languageId === 'gsql' && selectedSubgraphInfo) {
+					editor.edit((editBuilder) => {
+						editBuilder.insert(new vscode.Position(0, 0), '--+ID: ' + selectedSubgraphInfo.id);
+					});
+				}
+			}
+		}
+	);
+	context.subscriptions.push(addSubgraphIdCommand);
 }
 
 // This method is called when your extension is deactivated

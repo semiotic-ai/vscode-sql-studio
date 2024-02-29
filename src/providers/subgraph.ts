@@ -111,6 +111,22 @@ export class SubgraphProvider implements vscode.TreeDataProvider<SubgraphItem> {
 	}
 
 	/**
+	 * Retrieves the currently selected subgraph information from the cache.
+	 * This method checks if there is a selected subgraph and if it exists within
+	 * the cache. If both conditions are met, it returns the selected subgraph's
+	 * information. Otherwise, it returns null.
+	 *
+	 * @returns {ISubgraphInfo | null} The information of the currently selected subgraph
+	 * if it exists and is found in the cache; otherwise, null.
+	 */
+	getSelectedSubgraph(): ISubgraphInfo | null {
+		if (this._selectedSubgraph && this.cache['subgraphs'][this._selectedSubgraph.id]) {
+			return this._selectedSubgraph;
+		}
+		return null;
+	}
+
+	/**
 	 * Unselects the currently selected subgraph, if any.
 	 */
 	unsetSelectedSubgraph() {

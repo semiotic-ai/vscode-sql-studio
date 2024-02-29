@@ -80,6 +80,11 @@
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
 				}
+			},
+			{
+				"command": "gsqlEditor.addSubgraphId",
+				"title": "Add the selected subgraph's ID to the open GSQL file",
+				"category": "GRAPHSQL"
 			}
 		],
 		"keybindings": [
@@ -106,6 +111,12 @@
 				"key": "ctrl+m ctrl+l",
 				"mac": "cmd+m cmd+l",
 				"when": "view == subgraphs"
+			},
+			{
+				"command": "gsqlEditor.addSubgraphId",
+				"key": "ctrl+m ctrl+a",
+				"mac": "cmd+m cmd+a",
+				"when": "editorTextFocus && editorLangId == 'gsql'"
 			}
 		],
 		"viewsContainers": {

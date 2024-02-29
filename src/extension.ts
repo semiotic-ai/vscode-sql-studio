@@ -62,6 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const newQueryCommand = vscode.commands.registerCommand('subgraphs.newQuery', async () => {
 		await openNewQueryWindow();
+		await vscode.commands.executeCommand('gsqlEditor.addSubgraphId');
 	});
 
 	context.subscriptions.push(newQueryCommand);

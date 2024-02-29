@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.3.0...v0.4.0) (2024-02-29)
+
+
+### Features
+
+* ensure we don't add the same property twice ([f9ef7c1](https://github.com/semiotic-ai/vscode-sql-studio/commit/f9ef7c1826d5ff7234b1689302167cd3a9399dc1))
+
 ## [0.3.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.2.1...v0.3.0) (2024-02-29)
 
 

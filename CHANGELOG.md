@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.4.0...v0.5.0) (2024-03-01)
+
+
+### Features
+
+* add a command to replace the subgraph ID ([26ba3b0](https://github.com/semiotic-ai/vscode-sql-studio/commit/26ba3b07a7f17ac060eddc362f8d1ceaeb2b88d1))
+* add subgraph ID to editor when opening a new query ([d0fb97d](https://github.com/semiotic-ai/vscode-sql-studio/commit/d0fb97d06a1e0a4dbde160f0e62135b8675060c1))
+* **ui:** Search subgraph ([ff77b27](https://github.com/semiotic-ai/vscode-sql-studio/commit/ff77b27c46f0eacad0ea50212581b95b1044e49a))
+
 ## [0.4.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.3.0...v0.4.0) (2024-02-29)
 
 

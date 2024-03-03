@@ -64,8 +64,8 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 			const result = await executeSQL(enpoint, query!, this.abortController.signal);
 			await this.postMessage({ type: 'finish', data: result });
 		} catch (error: any) {
-			await vscode.window.showErrorMessage(error.message);
 			await this.postMessage({ type: 'clear' });
+			await vscode.window.showErrorMessage(error.message);
 		} finally {
 			this.abortController = undefined;
 		}
@@ -145,7 +145,12 @@ export class ResultsView implements vscode.Disposable {
 	}
 
 	public async execute(query?: string, info?: ISubgraphInfo) {
-		await this._provider.execute(query, info);
+		try {
+			await vscode.commands.executeCommand('setContext', 'subgraph.queryRunning', true);
+			await this._provider.execute(query, info);
+		} finally {
+			await vscode.commands.executeCommand('setContext', 'subgraph.queryRunning', false);
+		}
 	}
 
 	public cancel() {

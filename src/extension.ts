@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { SubgraphSchemaView, SubgraphView, SubgraphPicker } from './providers/subgraph';
 import { ResultsView } from './providers/results';
 import { GraphSQLProvider } from './providers/language';
-import { addPropertyToEditor, replacePropertyInEditor } from './editor/property';
+import { addPropertyToEditor, getPropertyValue, replacePropertyInEditor } from './editor/property';
 import { ISubgraphInfo } from './service';
 import { SqlDocumentDropProvider } from './providers/sqldoc';
 
@@ -34,13 +34,22 @@ class SubgraphExtension implements vscode.Disposable {
 	private async newQuery() {
 		const document = await vscode.workspace.openTextDocument({ language: 'gsql' });
 		await vscode.window.showTextDocument(document);
+		await this.addSubgraphId();
 	}
 
 	private async runQuery() {
 		await vscode.commands.executeCommand('tabularResult.focus');
 		await vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup');
-		const query = vscode.window.activeTextEditor?.document.getText();
-		await this._resultsView.execute(query, this._selectedSubgraph);
+		const document = vscode.window.activeTextEditor?.document;
+		if (document) {
+			const id = getPropertyValue('id', document);
+			if (id && id.trim() !== '' && id !== this._selectedSubgraph?.id) {
+				await this._subgraphsView.selectById(id);
+			}
+
+			const query = vscode.window.activeTextEditor?.document.getText();
+			await this._resultsView.execute(query, this._selectedSubgraph);
+		}
 	}
 
 	private async showResults() {
@@ -82,14 +91,6 @@ class SubgraphExtension implements vscode.Disposable {
 		this._selectedSubgraph = subgraph;
 		await this._subgraphSchemaView.update(subgraph);
 		this._languageProvider.updateLayout(this._subgraphSchemaView.subgraphLayout);
-
-		const isGsqlOpen = vscode.window.visibleTextEditors.some(
-			(editor) => editor.document.languageId === 'gsql'
-		);
-
-		if (!isGsqlOpen) {
-			await this.newQuery();
-		}
 	}
 
 	private initLanguage(context: vscode.ExtensionContext) {
@@ -134,6 +135,14 @@ class SubgraphExtension implements vscode.Disposable {
 			}),
 			this._subgraphPicker.onSubgraphPicked((subgraph) => {
 				this._subgraphsView.select(subgraph);
+			}),
+			vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+				if (editor?.document.languageId === LANGUAGE_ID) {
+					const id = getPropertyValue('id', editor.document);
+					if (id && id.trim() !== '' && id !== this._selectedSubgraph?.id) {
+						await this._subgraphsView.selectById(id);
+					}
+				}
 			})
 		);
 	}

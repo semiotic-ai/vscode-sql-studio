@@ -30,11 +30,17 @@
 	"main": "./dist/extension.js",
 	"contributes": {
 		"menus": {
-			"editor/context": [
+			"editor/title/run": [
 				{
-					"command": "subgraphs.Search",
-					"when": "editorTextFocus && editorLangId == 'gsql'"
+					"command": "query.runQuery",
+					"when": "editorTextFocus && editorLangId == 'gsql' && !subgraph.queryRunning"
 				},
+				{
+					"command": "query.cancelQuery",
+					"when": "editorTextFocus && editorLangId == 'gsql' && subgraph.queryRunning"
+				}
+			],
+			"editor/context": [
 				{
 					"command": "query.runQuery",
 					"when": "editorTextFocus && editorLangId == 'gsql'"
@@ -58,21 +64,19 @@
 			],
 			"view/title": [
 				{
+					"command": "subgraphs.newQuery",
+					"group": "navigation",
+					"when": "view == subgraphs"
+				},
+				{
 					"command": "subgraphs.Search",
-					"when": "view == subgraphs",
-					"group": "navigation"
+					"group": "navigation",
+					"when": "view == subgraphs"
 				},
 				{
 					"command": "subgraphs.Load",
-					"when": "view == subgraphs",
-					"group": "navigation"
-				}
-			],
-			"view/item/context": [
-				{
-					"command": "subgraphs.newQuery",
-					"when": "view == subgraphs",
-					"group": "query"
+					"group": "navigation",
+					"when": "view == subgraphs"
 				}
 			]
 		},
@@ -80,12 +84,14 @@
 			{
 				"command": "query.runQuery",
 				"title": "Run query",
-				"category": "GRAPHSQL"
+				"category": "GRAPHSQL",
+				"icon": "$(debug-start)"
 			},
 			{
 				"command": "query.cancelQuery",
 				"title": "Cancel query",
-				"category": "GRAPHSQL"
+				"category": "GRAPHSQL",
+				"icon": "$(debug-stop)"
 			},
 			{
 				"command": "query.showResults",
@@ -95,7 +101,8 @@
 			{
 				"command": "subgraphs.newQuery",
 				"title": "New Query",
-				"category": "GRAPHSQL"
+				"category": "GRAPHSQL",
+				"icon": "$(new-file)"
 			},
 			{
 				"command": "gsqlEditor.addSubgraphId",

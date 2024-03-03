@@ -1,5 +1,11 @@
 import * as vscode from 'vscode';
-import { getLayout, ISubgraphInfo, searchSubgraph, getSubgraphs } from '../service';
+import {
+	getLayout,
+	ISubgraphInfo,
+	searchSubgraph,
+	getSubgraphs,
+	searchSubgraphById
+} from '../service';
 import { ColumnType, Layout, TypeKind, Column, Table } from '../graphtables/layout';
 import path from 'path';
 
@@ -59,7 +65,19 @@ export class SubgraphView implements vscode.TreeDataProvider<ISubgraphInfo>, vsc
 				this._dataEmitter.fire();
 			}
 			this._view.reveal(subgraph, { select: true, focus: true });
+		} else {
+			this.updateSelected();
 		}
+	}
+
+	public async selectById(id: string) {
+		let subgraph = this._cache.get(id);
+
+		if (!subgraph) {
+			subgraph = await searchSubgraphById(id);
+		}
+
+		this.select(subgraph);
 	}
 
 	dispose() {

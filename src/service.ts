@@ -13,7 +13,7 @@ interface ISubgraphQuery {
 
 const SEARCH_TEMPLATE: ISubgraphQuery = {
 	query: `query SearchbyName($search:String!, $first:Int!) {
-		subgraphMetadataSearch(first:$first,text:$search,where:{ subgraph_:{id_not:null}})
+		metas:subgraphMetadataSearch(first:$first,text:$search,where:{ subgraph_:{id_not:null}})
 		{
 		  id,
 		  displayName,
@@ -47,9 +47,43 @@ const SEARCH_TEMPLATE: ISubgraphQuery = {
 	extensions: {}
 };
 
+const SEARCH_BYID_TEMPLATE: ISubgraphQuery = {
+	query: `query SearchbyId($id:ID!) {
+		metas:subgraphMetas(where:{subgraph_:{id:$id}}) {
+	  id,
+		displayName,
+	  image,
+	  description,
+	  subgraph {
+	  id,
+	  currentVersion {
+		id,
+		subgraphDeployment {
+		id,
+		 indexerAllocations(where: {activeForIndexer_not: null}) {
+			activeForIndexer {
+			id
+			}
+		},
+		manifest {
+		  network
+		  ,schema {
+			id
+		  }
+		}
+		}
+	  }
+	}
+	}
+	}`,
+	variables: { id: '' },
+	operationName: 'SearchById',
+	extensions: {}
+};
+
 interface ISubgraphSearchResult {
 	readonly data: {
-		readonly subgraphMetadataSearch: {
+		readonly metas: {
 			readonly id: string;
 			readonly displayName: string;
 			readonly description: string;
@@ -272,6 +306,23 @@ async function callGraphQL<B, R>(
 	return result;
 }
 
+function convertToSubgraphInfo(response: ISubgraphSearchResult): ISubgraphInfo[] {
+	return response.data.metas.map((meta) => {
+		return {
+			id: meta.subgraph.id,
+			displayName: meta.displayName,
+			description: meta.description,
+			image: meta.image,
+			currentVersion: meta.subgraph.currentVersion.id,
+			deploymentId: meta.subgraph.currentVersion.subgraphDeployment.id,
+			network: meta.subgraph.currentVersion.subgraphDeployment.manifest.network,
+			deploymentSchemaId: meta.subgraph.currentVersion.subgraphDeployment.manifest.schema.id,
+			activeIndexerAllocations:
+				meta.subgraph.currentVersion.subgraphDeployment.indexerAllocations.length
+		};
+	});
+}
+
 /**
  * Search for subgraphs by name or description from a graph network subgraph API endpoint
  * @param search text to search in both display name and description of the subgraph
@@ -290,22 +341,32 @@ export async function searchSubgraph(
 
 	const json_response: ISubgraphSearchResult = await callGraphQL(body, endpoint, abortSignal);
 
-	const result: ISubgraphInfo[] = json_response.data.subgraphMetadataSearch.map((meta) => {
-		return {
-			id: meta.subgraph.id,
-			displayName: meta.displayName,
-			description: meta.description,
-			image: meta.image,
-			currentVersion: meta.subgraph.currentVersion.id,
-			deploymentId: meta.subgraph.currentVersion.subgraphDeployment.id,
-			network: meta.subgraph.currentVersion.subgraphDeployment.manifest.network,
-			deploymentSchemaId: meta.subgraph.currentVersion.subgraphDeployment.manifest.schema.id,
-			activeIndexerAllocations:
-				meta.subgraph.currentVersion.subgraphDeployment.indexerAllocations.length
-		};
-	});
+	const result: ISubgraphInfo[] = convertToSubgraphInfo(json_response);
 
 	return result;
+}
+
+/**
+ * Search a single subgraph by its id
+ * @param id Id of the subgraph
+ * @param endpoint url of the graph network subgraph API endpoint (ie: https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum)
+ * @param abortSignal signal to cancel the request
+ * @returns `ISubgraphInfo` matching the search criteria or undefined if not found
+ */
+export async function searchSubgraphById(
+	id: string,
+	endpoint?: string,
+	abortSignal?: AbortSignal
+): Promise<ISubgraphInfo | undefined> {
+	const body = CheapCopy(SEARCH_BYID_TEMPLATE);
+
+	body.variables.id = id;
+
+	const json_response: ISubgraphSearchResult = await callGraphQL(body, endpoint, abortSignal);
+
+	const result: ISubgraphInfo[] = convertToSubgraphInfo(json_response);
+
+	return result.length === 0 ? undefined : result[0];
 }
 
 const SCHEMA_QUERY_TEMPLATE: ISubgraphQuery = {

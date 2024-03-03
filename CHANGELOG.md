@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.5.0...v0.5.1) (2024-03-03)
+
+
+### Bug Fixes
+
+* Use subgraph id in the gsql file for restoring info ([fe8a317](https://github.com/semiotic-ai/vscode-sql-studio/commit/fe8a3178e84b885207ecb64f803ac1cf43d17622))
+
 ## [0.5.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.4.0...v0.5.0) (2024-03-01)
 
 

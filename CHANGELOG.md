@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.3](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.5.2...v0.5.3) (2024-03-05)
+
+
+### Bug Fixes
+
+* wait for subgraph selection to update when ID and selection don't match ([77bc468](https://github.com/semiotic-ai/vscode-sql-studio/commit/77bc468b5279e7717c99e96916f2f1c19f76109c))
+
 ## [0.5.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.5.1...v0.5.2) (2024-03-05)
 
 

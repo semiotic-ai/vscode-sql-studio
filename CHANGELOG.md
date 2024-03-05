@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.4](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.5.3...v0.5.4) (2024-03-05)
+
+
+### Code Refactoring
+
+* rename 'load most signalled subgraphs' to 'load more subgraphs' ([4062f14](https://github.com/semiotic-ai/vscode-sql-studio/commit/4062f14d1078bfd5729d10e1f73a4bdd531ce8e5))
+
 ## [0.5.3](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.5.2...v0.5.3) (2024-03-05)
 
 

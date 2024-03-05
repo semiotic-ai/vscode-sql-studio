@@ -32,7 +32,7 @@ For now, we instead give an example workflow to get you started.
   - `Run Query` (`C-m C-r`) - Execute the query.
   - `Cancel Query` (`C-m C-c`) - Cancel execution.
   - `Show Results` (`C-m C-n`) - Show the results of the executed query.
-  - `Load Most Signalled Subgraphs` (`C-m C-l`) - Load the available subgraphs by signalled amount.
+  - `Load More Subgraphs` (`C-m C-l`) - Load the available subgraphs by signalled amount.
   - `Search Subgraph by Name and Description` (`C-m C-s`) - Search the subgraph by its name and description
 - View result table with
   - Sort by clicking column names

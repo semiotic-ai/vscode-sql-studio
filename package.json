@@ -122,7 +122,7 @@
 			},
 			{
 				"command": "subgraphs.Load",
-				"title": "Load Most Signalled Subgraphs",
+				"title": "Load More Subgraphs",
 				"icon": "$(cloud-download)",
 				"category": "GRAPHSQL"
 			}

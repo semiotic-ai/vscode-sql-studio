@@ -30,12 +30,17 @@ export class SubgraphView implements vscode.TreeDataProvider<ISubgraphInfo>, vsc
 
 	private selected?: ISubgraphInfo;
 
+	private _selectionChangedPromiseResolve: ((value: unknown) => void) | null;
+	private _onDidChangeSelectionPromise: Promise<unknown>;
+
 	constructor(viewId: string) {
 		this._cache = new Map();
 		this._dataEmitter = new vscode.EventEmitter();
 		this.onDidChangeTreeData = this._dataEmitter.event;
 		this._itemEmitter = new vscode.EventEmitter();
 		this.onSelectedItemChanged = this._itemEmitter.event;
+		this._selectionChangedPromiseResolve = null;
+		this._onDidChangeSelectionPromise = this._resetSelectionChangedPromise();
 
 		this._view = vscode.window.createTreeView(viewId, {
 			treeDataProvider: this
@@ -43,7 +48,46 @@ export class SubgraphView implements vscode.TreeDataProvider<ISubgraphInfo>, vsc
 
 		this._view.onDidChangeSelection((event) => {
 			this.updateSelected(event.selection[0]);
+
+			// This lets us await this handler executing in SubgraphExtension.runQuery
+			// Else, what was happening before was that runQuery would execute before
+			// this completed when the id property !== the selected subgraph. This meant
+			// that we'd execute against the wrong subgraph. We can now use this in
+			// conjunction with waitForSelectionChange to force runQuery to wait.
+			if (this._selectionChangedPromiseResolve) {
+				this._selectionChangedPromiseResolve(event.selection[0]);
+				this._onDidChangeSelectionPromise = this._resetSelectionChangedPromise();
+			}
 		});
+	}
+
+	/**
+	 * Initializes and returns a new promise used to wait for the next selection change event.
+	 * This method also assigns the resolve function of the promise to an internal variable,
+	 * allowing the promise to be resolved outside of its executor function. This is particularly
+	 * useful for synchronizing code execution with the selection change event.
+	 *
+	 * @returns {Promise<unknown>} A promise that resolves when the next selection change event occurs.
+	 */
+	private _resetSelectionChangedPromise(): Promise<unknown> {
+		return new Promise((resolve) => {
+			this._selectionChangedPromiseResolve = resolve;
+		});
+	}
+
+	/**
+	 * Returns a promise that callers can await to effectively pause execution until the next
+	 * selection change event is handled. This method facilitates synchronization in scenarios
+	 * where subsequent code execution depends on the completion of a selection change event.
+	 *
+	 * This promise is initially created in the constructor and is reset (re-initialized) every
+	 * time the selection change event is handled, ensuring that it can be used to wait for
+	 * subsequent selection changes as well.
+	 *
+	 * @returns {Promise<unknown>} A promise that resolves when the current or next selection change event is handled.
+	 */
+	waitForSelectionChange(): Promise<unknown> {
+		return this._onDidChangeSelectionPromise;
 	}
 
 	private updateSelected(subgraph?: ISubgraphInfo) {
@@ -78,6 +122,15 @@ export class SubgraphView implements vscode.TreeDataProvider<ISubgraphInfo>, vsc
 		}
 
 		this.select(subgraph);
+	}
+
+	/**
+	 * Returns the currently selected subgraph or undefined if no subgraph is currently selected.
+	 *
+	 * @returns {ISubgraphInfo | undefined} The selected subgraph.
+	 */
+	public getSelected(): ISubgraphInfo | undefined {
+		return this.selected;
 	}
 
 	dispose() {

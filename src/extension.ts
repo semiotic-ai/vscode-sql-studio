@@ -45,6 +45,8 @@ class SubgraphExtension implements vscode.Disposable {
 			const id = getPropertyValue('id', document);
 			if (id && id.trim() !== '' && id !== this._selectedSubgraph?.id) {
 				await this._subgraphsView.selectById(id);
+				await this._subgraphsView.waitForSelectionChange();
+				this._selectedSubgraph = this._subgraphsView.getSelected();
 			}
 
 			const query = vscode.window.activeTextEditor?.document.getText();

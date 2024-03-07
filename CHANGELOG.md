@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.5.4...v0.6.0) (2024-03-07)
+
+
+### Features
+
+* add a command to report bugs ([aa4609e](https://github.com/semiotic-ai/vscode-sql-studio/commit/aa4609e2de10348c22133dfdd9f9a5e4a7a1c146))
+
 ## [0.5.4](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.5.3...v0.5.4) (2024-03-05)
 
 

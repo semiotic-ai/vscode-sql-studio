@@ -7,6 +7,7 @@ import { GraphSQLProvider } from './providers/language';
 import { addPropertyToEditor, getPropertyValue, replacePropertyInEditor } from './editor/property';
 import { ISubgraphInfo } from './service';
 import { SqlDocumentDropProvider } from './providers/sqldoc';
+import { BugReporter } from './bug';
 
 const LANGUAGE_ID = 'gsql';
 
@@ -16,6 +17,7 @@ class SubgraphExtension implements vscode.Disposable {
 	private readonly _resultsView: ResultsView;
 	private readonly _subgraphsView: SubgraphView;
 	private readonly _subgraphSchemaView: SubgraphSchemaView;
+	private readonly _bugReporter: BugReporter;
 
 	private _selectedSubgraph?: ISubgraphInfo;
 
@@ -25,6 +27,9 @@ class SubgraphExtension implements vscode.Disposable {
 		this._subgraphSchemaView = new SubgraphSchemaView('subgraphSchema');
 		this._subgraphPicker = new SubgraphPicker();
 		this._resultsView = new ResultsView('tabularResult', context.extensionUri);
+		this._bugReporter = new BugReporter(
+			'https://us-central1-graphplots.cloudfunctions.net/linear-cloud-sql-function'
+		);
 
 		this.initLanguage(context);
 		this.initCommands(context);
@@ -109,6 +114,10 @@ class SubgraphExtension implements vscode.Disposable {
 		);
 	}
 
+	private async openBugReportTemplate() {
+		await this._bugReporter.openBugReportTemplate();
+	}
+
 	private initCommands(context: vscode.ExtensionContext) {
 		context.subscriptions.push(
 			vscode.commands.registerCommand('subgraphs.newQuery', this.newQuery, this),
@@ -126,7 +135,8 @@ class SubgraphExtension implements vscode.Disposable {
 				'gsqlEditor.replaceSubgraphId',
 				this.replaceSubgraphId,
 				this
-			)
+			),
+			vscode.commands.registerCommand('bug.Report', this.openBugReportTemplate, this)
 		);
 	}
 

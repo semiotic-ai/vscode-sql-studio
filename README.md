@@ -29,11 +29,12 @@ For now, we instead give an example workflow to get you started.
   - `New Query` - Create a GSQL window to write a new query. If you've already selected a subgraph in the *Available Subgraphs* menu, it will automatically populate the `ID` field in the document.
   - `Add Subgraph ID` (`C-m C-a`) - If you haven't yet added a subgraph ID to the document, it will add the ID of the currently selected subgraph.
   - `Replace Subgraph ID` (`C-m C-p`) - If there is no subgraph ID in the document, add the currently selected one. If there is, replace it with the currently selected one.
-  - `Run Query` (`C-m C-r`) - Execute the query.
-  - `Cancel Query` (`C-m C-c`) - Cancel execution.
-  - `Show Results` (`C-m C-n`) - Show the results of the executed query.
-  - `Load More Subgraphs` (`C-m C-l`) - Load the available subgraphs by signalled amount.
+  - `Run Query` (`C-m C-r`) - Execute the query
+  - `Cancel Query` (`C-m C-c`) - Cancel execution
+  - `Show Results` (`C-m C-n`) - Show the results of the executed query
+  - `Load More Subgraphs` (`C-m C-l`) - Load the available subgraphs by signalled amount
   - `Search Subgraph by Name and Description` (`C-m C-s`) - Search the subgraph by its name and description
+  - `Report a Bug` (`C-m C-b`) - Report a bug to us!
 - View result table with
   - Sort by clicking column names
   - Search all text

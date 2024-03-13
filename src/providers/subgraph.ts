@@ -245,6 +245,9 @@ export class SubgraphSchemaView
 
 	getTreeItem(element: SchemaObject): vscode.TreeItem {
 		const item = new vscode.TreeItem(element.name);
+		if (!element.parent) {
+			item.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+		}
 		item.id = element.parent ? `${element.parent}.${element.name}` : element.name;
 		item.iconPath = new vscode.ThemeIcon(element.parent ? 'symbol-field' : 'symbol-class');
 		item.description = element.type;

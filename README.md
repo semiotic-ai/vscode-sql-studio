@@ -27,8 +27,8 @@ For now, we instead give an example workflow to get you started.
 - Syntax highlighting and autocompletion
 - From the command menu `C-S-p`, you have access to all commands with the heading `GRAPHSQL`. These include:
   - `New Query` - Create a GSQL window to write a new query. If you've already selected a subgraph in the *Available Subgraphs* menu, it will automatically populate the `ID` field in the document.
-  - `Add Subgraph ID` (`C-m C-a`) - If you haven't yet added a subgraph ID to the document, it will add the ID of the currently selected subgraph.
-  - `Replace Subgraph ID` (`C-m C-p`) - If there is no subgraph ID in the document, add the currently selected one. If there is, replace it with the currently selected one.
+  - `Add Subgraph Info` (`C-m C-a`) - If you haven't yet added a subgraph to the document, it will add the name and ID of the currently selected subgraph.
+  - `Replace Subgraph Info` (`C-m C-p`) - If there is no subgraph metadata in the document, add the metadata associated with the currently selected one. If there is, replace it with the currently selected one.
   - `Run Query` (`C-m C-r`) - Execute the query
   - `Cancel Query` (`C-m C-c`) - Cancel execution
   - `Show Results` (`C-m C-n`) - Show the results of the executed query

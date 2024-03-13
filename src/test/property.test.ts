@@ -112,7 +112,6 @@ suite('replacePropertyInEditor', () => {
 
 		const property = '--+ID: ';
 		const information = '12345';
-		const position = new vscode.Position(0, 0);
 
 		assert.strictEqual(getPropertyLineNumber(property, editor.document), 1);
 

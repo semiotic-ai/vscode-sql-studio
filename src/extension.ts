@@ -37,9 +37,12 @@ class SubgraphExtension implements vscode.Disposable {
 	}
 
 	private async newQuery() {
-		const document = await vscode.workspace.openTextDocument({ language: 'gsql' });
+		const document = await vscode.workspace.openTextDocument({
+			content: '\n\n\n',
+			language: 'gsql'
+		});
 		await vscode.window.showTextDocument(document);
-		await this.addSubgraphId();
+		await this.addSubgraphInfo();
 	}
 
 	private async runQuery() {
@@ -75,23 +78,34 @@ class SubgraphExtension implements vscode.Disposable {
 		await this._subgraphsView.loadMore();
 	}
 
-	private async addSubgraphId() {
+	private async addSubgraphInfo() {
 		if (!this._selectedSubgraph) {
 			return; // Early return if no subgraph is selected
 		}
-		const property = 'id';
-		const position = new vscode.Position(0, 0);
-		const information = this._selectedSubgraph?.id;
-		await addPropertyToEditor(property, information, position);
+
+		const nameProperty = 'subgraph';
+		const namePosition = new vscode.Position(0, 0);
+		const nameInformation = this._selectedSubgraph?.displayName;
+		await addPropertyToEditor(nameProperty, nameInformation, namePosition);
+
+		const idProperty = 'id';
+		const idPosition = new vscode.Position(1, 0);
+		const idInformation = this._selectedSubgraph?.id;
+		await addPropertyToEditor(idProperty, idInformation, idPosition);
 	}
 
-	private async replaceSubgraphId() {
+	private async replaceSubgraphInfo() {
 		if (!this._selectedSubgraph) {
 			return; // Early return if no subgraph is selected
 		}
-		const property = 'id';
-		const information = this._selectedSubgraph?.id;
-		await replacePropertyInEditor(property, information);
+
+		const nameProperty = 'subgraph';
+		const nameInformation = this._selectedSubgraph?.displayName;
+		await replacePropertyInEditor(nameProperty, nameInformation);
+
+		const idProperty = 'id';
+		const idInformation = this._selectedSubgraph?.id;
+		await replacePropertyInEditor(idProperty, idInformation);
 	}
 
 	private async selectSubgraph(subgraph?: ISubgraphInfo) {
@@ -127,13 +141,13 @@ class SubgraphExtension implements vscode.Disposable {
 			vscode.commands.registerCommand('subgraphs.Search', this.search, this),
 			vscode.commands.registerCommand('subgraphs.Load', this.load, this),
 			vscode.commands.registerTextEditorCommand(
-				'gsqlEditor.addSubgraphId',
-				this.addSubgraphId,
+				'gsqlEditor.addSubgraphInfo',
+				this.addSubgraphInfo,
 				this
 			),
 			vscode.commands.registerTextEditorCommand(
-				'gsqlEditor.replaceSubgraphId',
-				this.replaceSubgraphId,
+				'gsqlEditor.replaceSubgraphInfo',
+				this.replaceSubgraphInfo,
 				this
 			),
 			vscode.commands.registerCommand('bug.Report', this.openBugReportTemplate, this)

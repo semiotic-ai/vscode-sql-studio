@@ -54,11 +54,11 @@
 					"when": "editorTextFocus && editorLangId == 'gsql'"
 				},
 				{
-					"command": "gsqlEditor.addSubgraphId",
+					"command": "gsqlEditor.addSubgraphInfo",
 					"when": "editorTextFocus && editorLangId == 'gsql'"
 				},
 				{
-					"command": "gsqlEditor.replaceSubgraphId",
+					"command": "gsqlEditor.replaceSubgraphInfo",
 					"when": "editorTextFocus && editorLangId == 'gsql'"
 				}
 			],
@@ -112,13 +112,13 @@
 				"icon": "$(new-file)"
 			},
 			{
-				"command": "gsqlEditor.addSubgraphId",
-				"title": "Add Subgraph ID",
+				"command": "gsqlEditor.addSubgraphInfo",
+				"title": "Add Selected Subgraph's Metadata to the GSQL file",
 				"category": "GRAPHSQL"
 			},
 			{
-				"command": "gsqlEditor.replaceSubgraphId",
-				"title": "Replace Subgraph ID",
+				"command": "gsqlEditor.replaceSubgraphInfo",
+				"title": "Replace the Metadata in the GSQL file with the new subgraph",
 				"category": "GRAPHSQL"
 			},
 			{
@@ -165,13 +165,13 @@
 				"when": "view == subgraphs"
 			},
 			{
-				"command": "gsqlEditor.addSubgraphId",
+				"command": "gsqlEditor.addSubgraphInfo",
 				"key": "ctrl+m ctrl+a",
 				"mac": "cmd+m cmd+a",
 				"when": "editorTextFocus && editorLangId == 'gsql'"
 			},
 			{
-				"command": "gsqlEditor.replaceSubgraphId",
+				"command": "gsqlEditor.replaceSubgraphInfo",
 				"key": "ctrl+m ctrl+p",
 				"mac": "cmd+m cmd+p",
 				"when": "editorTextFocus && editorLangId == 'gsql'"

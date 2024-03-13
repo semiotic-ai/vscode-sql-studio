@@ -64,7 +64,7 @@ export async function addPropertyToEditor(
 	}
 
 	await editor.edit((editBuilder) => {
-		editBuilder.insert(position, formattedProperty + information + '\n');
+		editBuilder.insert(position, formattedProperty + information);
 	});
 }
 
@@ -136,7 +136,7 @@ export async function replacePropertyInEditor(property: string, information: str
 	if (lineNumber > -1) {
 		const valuePosition = getValuePosition(lineNumber, editor.document);
 		await editor.edit((editBuilder) => {
-			editBuilder.replace(valuePosition.range, information + '\n');
+			editBuilder.replace(valuePosition.range, information);
 		});
 	} else {
 		const position = new vscode.Position(0, 0);

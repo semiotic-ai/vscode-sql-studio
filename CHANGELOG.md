@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.6.0...v0.6.1) (2024-03-13)
+
+
+### Bug Fixes
+
+* reset stop button to run on query error ([bdf2422](https://github.com/semiotic-ai/vscode-sql-studio/commit/bdf2422921c265f11012677a84df080f593af69d))
+
 ## [0.6.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.5.4...v0.6.0) (2024-03-07)
 
 

@@ -65,7 +65,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 			await this.postMessage({ type: 'finish', data: result });
 		} catch (error: any) {
 			await this.postMessage({ type: 'clear' });
-			await vscode.window.showErrorMessage(error.message);
+			vscode.window.showErrorMessage(error.message);
 		} finally {
 			this.abortController = undefined;
 		}

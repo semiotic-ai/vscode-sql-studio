@@ -78,6 +78,13 @@
 					"group": "navigation",
 					"when": "view == subgraphs"
 				}
+			],
+			"view/item/context": [
+				{
+					"command": "subgraphs.newQuery",
+					"when": "view == subgraphs",
+					"group": "query"
+				}
 			]
 		},
 		"commands": [

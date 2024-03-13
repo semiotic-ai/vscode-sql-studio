@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.6.1...v0.6.2) (2024-03-13)
+
+
+### Bug Fixes
+
+* display table columns and types when you click a table ([babc0b4](https://github.com/semiotic-ai/vscode-sql-studio/commit/babc0b4ab85e81a548e8691e9462aa46dc216f54))
+
 ## [0.6.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.6.0...v0.6.1) (2024-03-13)
 
 

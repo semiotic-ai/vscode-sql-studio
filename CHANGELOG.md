@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.6.2...v0.7.0) (2024-03-13)
+
+
+### Features
+
+* add right-click new query option to subgraphs view ([5b4ffa6](https://github.com/semiotic-ai/vscode-sql-studio/commit/5b4ffa6d9028fccf48e346389c5dd442ef23578e))
+
 ## [0.6.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.6.1...v0.6.2) (2024-03-13)
 
 

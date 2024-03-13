@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.7.0...v0.8.0) (2024-03-13)
+
+
+### Features
+
+* add both subgraph name and id as gsql metadata ([34aab73](https://github.com/semiotic-ai/vscode-sql-studio/commit/34aab73b6159fc6f3bbcce423b0c36f09cfa57d1))
+
 ## [0.7.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.6.2...v0.7.0) (2024-03-13)
 
 

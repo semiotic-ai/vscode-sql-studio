@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.8.0...v0.9.0) (2024-03-14)
+
+
+### Features
+
+* suggest column names when users enter a table name + dot ([16c05b9](https://github.com/semiotic-ai/vscode-sql-studio/commit/16c05b99b7c8532143ca95b44a837b24acdfbee8))
+
 ## [0.8.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.7.0...v0.8.0) (2024-03-13)
 
 

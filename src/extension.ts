@@ -119,6 +119,11 @@ class SubgraphExtension implements vscode.Disposable {
 			vscode.languages.registerCompletionItemProvider(LANGUAGE_ID, this._languageProvider)
 		);
 
+		const selector = { language: 'gsql', scheme: 'file' };
+		context.subscriptions.push(
+			vscode.languages.registerCompletionItemProvider(selector, this._languageProvider, '.')
+		);
+
 		context.subscriptions.push(
 			vscode.languages.registerSignatureHelpProvider(LANGUAGE_ID, this._languageProvider)
 		);

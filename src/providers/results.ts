@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { IQueryResult, executeSQL, ISubgraphInfo } from '../service';
+import { write as writeCSV } from '../filetypes/csv';
 
 class ResultsProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'tabularResult';
@@ -92,8 +93,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 	}
 
 	private async receiveMessage(message: string) {
-		const document = await vscode.workspace.openTextDocument({ language: 'csv', content: message });
-		await vscode.window.showTextDocument(document);
+		await writeCSV(message);
 	}
 
 	private _getHtmlForWebview(webview: vscode.Webview) {

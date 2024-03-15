@@ -10,7 +10,7 @@ import * as fOps from './fileOperations';
 export async function write(content: string) {
 	const uri = await vscode.window.showSaveDialog({
 		filters: {
-			'CSV files': ['csv']
+			'CSV file': ['csv']
 		}
 	});
 	await fOps.write(content, uri);

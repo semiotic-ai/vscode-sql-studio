@@ -32,7 +32,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 
 		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-		webviewView.webview.onDidReceiveMessage(this.recieveMessage);
+		webviewView.webview.onDidReceiveMessage(this.receiveMessage);
 	}
 
 	public async execute(query?: string, info?: ISubgraphInfo) {
@@ -91,7 +91,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 		return false;
 	}
 
-	private async recieveMessage(message: string) {
+	private async receiveMessage(message: string) {
 		const document = await vscode.workspace.openTextDocument({ language: 'csv', content: message });
 		await vscode.window.showTextDocument(document);
 	}

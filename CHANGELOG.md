@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.10.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.9.0...v0.10.0) (2024-03-15)
+
+
+### Features
+
+* add functions to write files to disk ([6f06643](https://github.com/semiotic-ai/vscode-sql-studio/commit/6f0664352a90371b3f88f87156496dd3e0f0acab))
+* save CSV file when users click the CSV button ([162027c](https://github.com/semiotic-ai/vscode-sql-studio/commit/162027c04721f369d70e35dd01a42192cd7a6ebf))
+
+
+### Code Refactoring
+
+* fix typo in function name ([5e4c9c8](https://github.com/semiotic-ai/vscode-sql-studio/commit/5e4c9c82748b47f33fefefb17057e2172619e563))
+
 ## [0.9.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.8.0...v0.9.0) (2024-03-14)
 
 

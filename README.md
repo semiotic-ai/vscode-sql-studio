@@ -6,17 +6,13 @@ The SQL studio enables developers to query SQL-enabled subgraphs on The Graph.
 
 ## Demo
 
-For now, we instead give an example workflow to get you started.
+![Demo](https://sql-studio-webapp.vercel.app/studio.webm)
 
 1. Open the extension on the *Activity Bar*
 2. Select the Substreams Uniswap v3 Ethereum subgraph (ID: HUZDsRpEVP2AvzDCyzDHtdc64dyDxx8FQjzsmqSg4H3B). You'll know it's selected when the icon next to it becomes a green circle.
 3. Run `New Query` or click on the new file button that you see when you hover your mouse over the *Available Subgraphs* menu. This will create a GSQL file with the ID field pre-populated.
 4. Type in a query. For instance, `SELECT * FROM token LIMIT 1;`
 5. Run the query using either the `Run Query` command or `C-m C-r`
-
-<!--
-![Demo](images/features.gif)
--->
 
 ## Features
 

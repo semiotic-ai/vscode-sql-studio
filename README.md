@@ -6,7 +6,7 @@ The SQL studio enables developers to query SQL-enabled subgraphs on The Graph.
 
 ## Demo
 
-![Demo](https://sql-studio-webapp.vercel.app/studio.webm)
+![Demo](https://sql-studio-webapp.vercel.app/studio.gif)
 
 1. Open the extension on the *Activity Bar*
 2. Select the Substreams Uniswap v3 Ethereum subgraph (ID: HUZDsRpEVP2AvzDCyzDHtdc64dyDxx8FQjzsmqSg4H3B). You'll know it's selected when the icon next to it becomes a green circle.

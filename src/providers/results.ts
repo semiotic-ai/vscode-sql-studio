@@ -1,21 +1,35 @@
 import * as vscode from 'vscode';
 import { IQueryResult, executeSQL, ISubgraphInfo } from '../service';
 import { write as writeCSV } from '../filetypes/csv';
+import fetch from 'node-fetch'; // Step 1: Import node-fetch
 
 class ResultsProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'tabularResult';
 	private static readonly __knownPaths?: { [key: string]: string } = vscode.workspace
 		.getConfiguration('graphsql')
 		.get('paths');
-	private static readonly __gateway?: string = vscode.workspace
-		.getConfiguration('graphsql')
-		.get('gateway');
+	private static __gateway?: string = vscode.workspace.getConfiguration('graphsql').get('gateway');
 
 	private _view?: vscode.WebviewView;
 
 	private abortController?: AbortController;
 
-	constructor(private readonly _extensionUri: vscode.Uri) {}
+	constructor(private readonly _extensionUri: vscode.Uri) {
+		console.log(ResultsProvider.__gateway);
+		ResultsProvider.fetchGateway().then(() => {
+			console.log(ResultsProvider.__gateway);
+		});
+	}
+
+	private static async fetchGateway() {
+		try {
+			const response = await fetch('https://sql-studio-webapp.vercel.app/graph-node-endpoint'); // Step 3: Make API call
+			const gateway = await response.text(); // Parse response as text
+			ResultsProvider.__gateway = gateway; // Step 4: Assign response to __gateway
+		} catch (error) {
+			console.error('Failed to fetch gateway:', error);
+		}
+	}
 
 	public resolveWebviewView(
 		webviewView: vscode.WebviewView,
@@ -57,12 +71,12 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 				throw new Error(`${info.displayName} is not yet supported/indexed.`);
 			}
 
-			const enpoint = `${ResultsProvider.__gateway}/${path}`;
+			const endpoint = `${ResultsProvider.__gateway}/${path}`;
 
 			this.abortController = new AbortController();
 
 			await this.postMessage({ type: 'start', data: info.image });
-			const result = await executeSQL(enpoint, query!, this.abortController.signal);
+			const result = await executeSQL(endpoint, query!, this.abortController.signal);
 			await this.postMessage({ type: 'finish', data: result });
 		} catch (error: any) {
 			await this.postMessage({ type: 'clear' });

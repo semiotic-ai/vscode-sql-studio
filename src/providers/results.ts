@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { IQueryResult, executeSQL, ISubgraphInfo } from '../service';
 import { write as writeCSV } from '../filetypes/csv';
-import fetch from 'node-fetch'; // Step 1: Import node-fetch
+import fetch from 'node-fetch';
 
 class ResultsProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'tabularResult';
@@ -23,9 +23,9 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 
 	private static async fetchGateway() {
 		try {
-			const response = await fetch('https://sql-studio-webapp.vercel.app/graph-node-endpoint'); // Step 3: Make API call
-			const gateway = await response.text(); // Parse response as text
-			ResultsProvider.__gateway = gateway; // Step 4: Assign response to __gateway
+			const response = await fetch('https://sql-studio-webapp.vercel.app/graph-node-endpoint');
+			const gateway = await response.text();
+			ResultsProvider.__gateway = gateway;
 		} catch (error) {
 			console.error('Failed to fetch gateway:', error);
 		}

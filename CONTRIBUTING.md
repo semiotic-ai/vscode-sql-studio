@@ -80,3 +80,13 @@ We use pre-commit hooks for code style and linting checks. Ensure that you confi
 ## Final Notes
 
 Your contributions are vital to the success of the Semiotic SQL Studio. By following these guidelines, we can maintain a high-quality codebase, streamline the development process, and ensure that our project remains robust and scalable. Thank you for your contributions and commitment to excellence.
+
+## Local Development
+
+You can compile and run a local dev version by hitting F5 in any file in the project from VSCode.
+
+Use `npm run test` to run the test suite.
+
+Use `npm run format` to format the code.
+
+There are precommit hooks that check if the code is correctly formatted. `npm run test` will also check formatting before running, so it's adviced to enable format on save.

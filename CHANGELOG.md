@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.11.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.10.0...v0.11.0) (2024-03-20)
+
+
+### Features
+
+* add fetch call to sql-studio-webapp when instancing ResultsProvider ([72eca52](https://github.com/semiotic-ai/vscode-sql-studio/commit/72eca52ef18a7dc6ef4570d0cae65422f87db348))
+
+
+### Bug Fixes
+
+* remove console commands ([088ff5a](https://github.com/semiotic-ai/vscode-sql-studio/commit/088ff5a7dbf8982712d9341ede47c4ca2586de8e))
+
 ## [0.10.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.9.0...v0.10.0) (2024-03-15)
 
 

@@ -15,10 +15,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 	private abortController?: AbortController;
 
 	constructor(private readonly _extensionUri: vscode.Uri) {
-		console.log(ResultsProvider.__gateway);
-		ResultsProvider.fetchGateway().then(() => {
-			console.log(ResultsProvider.__gateway);
-		});
+		ResultsProvider.fetchGateway();
 	}
 
 	private static async fetchGateway() {
@@ -27,7 +24,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 			const gateway = await response.text();
 			ResultsProvider.__gateway = gateway;
 		} catch (error) {
-			console.error('Failed to fetch gateway:', error);
+			vscode.window.showErrorMessage('Failed to fetch gateway endpoint.');
 		}
 	}
 

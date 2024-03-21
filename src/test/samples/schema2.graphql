@@ -1,365 +1,365 @@
 enum PrizePoolState {
-	Opened
-	Started
-	Awarded
+  Opened
+  Started
+  Awarded
 }
 
 enum PrizePoolType {
-	Compound
-	yVault
+  Compound
+  yVault
 }
 
 # ID: `${comptroller.address}`
 type Comptroller @entity {
-	id: ID!
-	owner: Bytes!
+  id: ID!
+  owner: Bytes!
 
-	players: [DripTokenPlayer!]! @derivedFrom(field: "comptroller")
-	balanceDrips: [BalanceDrip!]! @derivedFrom(field: "comptroller")
-	volumeDrips: [VolumeDrip!]! @derivedFrom(field: "comptroller")
+  players: [DripTokenPlayer!]! @derivedFrom(field: "comptroller")
+  balanceDrips: [BalanceDrip!]! @derivedFrom(field: "comptroller")
+  volumeDrips: [VolumeDrip!]! @derivedFrom(field: "comptroller")
 }
 
 # ID: `${prizePool.address}`
 type PrizePool @entity {
-	id: ID!
-	deactivated: Boolean!
+  id: ID!
+  deactivated: Boolean!
 
-	owner: Bytes
-	reserveRegistry: Bytes
+  owner: Bytes
+  reserveRegistry: Bytes
 
-	prizeStrategy: PrizeStrategy
-	prizePoolType: PrizePoolType
-	compoundPrizePool: CompoundPrizePool
+  prizeStrategy: PrizeStrategy
+  prizePoolType: PrizePoolType
+  compoundPrizePool: CompoundPrizePool
 
-	reserveFeeControlledToken: Bytes!
+  reserveFeeControlledToken: Bytes!
 
-	underlyingCollateralToken: Bytes
-	underlyingCollateralDecimals: BigInt
-	underlyingCollateralName: String
-	underlyingCollateralSymbol: String
+  underlyingCollateralToken: Bytes
+  underlyingCollateralDecimals: BigInt
+  underlyingCollateralName: String
+  underlyingCollateralSymbol: String
 
-	maxExitFeeMantissa: BigInt!
-	maxTimelockDuration: BigInt!
-	timelockTotalSupply: BigInt
-	liquidityCap: BigInt!
+  maxExitFeeMantissa: BigInt!
+  maxTimelockDuration: BigInt!
+  timelockTotalSupply: BigInt
+  liquidityCap: BigInt!
 
-	cumulativePrizeGross: BigInt!
-	cumulativePrizeReserveFee: BigInt!
-	cumulativePrizeNet: BigInt!
+  cumulativePrizeGross: BigInt!
+  cumulativePrizeReserveFee: BigInt!
+  cumulativePrizeNet: BigInt!
 
-	currentPrizeId: BigInt!
-	currentState: PrizePoolState!
+  currentPrizeId: BigInt!
+  currentState: PrizePoolState!
 
-	prizesCount: BigInt!
-	prizes: [Prize!]! @derivedFrom(field: "prizePool")
+  prizesCount: BigInt!
+  prizes: [Prize!]! @derivedFrom(field: "prizePool")
 
-	tokenCreditRates: [CreditRate!]! @derivedFrom(field: "prizePool")
-	tokenCreditBalances: [CreditBalance!]! @derivedFrom(field: "prizePool")
+  tokenCreditRates: [CreditRate!]! @derivedFrom(field: "prizePool")
+  tokenCreditBalances: [CreditBalance!]! @derivedFrom(field: "prizePool")
 
-	prizePoolAccounts: [PrizePoolAccount!]! @derivedFrom(field: "prizePool")
+  prizePoolAccounts: [PrizePoolAccount!]! @derivedFrom(field: "prizePool")
 
-	controlledTokens: [ControlledToken!]! @derivedFrom(field: "controller")
+  controlledTokens: [ControlledToken!]! @derivedFrom(field: "controller")
 }
 
 # ID: `${compoundPrizePool.address}`
 type CompoundPrizePool @entity {
-	id: ID!
+  id: ID!
 
-	cToken: Bytes
+  cToken: Bytes
 }
 
 # ID: `${prizeStrategy.address}`
 type PrizeStrategy @entity {
-	id: ID!
-	singleRandomWinner: SingleRandomWinnerPrizeStrategy
-	multipleWinners: MultipleWinnersPrizeStrategy
+  id: ID!
+  singleRandomWinner: SingleRandomWinnerPrizeStrategy
+  multipleWinners: MultipleWinnersPrizeStrategy
 }
 
 # ID: `${singleRandomWinner.address}`   (will be same address as PrizeStrategy)
 type SingleRandomWinnerPrizeStrategy @entity {
-	id: ID!
+  id: ID!
 
-	owner: Bytes
+  owner: Bytes
 
-	tokenListener: Comptroller
-	prizePool: PrizePool
-	rng: Bytes
-	ticket: ControlledToken
-	sponsorship: ControlledToken
+  tokenListener: Comptroller
+  prizePool: PrizePool
+  rng: Bytes
+  ticket: ControlledToken
+  sponsorship: ControlledToken
 
-	prizePeriodSeconds: BigInt!
-	prizePeriodStartedAt: BigInt!
-	prizePeriodEndAt: BigInt!
+  prizePeriodSeconds: BigInt!
+  prizePeriodStartedAt: BigInt!
+  prizePeriodEndAt: BigInt!
 
-	externalErc20Awards: [SingleRandomWinnerExternalErc20Award!]! @derivedFrom(field: "prizeStrategy")
-	externalErc721Awards: [SingleRandomWinnerExternalErc721Award!]!
-		@derivedFrom(field: "prizeStrategy")
+  externalErc20Awards: [SingleRandomWinnerExternalErc20Award!]! @derivedFrom(field: "prizeStrategy")
+  externalErc721Awards: [SingleRandomWinnerExternalErc721Award!]!
+    @derivedFrom(field: "prizeStrategy")
 }
 
 # ID: `${prizePool.address}-${prizeCount}`
 # dynamically generated type, not mapped to a specific contract
 type Prize @entity {
-	id: ID!
-	prizePool: PrizePool!
+  id: ID!
+  prizePool: PrizePool!
 
-	awardStartOperator: Bytes
-	awardedOperator: Bytes
+  awardStartOperator: Bytes
+  awardedOperator: Bytes
 
-	prizePeriodStartedTimestamp: BigInt
-	lockBlock: BigInt
+  prizePeriodStartedTimestamp: BigInt
+  lockBlock: BigInt
 
-	awardedBlock: BigInt
-	awardedTimestamp: BigInt
+  awardedBlock: BigInt
+  awardedTimestamp: BigInt
 
-	rngRequestId: BigInt
-	randomNumber: BigInt
+  rngRequestId: BigInt
+  randomNumber: BigInt
 
-	amount: BigInt
+  amount: BigInt
 
-	totalTicketSupply: BigInt # cache of num tickets sold when this prize was awarded
-	winners: [Bytes!]
+  totalTicketSupply: BigInt # cache of num tickets sold when this prize was awarded
+  winners: [Bytes!]
 
-	awardedExternalErc20Tokens: [AwardedExternalErc20Token!]! @derivedFrom(field: "prize")
-	awardedExternalErc721Nfts: [AwardedExternalErc721Nft!]! @derivedFrom(field: "prize")
+  awardedExternalErc20Tokens: [AwardedExternalErc20Token!]! @derivedFrom(field: "prize")
+  awardedExternalErc721Nfts: [AwardedExternalErc721Nft!]! @derivedFrom(field: "prize")
 }
 
 # ID: `${prize.id}-${token.address}`
 # dynamically generated type, not mapped to a specific contract
 type AwardedExternalErc20Token @entity {
-	id: ID!
+  id: ID!
 
-	address: Bytes!
-	name: String
-	symbol: String
-	decimals: BigInt
+  address: Bytes!
+  name: String
+  symbol: String
+  decimals: BigInt
 
-	balanceAwarded: BigInt
-	prize: Prize!
+  balanceAwarded: BigInt
+  prize: Prize!
 }
 
 # ID: `${prize.id}-${token.address}`
 # dynamically generated type, not mapped to a specific contract
 type AwardedExternalErc721Nft @entity {
-	id: ID!
+  id: ID!
 
-	address: Bytes!
-	tokenIds: [BigInt!]
-	prize: Prize
+  address: Bytes!
+  tokenIds: [BigInt!]
+  prize: Prize
 }
 
 # ID: `${controlledToken.address}`
 type ControlledToken @entity {
-	id: ID!
+  id: ID!
 
-	name: String!
-	symbol: String!
-	decimals: BigInt
+  name: String!
+  symbol: String!
+  decimals: BigInt
 
-	controller: PrizePool
+  controller: PrizePool
 
-	totalSupply: BigInt!
+  totalSupply: BigInt!
 
-	numberOfHolders: BigInt!
+  numberOfHolders: BigInt!
 
-	balances: [ControlledTokenBalance!]! @derivedFrom(field: "controlledToken")
+  balances: [ControlledTokenBalance!]! @derivedFrom(field: "controlledToken")
 }
 
 type ControlledTokenBalance @entity {
-	id: ID! # composite key of (address, controlledToken)
-	account: Account!
-	controlledToken: ControlledToken!
-	balance: BigInt
+  id: ID! # composite key of (address, controlledToken)
+  account: Account!
+  controlledToken: ControlledToken!
+  balance: BigInt
 }
 
 # ID: `${prizeStrategy.address}-${token.address}`
 # dynamically generated type, not mapped to a specific contract
 type SingleRandomWinnerExternalErc20Award @entity {
-	id: ID!
+  id: ID!
 
-	address: Bytes!
-	name: String
-	symbol: String
-	decimals: BigInt
+  address: Bytes!
+  name: String
+  symbol: String
+  decimals: BigInt
 
-	prizeStrategy: SingleRandomWinnerPrizeStrategy
+  prizeStrategy: SingleRandomWinnerPrizeStrategy
 }
 
 # ID: `${prizeStrategy.address}-${token.address}`
 # dynamically generated type, not mapped to a specific contract
 type SingleRandomWinnerExternalErc721Award @entity {
-	id: ID!
-	address: Bytes!
-	tokenIds: [BigInt!]
-	prizeStrategy: SingleRandomWinnerPrizeStrategy
+  id: ID!
+  address: Bytes!
+  tokenIds: [BigInt!]
+  prizeStrategy: SingleRandomWinnerPrizeStrategy
 }
 
 # join table
 type PrizePoolAccount @entity {
-	id: ID! #composite prizerpool id - accountid
-	prizePool: PrizePool!
-	account: Account!
+  id: ID! #composite prizerpool id - accountid
+  prizePool: PrizePool!
+  account: Account!
 
-	# address specific fields
-	timelockedBalance: BigInt!
-	unlockTimestamp: BigInt!
-	cumulativeWinnings: BigInt!
+  # address specific fields
+  timelockedBalance: BigInt!
+  unlockTimestamp: BigInt!
+  cumulativeWinnings: BigInt!
 }
 
 type Account @entity {
-	id: ID!
+  id: ID!
 
-	prizePoolAccounts: [PrizePoolAccount!]! @derivedFrom(field: "account")
-	controlledTokenBalances: [ControlledTokenBalance!] @derivedFrom(field: "account")
+  prizePoolAccounts: [PrizePoolAccount!]! @derivedFrom(field: "account")
+  controlledTokenBalances: [ControlledTokenBalance!] @derivedFrom(field: "account")
 }
 
 # ID: `${prizePool.address}-${controlledToken.address}`
 # dynamically generated type, not mapped to a specific contract
 type CreditRate @entity {
-	id: ID!
-	prizePool: PrizePool!
+  id: ID!
+  prizePool: PrizePool!
 
-	creditLimitMantissa: BigInt!
-	creditRateMantissa: BigInt!
+  creditLimitMantissa: BigInt!
+  creditRateMantissa: BigInt!
 }
 
 # ID: `${prizePool.address}-${controlledToken.address}`
 # dynamically generated type, not mapped to a specific contract
 type CreditBalance @entity {
-	id: ID!
-	prizePool: PrizePool!
+  id: ID!
+  prizePool: PrizePool!
 
-	balance: BigInt
-	timestamp: BigInt
-	initialized: Boolean
+  balance: BigInt
+  timestamp: BigInt
+  initialized: Boolean
 }
 
 # ID: `${comptroller.address}-${dripToken.address}-${player.address}`
 # dynamically generated type, not mapped to a specific contract
 type DripTokenPlayer @entity {
-	id: ID!
-	comptroller: Comptroller!
-	dripToken: Bytes!
-	address: Bytes!
+  id: ID!
+  comptroller: Comptroller!
+  dripToken: Bytes!
+  address: Bytes!
 
-	# claimable balance
-	balance: BigInt!
+  # claimable balance
+  balance: BigInt!
 }
 
 # ID: `${balanceDripId}-${player.address}`
 # dynamically generated type, not mapped to a specific contract
 type BalanceDripPlayer @entity {
-	id: ID!
-	balanceDrip: BalanceDrip!
-	address: Bytes!
+  id: ID!
+  balanceDrip: BalanceDrip!
+  address: Bytes!
 }
 
 # ID: `${comptroller.address}-${sourceToken.address}-${measureToken.address}-${dripToken.address}`
 # dynamically generated type, not mapped to a specific contract
 type BalanceDrip @entity {
-	id: ID!
+  id: ID!
 
-	comptroller: Comptroller!
+  comptroller: Comptroller!
 
-	sourceAddress: Bytes!
-	measureToken: Bytes!
-	dripToken: Bytes!
+  sourceAddress: Bytes!
+  measureToken: Bytes!
+  dripToken: Bytes!
 
-	dripRatePerSecond: BigInt
-	exchangeRateMantissa: BigInt
-	timestamp: BigInt
+  dripRatePerSecond: BigInt
+  exchangeRateMantissa: BigInt
+  timestamp: BigInt
 
-	players: [BalanceDripPlayer!]! @derivedFrom(field: "balanceDrip")
+  players: [BalanceDripPlayer!]! @derivedFrom(field: "balanceDrip")
 
-	deactivated: Boolean!
+  deactivated: Boolean!
 }
 
 # ID: `${volumeDripId}-${player.address}`
 # dynamically generated type, not mapped to a specific contract
 type VolumeDripPlayer @entity {
-	id: ID!
-	volumeDrip: VolumeDrip!
-	address: Bytes!
+  id: ID!
+  volumeDrip: VolumeDrip!
+  address: Bytes!
 
-	periodIndex: BigInt!
-	balance: BigInt!
+  periodIndex: BigInt!
+  balance: BigInt!
 }
 
 # ID: `${volumeDripId}-${periodIndex}`
 # dynamically generated type, not mapped to a specific contract
 type VolumeDripPeriod @entity {
-	id: ID!
-	volumeDrip: VolumeDrip!
-	periodIndex: BigInt!
+  id: ID!
+  volumeDrip: VolumeDrip!
+  periodIndex: BigInt!
 
-	totalSupply: BigInt
-	dripAmount: BigInt
-	endTime: BigInt
+  totalSupply: BigInt
+  dripAmount: BigInt
+  endTime: BigInt
 
-	isDripping: Boolean!
+  isDripping: Boolean!
 }
 
 # ID: `${comptroller.address}-${sourceToken.address}-${measureToken.address}-${dripToken.address}-${isReferral}`
 # dynamically generated type, not mapped to a specific contract
 type VolumeDrip @entity {
-	id: ID!
+  id: ID!
 
-	comptroller: Comptroller!
+  comptroller: Comptroller!
 
-	sourceAddress: Bytes!
-	measureToken: Bytes!
-	dripToken: Bytes!
-	referral: Boolean!
+  sourceAddress: Bytes!
+  measureToken: Bytes!
+  dripToken: Bytes!
+  referral: Boolean!
 
-	periodSeconds: BigInt
-	dripAmount: BigInt
-	periodCount: BigInt
+  periodSeconds: BigInt
+  dripAmount: BigInt
+  periodCount: BigInt
 
-	deposits: [VolumeDripPlayer!]! @derivedFrom(field: "volumeDrip")
-	periods: [VolumeDripPeriod!]! @derivedFrom(field: "volumeDrip")
+  deposits: [VolumeDripPlayer!]! @derivedFrom(field: "volumeDrip")
+  periods: [VolumeDripPeriod!]! @derivedFrom(field: "volumeDrip")
 
-	deactivated: Boolean!
+  deactivated: Boolean!
 }
 
 type MultipleWinnersPrizeStrategy @entity {
-	id: ID!
-	owner: Bytes
+  id: ID!
+  owner: Bytes
 
-	numberOfWinners: BigInt
+  numberOfWinners: BigInt
 
-	tokenListener: Bytes
-	prizePool: PrizePool
-	rng: Bytes
+  tokenListener: Bytes
+  prizePool: PrizePool
+  rng: Bytes
 
-	ticket: ControlledToken
-	sponsorship: ControlledToken
+  ticket: ControlledToken
+  sponsorship: ControlledToken
 
-	prizePeriodSeconds: BigInt!
-	prizePeriodStartedAt: BigInt!
-	prizePeriodEndAt: BigInt!
+  prizePeriodSeconds: BigInt!
+  prizePeriodStartedAt: BigInt!
+  prizePeriodEndAt: BigInt!
 
-	externalErc20Awards: [MultipleWinnersExternalErc20Award!]! @derivedFrom(field: "prizeStrategy")
-	externalErc721Awards: [MultipleWinnersExternalErc721Award!]! @derivedFrom(field: "prizeStrategy")
+  externalErc20Awards: [MultipleWinnersExternalErc20Award!]! @derivedFrom(field: "prizeStrategy")
+  externalErc721Awards: [MultipleWinnersExternalErc721Award!]! @derivedFrom(field: "prizeStrategy")
 }
 
 # ID: `${prizeStrategy.address}-${token.address}`
 # dynamically generated type, not mapped to a specific contract
 type MultipleWinnersExternalErc20Award @entity {
-	id: ID!
+  id: ID!
 
-	address: Bytes!
-	name: String
-	symbol: String
-	decimals: BigInt
+  address: Bytes!
+  name: String
+  symbol: String
+  decimals: BigInt
 
-	balanceAwarded: BigInt
-	prizeStrategy: MultipleWinnersPrizeStrategy
+  balanceAwarded: BigInt
+  prizeStrategy: MultipleWinnersPrizeStrategy
 }
 
 # ID: `${prizeStrategy.address}-${token.address}`
 # dynamically generated type, not mapped to a specific contract
 type MultipleWinnersExternalErc721Award @entity {
-	id: ID!
-	address: Bytes!
-	tokenIds: [BigInt!]
-	prizeStrategy: MultipleWinnersPrizeStrategy
+  id: ID!
+  address: Bytes!
+  tokenIds: [BigInt!]
+  prizeStrategy: MultipleWinnersPrizeStrategy
 }

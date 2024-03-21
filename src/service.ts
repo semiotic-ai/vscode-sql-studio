@@ -2,17 +2,17 @@ import { parse } from './graphtables';
 import type { Layout } from './graphtables/layout';
 
 export const DEFAULT_SUBGRAPH_API_ENDPOINT =
-	'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum';
+  'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum';
 
 interface ISubgraphQuery {
-	readonly query: string;
-	readonly variables: Record<string, unknown>;
-	readonly operationName: string;
-	readonly extensions: Record<string, unknown>;
+  readonly query: string;
+  readonly variables: Record<string, unknown>;
+  readonly operationName: string;
+  readonly extensions: Record<string, unknown>;
 }
 
 const SEARCH_TEMPLATE: ISubgraphQuery = {
-	query: `query SearchbyName($search:String!, $first:Int!) {
+  query: `query SearchbyName($search:String!, $first:Int!) {
 		metas:subgraphMetadataSearch(first:$first,text:$search,where:{ subgraph_:{id_not:null}})
 		{
 		  id,
@@ -42,13 +42,13 @@ const SEARCH_TEMPLATE: ISubgraphQuery = {
 		}
 	  }
     `,
-	variables: { search: '', first: 5 },
-	operationName: 'SearchbyName',
-	extensions: {}
+  variables: { search: '', first: 5 },
+  operationName: 'SearchbyName',
+  extensions: {}
 };
 
 const SEARCH_BYID_TEMPLATE: ISubgraphQuery = {
-	query: `query SearchbyId($id:ID!) {
+  query: `query SearchbyId($id:ID!) {
 		metas:subgraphMetas(where:{subgraph_:{id:$id}}) {
 	  id,
 		displayName,
@@ -76,63 +76,63 @@ const SEARCH_BYID_TEMPLATE: ISubgraphQuery = {
 	}
 	}
 	}`,
-	variables: { id: '' },
-	operationName: 'SearchById',
-	extensions: {}
+  variables: { id: '' },
+  operationName: 'SearchById',
+  extensions: {}
 };
 
 interface ISubgraphSearchResult {
-	readonly data: {
-		readonly metas: {
-			readonly id: string;
-			readonly displayName: string;
-			readonly description: string;
-			readonly image: string;
-			readonly subgraph: {
-				readonly id: string;
-				readonly currentVersion: {
-					readonly id: string;
-					readonly subgraphDeployment: {
-						readonly id: string;
-						readonly indexerAllocations: {
-							readonly activeForIndexer: {
-								readonly id: string;
-							};
-						}[];
-						readonly manifest: {
-							readonly schema: {
-								readonly id: string;
-							};
-							readonly network: string;
-						};
-					};
-				};
-			};
-		}[];
-	};
+  readonly data: {
+    readonly metas: {
+      readonly id: string;
+      readonly displayName: string;
+      readonly description: string;
+      readonly image: string;
+      readonly subgraph: {
+        readonly id: string;
+        readonly currentVersion: {
+          readonly id: string;
+          readonly subgraphDeployment: {
+            readonly id: string;
+            readonly indexerAllocations: {
+              readonly activeForIndexer: {
+                readonly id: string;
+              };
+            }[];
+            readonly manifest: {
+              readonly schema: {
+                readonly id: string;
+              };
+              readonly network: string;
+            };
+          };
+        };
+      };
+    }[];
+  };
 }
 
 /*
  * Basic subgraph and current version/deployment information
  */
 export interface ISubgraphInfo {
-	readonly id: string;
-	readonly displayName: string;
-	readonly description: string;
-	readonly image: string;
-	readonly currentVersion: string;
-	readonly deploymentId: string;
-	readonly network: string;
-	readonly deploymentSchemaId: string;
-	readonly activeIndexerAllocations: number;
+  readonly id: string;
+  readonly displayName: string;
+  readonly description: string;
+  readonly image: string;
+  readonly currentVersion: string;
+  readonly deploymentId: string;
+  readonly network: string;
+  readonly deploymentSchemaId: string;
+  readonly activeIndexerAllocations: number;
 }
 
 export function CheapCopy<T>(value: T): T {
-	return JSON.parse(JSON.stringify(value));
+  return JSON.parse(JSON.stringify(value));
 }
 
 const PAGINATED_SUBGRAPH_TEMPLATE: ISubgraphQuery = {
-	query: `query HomeSubgraphsPageContent__Subgraphs($_v0_skip: Int, $_v1_first: Int, $_v2_orderBy: Subgraph_orderBy, $_v3_orderDirection: OrderDirection, $_v4_where: Subgraph_filter, $_v5_subgraphError: _SubgraphErrorPolicy_!) {
+  query: `query HomeSubgraphsPageContent__Subgraphs($_v0_skip: Int, $_v1_first: Int, $_v2_orderBy: Subgraph_orderBy, $_v3_orderDirection: OrderDirection, $_v4_where: Subgraph_filter, $_v5_subgraphError: _SubgraphErrorPolicy_!) {
   __typename
   NETWORK__subgraphs: subgraphs(
     where: $_v4_where
@@ -185,65 +185,65 @@ fragment SubgraphCard__Subgraph on Subgraph {
   }
 }
 `,
-	variables: {
-		_v4_where: {
-			active: true,
-			entityVersion: 2,
-			metadata_: {
-				displayName_not: ''
-			}
-		},
-		_v2_orderBy: 'currentSignalledTokens',
-		_v3_orderDirection: 'desc',
-		_v1_first: 5,
-		_v0_skip: 0,
-		_v5_subgraphError: 'deny'
-	},
-	operationName: 'SearchbyName',
-	extensions: {}
+  variables: {
+    _v4_where: {
+      active: true,
+      entityVersion: 2,
+      metadata_: {
+        displayName_not: ''
+      }
+    },
+    _v2_orderBy: 'currentSignalledTokens',
+    _v3_orderDirection: 'desc',
+    _v1_first: 5,
+    _v0_skip: 0,
+    _v5_subgraphError: 'deny'
+  },
+  operationName: 'SearchbyName',
+  extensions: {}
 };
 
 interface PaginatedSubgraph {
-	readonly data: {
-		readonly NETWORK__subgraphs: {
-			readonly active: boolean;
-			readonly createdAt: number;
-			readonly currentSignalledTokens: string;
-			readonly currentVersion: {
-				readonly id: string;
-				readonly subgraphDeployment: {
-					readonly id: string;
-					readonly manifest: {
-						readonly network: string;
-						readonly schema: {
-							readonly id: string;
-						};
-					};
-					readonly queryFeesAmount: string;
-					readonly stakedTokens: string;
-				};
-			};
-			readonly entityVersion: string;
-			readonly id: string;
-			readonly metadata: {
-				readonly description: string;
-				readonly displayName: string;
-				readonly image: string;
-			};
-			readonly owner: {
-				readonly defaultDisplayName: string;
-				readonly defaultName: {
-					readonly id: string;
-					readonly name: string;
-				};
-				readonly id: string;
-				readonly metadata: {
-					readonly image: string;
-				};
-			};
-			readonly updatedAt: number;
-		}[];
-	};
+  readonly data: {
+    readonly NETWORK__subgraphs: {
+      readonly active: boolean;
+      readonly createdAt: number;
+      readonly currentSignalledTokens: string;
+      readonly currentVersion: {
+        readonly id: string;
+        readonly subgraphDeployment: {
+          readonly id: string;
+          readonly manifest: {
+            readonly network: string;
+            readonly schema: {
+              readonly id: string;
+            };
+          };
+          readonly queryFeesAmount: string;
+          readonly stakedTokens: string;
+        };
+      };
+      readonly entityVersion: string;
+      readonly id: string;
+      readonly metadata: {
+        readonly description: string;
+        readonly displayName: string;
+        readonly image: string;
+      };
+      readonly owner: {
+        readonly defaultDisplayName: string;
+        readonly defaultName: {
+          readonly id: string;
+          readonly name: string;
+        };
+        readonly id: string;
+        readonly metadata: {
+          readonly image: string;
+        };
+      };
+      readonly updatedAt: number;
+    }[];
+  };
 }
 
 /**
@@ -254,73 +254,73 @@ interface PaginatedSubgraph {
  * @returns a list of `ISubgraphInfo`
  */
 export async function getSubgraphs(
-	first: number,
-	skip: number,
-	abortSignal?: AbortSignal
+  first: number,
+  skip: number,
+  abortSignal?: AbortSignal
 ): Promise<ISubgraphInfo[]> {
-	const body = CheapCopy(PAGINATED_SUBGRAPH_TEMPLATE);
-	body.variables._v1_first = first;
-	body.variables._v0_skip = skip;
-	const response: PaginatedSubgraph = await callGraphQL(body, undefined, abortSignal);
+  const body = CheapCopy(PAGINATED_SUBGRAPH_TEMPLATE);
+  body.variables._v1_first = first;
+  body.variables._v0_skip = skip;
+  const response: PaginatedSubgraph = await callGraphQL(body, undefined, abortSignal);
 
-	return response.data.NETWORK__subgraphs.map((subgraph) => ({
-		id: subgraph.id,
-		displayName: subgraph.metadata.displayName,
-		description: subgraph.metadata.description,
-		image: subgraph.metadata.image,
-		currentVersion: subgraph.currentVersion.id,
-		deploymentId: subgraph.currentVersion.subgraphDeployment.id,
-		network: subgraph.currentVersion.subgraphDeployment.manifest.network,
-		deploymentSchemaId: subgraph.currentVersion.subgraphDeployment.manifest.schema.id,
-		activeIndexerAllocations: 0
-	}));
+  return response.data.NETWORK__subgraphs.map((subgraph) => ({
+    id: subgraph.id,
+    displayName: subgraph.metadata.displayName,
+    description: subgraph.metadata.description,
+    image: subgraph.metadata.image,
+    currentVersion: subgraph.currentVersion.id,
+    deploymentId: subgraph.currentVersion.subgraphDeployment.id,
+    network: subgraph.currentVersion.subgraphDeployment.manifest.network,
+    deploymentSchemaId: subgraph.currentVersion.subgraphDeployment.manifest.schema.id,
+    activeIndexerAllocations: 0
+  }));
 }
 
 async function callGraphQL<B, R>(
-	body: B,
-	endpoint?: string,
-	abortSignal?: AbortSignal
+  body: B,
+  endpoint?: string,
+  abortSignal?: AbortSignal
 ): Promise<R> {
-	endpoint = endpoint || DEFAULT_SUBGRAPH_API_ENDPOINT;
+  endpoint = endpoint || DEFAULT_SUBGRAPH_API_ENDPOINT;
 
-	const response = await fetch(endpoint, {
-		headers: {
-			accept: 'application/graphql-response+json, application/json, multipart/mixed',
-			'accept-language': 'en-US,en;q=0.5',
-			'content-type': 'application/json'
-		},
-		body: JSON.stringify(body),
-		method: 'POST',
-		signal: abortSignal
-	});
+  const response = await fetch(endpoint, {
+    headers: {
+      accept: 'application/graphql-response+json, application/json, multipart/mixed',
+      'accept-language': 'en-US,en;q=0.5',
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify(body),
+    method: 'POST',
+    signal: abortSignal
+  });
 
-	const json_response: any = await response.json();
+  const json_response: any = await response.json();
 
-	if (Object.hasOwn(json_response, 'errors')) {
-		throw new Error(json_response.errors.map((e: any) => e.message).join('\n'));
-	}
+  if (Object.hasOwn(json_response, 'errors')) {
+    throw new Error(json_response.errors.map((e: any) => e.message).join('\n'));
+  }
 
-	//@ts-ignore
-	const result: R = json_response as R;
+  //@ts-ignore
+  const result: R = json_response as R;
 
-	return result;
+  return result;
 }
 
 function convertToSubgraphInfo(response: ISubgraphSearchResult): ISubgraphInfo[] {
-	return response.data.metas.map((meta) => {
-		return {
-			id: meta.subgraph.id,
-			displayName: meta.displayName,
-			description: meta.description,
-			image: meta.image,
-			currentVersion: meta.subgraph.currentVersion.id,
-			deploymentId: meta.subgraph.currentVersion.subgraphDeployment.id,
-			network: meta.subgraph.currentVersion.subgraphDeployment.manifest.network,
-			deploymentSchemaId: meta.subgraph.currentVersion.subgraphDeployment.manifest.schema.id,
-			activeIndexerAllocations:
-				meta.subgraph.currentVersion.subgraphDeployment.indexerAllocations.length
-		};
-	});
+  return response.data.metas.map((meta) => {
+    return {
+      id: meta.subgraph.id,
+      displayName: meta.displayName,
+      description: meta.description,
+      image: meta.image,
+      currentVersion: meta.subgraph.currentVersion.id,
+      deploymentId: meta.subgraph.currentVersion.subgraphDeployment.id,
+      network: meta.subgraph.currentVersion.subgraphDeployment.manifest.network,
+      deploymentSchemaId: meta.subgraph.currentVersion.subgraphDeployment.manifest.schema.id,
+      activeIndexerAllocations:
+        meta.subgraph.currentVersion.subgraphDeployment.indexerAllocations.length
+    };
+  });
 }
 
 /**
@@ -331,19 +331,19 @@ function convertToSubgraphInfo(response: ISubgraphSearchResult): ISubgraphInfo[]
  * @returns a list of `ISubgraphInfo` matching the search criteria
  */
 export async function searchSubgraph(
-	search: string,
-	endpoint?: string,
-	abortSignal?: AbortSignal
+  search: string,
+  endpoint?: string,
+  abortSignal?: AbortSignal
 ): Promise<ISubgraphInfo[]> {
-	const body = CheapCopy(SEARCH_TEMPLATE);
+  const body = CheapCopy(SEARCH_TEMPLATE);
 
-	body.variables.search = search;
+  body.variables.search = search;
 
-	const json_response: ISubgraphSearchResult = await callGraphQL(body, endpoint, abortSignal);
+  const json_response: ISubgraphSearchResult = await callGraphQL(body, endpoint, abortSignal);
 
-	const result: ISubgraphInfo[] = convertToSubgraphInfo(json_response);
+  const result: ISubgraphInfo[] = convertToSubgraphInfo(json_response);
 
-	return result;
+  return result;
 }
 
 /**
@@ -354,38 +354,38 @@ export async function searchSubgraph(
  * @returns `ISubgraphInfo` matching the search criteria or undefined if not found
  */
 export async function searchSubgraphById(
-	id: string,
-	endpoint?: string,
-	abortSignal?: AbortSignal
+  id: string,
+  endpoint?: string,
+  abortSignal?: AbortSignal
 ): Promise<ISubgraphInfo | undefined> {
-	const body = CheapCopy(SEARCH_BYID_TEMPLATE);
+  const body = CheapCopy(SEARCH_BYID_TEMPLATE);
 
-	body.variables.id = id;
+  body.variables.id = id;
 
-	const json_response: ISubgraphSearchResult = await callGraphQL(body, endpoint, abortSignal);
+  const json_response: ISubgraphSearchResult = await callGraphQL(body, endpoint, abortSignal);
 
-	const result: ISubgraphInfo[] = convertToSubgraphInfo(json_response);
+  const result: ISubgraphInfo[] = convertToSubgraphInfo(json_response);
 
-	return result.length === 0 ? undefined : result[0];
+  return result.length === 0 ? undefined : result[0];
 }
 
 const SCHEMA_QUERY_TEMPLATE: ISubgraphQuery = {
-	query: `query GetLayout($deploymentSchemaId: ID!) {
+  query: `query GetLayout($deploymentSchemaId: ID!) {
 		subgraphDeploymentSchema(id:$deploymentSchemaId) {
 			schema
 	  }
 	}`,
-	variables: { deploymentSchemaId: '' },
-	operationName: 'GetLayout',
-	extensions: {}
+  variables: { deploymentSchemaId: '' },
+  operationName: 'GetLayout',
+  extensions: {}
 };
 
 interface ISchemaResponse {
-	readonly data: {
-		readonly subgraphDeploymentSchema: {
-			readonly schema: string;
-		};
-	};
+  readonly data: {
+    readonly subgraphDeploymentSchema: {
+      readonly schema: string;
+    };
+  };
 }
 
 /**
@@ -397,42 +397,42 @@ interface ISchemaResponse {
  * @returns database layout
  */
 export async function getLayout(
-	deploymentSchemaId: string,
-	endpoint?: string,
-	abortSignal?: AbortSignal
+  deploymentSchemaId: string,
+  endpoint?: string,
+  abortSignal?: AbortSignal
 ): Promise<Layout> {
-	const body = CheapCopy(SCHEMA_QUERY_TEMPLATE);
+  const body = CheapCopy(SCHEMA_QUERY_TEMPLATE);
 
-	body.variables.deploymentSchemaId = deploymentSchemaId;
+  body.variables.deploymentSchemaId = deploymentSchemaId;
 
-	const json_response: ISchemaResponse = await callGraphQL(body, endpoint, abortSignal);
+  const json_response: ISchemaResponse = await callGraphQL(body, endpoint, abortSignal);
 
-	const result = parse(json_response.data.subgraphDeploymentSchema.schema);
+  const result = parse(json_response.data.subgraphDeploymentSchema.schema);
 
-	return result;
+  return result;
 }
 
 const SQL_QUERY_TEMPLATE: ISubgraphQuery = {
-	query: `query SQL($query: String!) {
+  query: `query SQL($query: String!) {
         sql(input:{query : $query}) {
 			rowCount,
 			rows,
 			columns
         }
     }`,
-	variables: { query: '' },
-	operationName: 'SQL',
-	extensions: {}
+  variables: { query: '' },
+  operationName: 'SQL',
+  extensions: {}
 };
 
 export interface IQueryResult {
-	readonly data: {
-		readonly sql: {
-			readonly rowCount: number;
-			readonly rows: [{ (key: string): string | number }];
-			readonly columns: string[];
-		};
-	};
+  readonly data: {
+    readonly sql: {
+      readonly rowCount: number;
+      readonly rows: [{ (key: string): string | number }];
+      readonly columns: string[];
+    };
+  };
 }
 
 /**
@@ -443,15 +443,15 @@ export interface IQueryResult {
  * @returns result of the query
  */
 export async function executeSQL(
-	endpoint: string,
-	query: string,
-	abortSignal?: AbortSignal
+  endpoint: string,
+  query: string,
+  abortSignal?: AbortSignal
 ): Promise<IQueryResult> {
-	const body = CheapCopy(SQL_QUERY_TEMPLATE);
+  const body = CheapCopy(SQL_QUERY_TEMPLATE);
 
-	body.variables.query = query;
+  body.variables.query = query;
 
-	const json_response: IQueryResult = await callGraphQL(body, endpoint, abortSignal);
+  const json_response: IQueryResult = await callGraphQL(body, endpoint, abortSignal);
 
-	return json_response;
+  return json_response;
 }

@@ -13,10 +13,10 @@ type FileWriter = (path: string, content: string) => Promise<void>;
  * Type definition for the result of the write operation.
  */
 type WriteResult = {
-	/** Indicates whether the write operation was successful. */
-	success: boolean;
-	/** Contains an error message if the write operation failed. */
-	error?: string;
+  /** Indicates whether the write operation was successful. */
+  success: boolean;
+  /** Contains an error message if the write operation failed. */
+  error?: string;
 };
 
 /**
@@ -30,19 +30,19 @@ type WriteResult = {
  *         If the operation fails or no URI is provided, `success` will be false and `error` will contain an error message.
  */
 export async function write(
-	content: string,
-	uri: vscode.Uri | undefined,
-	writeFile: FileWriter = fsPromises.writeFile
+  content: string,
+  uri: vscode.Uri | undefined,
+  writeFile: FileWriter = fsPromises.writeFile
 ): Promise<WriteResult> {
-	if (!uri) {
-		return { success: false, error: 'No URI Provided' };
-	}
-	try {
-		await writeFile(uri.fsPath, content);
-		return { success: true };
-	} catch (err) {
-		const errorMessage = 'Failed to save the file: ' + (err as Error).message;
-		vscode.window.showErrorMessage(errorMessage);
-		return { success: false, error: errorMessage };
-	}
+  if (!uri) {
+    return { success: false, error: 'No URI Provided' };
+  }
+  try {
+    await writeFile(uri.fsPath, content);
+    return { success: true };
+  } catch (err) {
+    const errorMessage = 'Failed to save the file: ' + (err as Error).message;
+    vscode.window.showErrorMessage(errorMessage);
+    return { success: false, error: errorMessage };
+  }
 }

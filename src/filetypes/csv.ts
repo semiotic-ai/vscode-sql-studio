@@ -8,10 +8,10 @@ import * as fOps from './fileOperations';
  * @returns {Promise<void>} A promise that resolves when the content has been written to the selected file.
  */
 export async function write(content: string) {
-	const uri = await vscode.window.showSaveDialog({
-		filters: {
-			'CSV file': ['csv']
-		}
-	});
-	await fOps.write(content, uri);
+  const uri = await vscode.window.showSaveDialog({
+    filters: {
+      'CSV file': ['csv']
+    }
+  });
+  await fOps.write(content, uri);
 }

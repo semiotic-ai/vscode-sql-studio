@@ -1,8 +1,8 @@
 {
-	"out": "./docs",
-	"entryPoints": ["./src"],
-	"entryPointStrategy": "expand",
-	"plugin": ["typedoc-theme-hierarchy"],
-	"theme": "hierarchy",
-	"name": "Semiotic SQL Studio"
+  "out": "./docs",
+  "entryPoints": ["./src"],
+  "entryPointStrategy": "expand",
+  "plugin": ["typedoc-theme-hierarchy"],
+  "theme": "hierarchy",
+  "name": "Semiotic SQL Studio"
 }

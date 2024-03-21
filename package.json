@@ -1,333 +1,333 @@
 {
-	"name": "semiotic-sql-studio",
-	"displayName": "Semiotic SQL Studio",
-	"description": "A SQL interface for The Graph Protocol managed by Semiotic Labs",
-	"version": "0.1.0",
-	"publisher": "SemioticLabs",
-	"preview": true,
-	"icon": "images/extension-icon.png",
-	"private": true,
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/semiotic-ai/vscode-sql-studio.git"
-	},
-	"galleryBanner": {
-		"color": "#1f1f1f",
-		"theme": "dark"
-	},
-	"bugs": {
-		"url": "https://github.com/semiotic-ai/vscode-sql-studio/issues"
-	},
-	"homepage": "https://github.com/semiotic-ai/vscode-sql-studio/blob/master/README.md",
-	"engines": {
-		"vscode": "^1.86.0"
-	},
-	"categories": [
-		"Programming Languages",
-		"Data Science",
-		"Other"
-	],
-	"main": "./dist/extension.js",
-	"contributes": {
-		"menus": {
-			"editor/title/run": [
-				{
-					"command": "query.runQuery",
-					"when": "editorTextFocus && editorLangId == 'gsql' && !subgraph.queryRunning"
-				},
-				{
-					"command": "query.cancelQuery",
-					"when": "editorTextFocus && editorLangId == 'gsql' && subgraph.queryRunning"
-				}
-			],
-			"editor/context": [
-				{
-					"command": "query.runQuery",
-					"when": "editorTextFocus && editorLangId == 'gsql'"
-				},
-				{
-					"command": "query.cancelQuery",
-					"when": "editorTextFocus && editorLangId == 'gsql'"
-				},
-				{
-					"command": "query.showResults",
-					"when": "editorTextFocus && editorLangId == 'gsql'"
-				},
-				{
-					"command": "gsqlEditor.addSubgraphInfo",
-					"when": "editorTextFocus && editorLangId == 'gsql'"
-				},
-				{
-					"command": "gsqlEditor.replaceSubgraphInfo",
-					"when": "editorTextFocus && editorLangId == 'gsql'"
-				}
-			],
-			"view/title": [
-				{
-					"command": "subgraphs.newQuery",
-					"group": "navigation",
-					"when": "view == subgraphs"
-				},
-				{
-					"command": "subgraphs.Search",
-					"group": "navigation",
-					"when": "view == subgraphs"
-				},
-				{
-					"command": "subgraphs.Load",
-					"group": "navigation",
-					"when": "view == subgraphs"
-				}
-			],
-			"view/item/context": [
-				{
-					"command": "subgraphs.newQuery",
-					"when": "view == subgraphs",
-					"group": "query"
-				}
-			]
-		},
-		"commands": [
-			{
-				"command": "query.runQuery",
-				"title": "Run Query",
-				"category": "GRAPHSQL",
-				"icon": "$(debug-start)"
-			},
-			{
-				"command": "query.cancelQuery",
-				"title": "Cancel Query",
-				"category": "GRAPHSQL",
-				"icon": "$(debug-stop)"
-			},
-			{
-				"command": "query.showResults",
-				"title": "Show Results",
-				"category": "GRAPHSQL"
-			},
-			{
-				"command": "subgraphs.newQuery",
-				"title": "New Query",
-				"category": "GRAPHSQL",
-				"icon": "$(new-file)"
-			},
-			{
-				"command": "gsqlEditor.addSubgraphInfo",
-				"title": "Add Selected Subgraph's Metadata to the GSQL file",
-				"category": "GRAPHSQL"
-			},
-			{
-				"command": "gsqlEditor.replaceSubgraphInfo",
-				"title": "Replace the Metadata in the GSQL file with the new subgraph",
-				"category": "GRAPHSQL"
-			},
-			{
-				"command": "subgraphs.Search",
-				"title": "Search Subgraph by Name and Description",
-				"category": "GRAPHSQL",
-				"icon": "$(search)"
-			},
-			{
-				"command": "subgraphs.Load",
-				"title": "Load More Subgraphs",
-				"icon": "$(cloud-download)",
-				"category": "GRAPHSQL"
-			},
-			{
-				"command": "bug.Report",
-				"title": "Report a Bug",
-				"category": "GRAPHSQL"
-			}
-		],
-		"keybindings": [
-			{
-				"command": "query.runQuery",
-				"key": "ctrl+m ctrl+r",
-				"mac": "cmd+m cmd+r",
-				"when": "editorTextFocus && editorLangId == 'gsql'"
-			},
-			{
-				"command": "query.cancelQuery",
-				"key": "ctrl+m ctrl+c",
-				"mac": "cmd+m cmd+c",
-				"when": "editorTextFocus && editorLangId == 'gsql'"
-			},
-			{
-				"command": "query.showResults",
-				"key": "ctrl+m ctrl+n",
-				"mac": "cmd+m cmd+n",
-				"when": "editorTextFocus && editorLangId == 'gsql'"
-			},
-			{
-				"command": "subgraphs.Load",
-				"key": "ctrl+m ctrl+l",
-				"mac": "cmd+m cmd+l",
-				"when": "view == subgraphs"
-			},
-			{
-				"command": "gsqlEditor.addSubgraphInfo",
-				"key": "ctrl+m ctrl+a",
-				"mac": "cmd+m cmd+a",
-				"when": "editorTextFocus && editorLangId == 'gsql'"
-			},
-			{
-				"command": "gsqlEditor.replaceSubgraphInfo",
-				"key": "ctrl+m ctrl+p",
-				"mac": "cmd+m cmd+p",
-				"when": "editorTextFocus && editorLangId == 'gsql'"
-			},
-			{
-				"command": "subgraphs.Search",
-				"key": "ctrl+m ctrl+s",
-				"mac": "cmd+m cmd+s",
-				"when": "view == subgraphs"
-			},
-			{
-				"command": "bug.Report",
-				"key": "ctrl+m ctrl+b",
-				"mac": "cmd+m cmd+b"
-			}
-		],
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "subgraphExplorer",
-					"title": "Subgraph Explorer",
-					"icon": "resources/semiotic-icon.svg"
-				}
-			],
-			"panel": [
-				{
-					"id": "results",
-					"title": "Graph SQL Result",
-					"icon": "resources/semiotic-icon.svg"
-				}
-			]
-		},
-		"views": {
-			"subgraphExplorer": [
-				{
-					"id": "subgraphs",
-					"name": "Available Subgraphs"
-				},
-				{
-					"id": "subgraphSchema",
-					"name": "Subgraph Tables"
-				}
-			],
-			"results": [
-				{
-					"id": "tabularResult",
-					"type": "webview",
-					"contextualTitle": "Graph SQL Tabular Results",
-					"name": "Graph SQL Tabular Results",
-					"visibility": "visible"
-				}
-			]
-		},
-		"viewsWelcome": [
-			{
-				"view": "subgraphSchema",
-				"contents": "In order to view an specific subgraph columns, select a SQL enabled subgraph.",
-				"when": "workbenchState == empty"
-			}
-		],
-		"configuration": {
-			"title": "GRAPHSQL configuration",
-			"properties": {
-				"graphsql.gateway": {
-					"type": "string",
-					"description": "Gateway",
-					"default": "http://eth.rubik.com.tr:8000/subgraphs/name",
-					"scope": "resource"
-				},
-				"graphsql.paths": {
-					"type": "object",
-					"description": "Mapping of lower case subgraph names to their endpoints relative paths.",
-					"default": {
-						"substreams uniswap v3 ethereum": "tumay/uniswap-v3",
-						"odos-v2-ethereum": "odos/v2"
-					},
-					"scope": "resource"
-				}
-			}
-		},
-		"languages": [
-			{
-				"id": "gsql",
-				"extensions": [
-					".gsql"
-				],
-				"aliases": [
-					"GraphSQL",
-					"graphsql"
-				],
-				"configuration": "./language-configuration.json"
-			}
-		],
-		"grammars": [
-			{
-				"language": "gsql",
-				"scopeName": "source.gsql",
-				"path": "./syntaxes/gsql.tmLanguage.json"
-			}
-		]
-	},
-	"scripts": {
-		"lang": "js-yaml syntaxes/gsql.tmLanguage.yaml > syntaxes/gsql.tmLanguage.json",
-		"vscode:prepublish": "npm run package",
-		"compile": "webpack",
-		"watch": "webpack --watch",
-		"package": "webpack --mode production --devtool hidden-source-map",
-		"compile-tests": "tsc -p . --outDir out",
-		"watch-tests": "tsc -p . -w --outDir out",
-		"pretest": "npm run compile-tests && npm run compile && npm run lint",
-		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write .",
-		"test": "vscode-test",
-		"release": "semantic-release",
-		"check-format": "prettier --check .",
-		"prepare": "husky",
-		"docs": "typedoc"
-	},
-	"devDependencies": {
-		"@semantic-release/changelog": "^6.0.3",
-		"@semantic-release/commit-analyzer": "^11.1.0",
-		"@semantic-release/git": "^10.0.1",
-		"@semantic-release/npm": "^11.0.2",
-		"@types/mocha": "^10.0.6",
-		"@types/node": "18.x",
-		"@types/node-fetch": "^2.6.11",
-		"@types/vscode": "^1.86.0",
-		"@typescript-eslint/eslint-plugin": "^6.19.1",
-		"@typescript-eslint/parser": "^6.19.1",
-		"@vscode/test-cli": "^0.0.4",
-		"@vscode/test-electron": "^2.3.9",
-		"conventional-changelog-conventionalcommits": "^7.0.2",
-		"eslint": "^8.56.0",
-		"eslint-config-prettier": "^9.1.0",
-		"husky": "^9.0.10",
-		"lint-staged": "^15.2.1",
-		"prettier": "^3.2.4",
-		"semantic-release": "^23.0.0",
-		"semantic-release-stop-before-publish": "^1.0.0",
-		"semantic-release-vsce": "^5.6.4",
-		"ts-loader": "^9.5.1",
-		"typedoc": "^0.25.7",
-		"typedoc-theme-hierarchy": "^4.1.2",
-		"typescript": "^5.3.3",
-		"webpack": "^5.90.0",
-		"webpack-cli": "^5.1.4",
-		"yaml-loader": "^0.8.0"
-	},
-	"dependencies": {
-		"@vscode/codicons": "^0.0.35",
-		"graphql": "^16.8.1",
-		"node-fetch": "^2.7.0",
-		"simple-datatables": "^9.0.0"
-	},
-	"volta": {
-		"node": "20.11.0",
-		"npm": "10.2.4"
-	}
+  "name": "semiotic-sql-studio",
+  "displayName": "Semiotic SQL Studio",
+  "description": "A SQL interface for The Graph Protocol managed by Semiotic Labs",
+  "version": "0.1.0",
+  "publisher": "SemioticLabs",
+  "preview": true,
+  "icon": "images/extension-icon.png",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/semiotic-ai/vscode-sql-studio.git"
+  },
+  "galleryBanner": {
+    "color": "#1f1f1f",
+    "theme": "dark"
+  },
+  "bugs": {
+    "url": "https://github.com/semiotic-ai/vscode-sql-studio/issues"
+  },
+  "homepage": "https://github.com/semiotic-ai/vscode-sql-studio/blob/master/README.md",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Data Science",
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "menus": {
+      "editor/title/run": [
+        {
+          "command": "query.runQuery",
+          "when": "editorTextFocus && editorLangId == 'gsql' && !subgraph.queryRunning"
+        },
+        {
+          "command": "query.cancelQuery",
+          "when": "editorTextFocus && editorLangId == 'gsql' && subgraph.queryRunning"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "query.runQuery",
+          "when": "editorTextFocus && editorLangId == 'gsql'"
+        },
+        {
+          "command": "query.cancelQuery",
+          "when": "editorTextFocus && editorLangId == 'gsql'"
+        },
+        {
+          "command": "query.showResults",
+          "when": "editorTextFocus && editorLangId == 'gsql'"
+        },
+        {
+          "command": "gsqlEditor.addSubgraphInfo",
+          "when": "editorTextFocus && editorLangId == 'gsql'"
+        },
+        {
+          "command": "gsqlEditor.replaceSubgraphInfo",
+          "when": "editorTextFocus && editorLangId == 'gsql'"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "subgraphs.newQuery",
+          "group": "navigation",
+          "when": "view == subgraphs"
+        },
+        {
+          "command": "subgraphs.Search",
+          "group": "navigation",
+          "when": "view == subgraphs"
+        },
+        {
+          "command": "subgraphs.Load",
+          "group": "navigation",
+          "when": "view == subgraphs"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "subgraphs.newQuery",
+          "when": "view == subgraphs",
+          "group": "query"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "query.runQuery",
+        "title": "Run Query",
+        "category": "GRAPHSQL",
+        "icon": "$(debug-start)"
+      },
+      {
+        "command": "query.cancelQuery",
+        "title": "Cancel Query",
+        "category": "GRAPHSQL",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "query.showResults",
+        "title": "Show Results",
+        "category": "GRAPHSQL"
+      },
+      {
+        "command": "subgraphs.newQuery",
+        "title": "New Query",
+        "category": "GRAPHSQL",
+        "icon": "$(new-file)"
+      },
+      {
+        "command": "gsqlEditor.addSubgraphInfo",
+        "title": "Add Selected Subgraph's Metadata to the GSQL file",
+        "category": "GRAPHSQL"
+      },
+      {
+        "command": "gsqlEditor.replaceSubgraphInfo",
+        "title": "Replace the Metadata in the GSQL file with the new subgraph",
+        "category": "GRAPHSQL"
+      },
+      {
+        "command": "subgraphs.Search",
+        "title": "Search Subgraph by Name and Description",
+        "category": "GRAPHSQL",
+        "icon": "$(search)"
+      },
+      {
+        "command": "subgraphs.Load",
+        "title": "Load More Subgraphs",
+        "icon": "$(cloud-download)",
+        "category": "GRAPHSQL"
+      },
+      {
+        "command": "bug.Report",
+        "title": "Report a Bug",
+        "category": "GRAPHSQL"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "query.runQuery",
+        "key": "ctrl+m ctrl+r",
+        "mac": "cmd+m cmd+r",
+        "when": "editorTextFocus && editorLangId == 'gsql'"
+      },
+      {
+        "command": "query.cancelQuery",
+        "key": "ctrl+m ctrl+c",
+        "mac": "cmd+m cmd+c",
+        "when": "editorTextFocus && editorLangId == 'gsql'"
+      },
+      {
+        "command": "query.showResults",
+        "key": "ctrl+m ctrl+n",
+        "mac": "cmd+m cmd+n",
+        "when": "editorTextFocus && editorLangId == 'gsql'"
+      },
+      {
+        "command": "subgraphs.Load",
+        "key": "ctrl+m ctrl+l",
+        "mac": "cmd+m cmd+l",
+        "when": "view == subgraphs"
+      },
+      {
+        "command": "gsqlEditor.addSubgraphInfo",
+        "key": "ctrl+m ctrl+a",
+        "mac": "cmd+m cmd+a",
+        "when": "editorTextFocus && editorLangId == 'gsql'"
+      },
+      {
+        "command": "gsqlEditor.replaceSubgraphInfo",
+        "key": "ctrl+m ctrl+p",
+        "mac": "cmd+m cmd+p",
+        "when": "editorTextFocus && editorLangId == 'gsql'"
+      },
+      {
+        "command": "subgraphs.Search",
+        "key": "ctrl+m ctrl+s",
+        "mac": "cmd+m cmd+s",
+        "when": "view == subgraphs"
+      },
+      {
+        "command": "bug.Report",
+        "key": "ctrl+m ctrl+b",
+        "mac": "cmd+m cmd+b"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "subgraphExplorer",
+          "title": "Subgraph Explorer",
+          "icon": "resources/semiotic-icon.svg"
+        }
+      ],
+      "panel": [
+        {
+          "id": "results",
+          "title": "Graph SQL Result",
+          "icon": "resources/semiotic-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "subgraphExplorer": [
+        {
+          "id": "subgraphs",
+          "name": "Available Subgraphs"
+        },
+        {
+          "id": "subgraphSchema",
+          "name": "Subgraph Tables"
+        }
+      ],
+      "results": [
+        {
+          "id": "tabularResult",
+          "type": "webview",
+          "contextualTitle": "Graph SQL Tabular Results",
+          "name": "Graph SQL Tabular Results",
+          "visibility": "visible"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "subgraphSchema",
+        "contents": "In order to view an specific subgraph columns, select a SQL enabled subgraph.",
+        "when": "workbenchState == empty"
+      }
+    ],
+    "configuration": {
+      "title": "GRAPHSQL configuration",
+      "properties": {
+        "graphsql.gateway": {
+          "type": "string",
+          "description": "Gateway",
+          "default": "http://eth.rubik.com.tr:8000/subgraphs/name",
+          "scope": "resource"
+        },
+        "graphsql.paths": {
+          "type": "object",
+          "description": "Mapping of lower case subgraph names to their endpoints relative paths.",
+          "default": {
+            "substreams uniswap v3 ethereum": "tumay/uniswap-v3",
+            "odos-v2-ethereum": "odos/v2"
+          },
+          "scope": "resource"
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "gsql",
+        "extensions": [
+          ".gsql"
+        ],
+        "aliases": [
+          "GraphSQL",
+          "graphsql"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "gsql",
+        "scopeName": "source.gsql",
+        "path": "./syntaxes/gsql.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "lang": "js-yaml syntaxes/gsql.tmLanguage.yaml > syntaxes/gsql.tmLanguage.json",
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "prettier --check . && eslint .",
+    "format": "prettier --write .",
+    "test": "vscode-test",
+    "release": "semantic-release",
+    "check-format": "prettier --check .",
+    "prepare": "husky",
+    "docs": "typedoc"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/npm": "^11.0.2",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/node-fetch": "^2.6.11",
+    "@types/vscode": "^1.86.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.9",
+    "conventional-changelog-conventionalcommits": "^7.0.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.0.10",
+    "lint-staged": "^15.2.1",
+    "prettier": "^3.2.4",
+    "semantic-release": "^23.0.0",
+    "semantic-release-stop-before-publish": "^1.0.0",
+    "semantic-release-vsce": "^5.6.4",
+    "ts-loader": "^9.5.1",
+    "typedoc": "^0.25.7",
+    "typedoc-theme-hierarchy": "^4.1.2",
+    "typescript": "^5.3.3",
+    "webpack": "^5.90.0",
+    "webpack-cli": "^5.1.4",
+    "yaml-loader": "^0.8.0"
+  },
+  "dependencies": {
+    "@vscode/codicons": "^0.0.35",
+    "graphql": "^16.8.1",
+    "node-fetch": "^2.7.0",
+    "simple-datatables": "^9.0.0"
+  },
+  "volta": {
+    "node": "20.11.0",
+    "npm": "10.2.4"
+  }
 }

@@ -1,8 +1,8 @@
 import {
-	Kind,
-	type FieldDefinitionNode,
-	type ObjectTypeDefinitionNode,
-	type BooleanValueNode
+  Kind,
+  type FieldDefinitionNode,
+  type ObjectTypeDefinitionNode,
+  type BooleanValueNode
 } from 'graphql';
 
 /**
@@ -54,10 +54,10 @@ export const BLOCK_COLUMN_NAME = 'block$';
  * @returns `true` if the `field` is a derived list of child objects
  */
 export function isDerivedField(field: FieldDefinitionNode): boolean {
-	return (
-		field.directives?.some((directive) => directive.name.value === DERIVED_FROM_DIRECTIVE_NAME) ??
-		false
-	);
+  return (
+    field.directives?.some((directive) => directive.name.value === DERIVED_FROM_DIRECTIVE_NAME) ??
+    false
+  );
 }
 
 /**
@@ -66,13 +66,13 @@ export function isDerivedField(field: FieldDefinitionNode): boolean {
  * @returns `true` if the `entity` is marked as immuttable
  */
 export function isImmutableEntity(entity: ObjectTypeDefinitionNode): boolean {
-	const immutableArgument = entity.directives
-		?.find((directive) => directive.name.value === ENTITY_DIRECTIVE_NAME)
-		?.arguments?.find(
-			(arg) => arg.name.value === IMMUTABLE_ARGUMENT_NAME && arg.value.kind === Kind.BOOLEAN
-		)?.value;
+  const immutableArgument = entity.directives
+    ?.find((directive) => directive.name.value === ENTITY_DIRECTIVE_NAME)
+    ?.arguments?.find(
+      (arg) => arg.name.value === IMMUTABLE_ARGUMENT_NAME && arg.value.kind === Kind.BOOLEAN
+    )?.value;
 
-	if (!immutableArgument) return false;
+  if (!immutableArgument) return false;
 
-	return (immutableArgument as BooleanValueNode).value;
+  return (immutableArgument as BooleanValueNode).value;
 }

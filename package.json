@@ -140,7 +140,8 @@
       },
       {
         "command": "gateway.setApiKey",
-        "title": "SQL Studio: Set API Key gateway"
+        "title": "Set API Key gateway",
+        "category": "GRAPHSQL"
       }
     ],
     "keybindings": [

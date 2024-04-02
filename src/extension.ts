@@ -8,6 +8,7 @@ import { addPropertyToEditor, getPropertyValue, replacePropertyInEditor } from '
 import { ISubgraphInfo } from './service';
 import { SqlDocumentDropProvider } from './providers/sqldoc';
 import { BugReporter } from './bug';
+import { GatewayProvider } from './providers/gateway';
 
 const LANGUAGE_ID = 'gsql';
 
@@ -192,6 +193,23 @@ export function activate(context: vscode.ExtensionContext) {
   const extension = new SubgraphExtension(context);
   context.subscriptions.push(extension);
   vscode.commands.executeCommand('tabularResult.focus');
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('gateway.setApiKey', async () => {
+      const apiKey = await vscode.window.showInputBox({
+        placeHolder: 'Enter your Sql Studio API Key',
+        prompt: 'API Key',
+        ignoreFocusOut: true
+      });
+
+      if (apiKey) {
+        GatewayProvider.setApiKey(apiKey);
+        vscode.window.showInformationMessage('GraphQL API Key set successfully!');
+      } else {
+        vscode.window.showErrorMessage('No API Key provided.');
+      }
+    })
+  );
 }
 
 // This method is called when your extension is deactivated

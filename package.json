@@ -137,6 +137,10 @@
         "command": "bug.Report",
         "title": "Report a Bug",
         "category": "GRAPHSQL"
+      },
+      {
+        "command": "gateway.setApiKey",
+        "title": "SQL Studio: Set API Key gateway"
       }
     ],
     "keybindings": [
@@ -238,7 +242,6 @@
         "graphsql.gateway": {
           "type": "string",
           "description": "Gateway",
-          "default": "http://eth.rubik.com.tr:8000/subgraphs/name",
           "scope": "resource"
         },
         "graphsql.paths": {

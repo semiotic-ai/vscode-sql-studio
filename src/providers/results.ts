@@ -55,7 +55,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
         throw new Error(`${info.displayName} is not yet supported/indexed.`);
       }
 
-      const endpoint = `${GatewayProvider.getEndpoint()}/${path}`;
+      const endpoint = `${await GatewayProvider.getEndpoint()}/${path}`;
 
       this.abortController = new AbortController();
 

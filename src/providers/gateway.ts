@@ -26,20 +26,30 @@ export class GatewayProvider {
     }
   }
 
-  public static getEndpoint() {
+  public static async getEndpoint() {
     if (!GatewayProvider.endpoint) {
-      throw new Error('Gateway endpoint not set.');
-    } else {
-      return GatewayProvider.endpoint;
+      await GatewayProvider.fetchEndpoint();
+
+      if (!GatewayProvider.endpoint) {
+        throw new Error(
+          'Failed to fetch gateway endpoint. Try setting it manually using the setting `graphsql.gateway`.'
+        );
+      }
     }
+
+    return GatewayProvider.endpoint;
   }
 
-  public static getApiKey() {
+  public static async getApiKey() {
     if (!GatewayProvider.apiKey) {
-      throw new Error('API key not set.');
-    } else {
-      return GatewayProvider.apiKey;
+      await vscode.commands.executeCommand('gateway.setApiKey');
+
+      if (!GatewayProvider.apiKey) {
+        throw new Error('API key not set.');
+      }
     }
+
+    return GatewayProvider.apiKey;
   }
 
   public static setApiKey(apiKey: string) {

@@ -289,7 +289,7 @@ async function callGraphQL<B, R>(
       accept: 'application/graphql-response+json, application/json, multipart/mixed',
       'accept-language': 'en-US,en;q=0.5',
       'content-type': 'application/json',
-      Authorization: `Bearer ${GatewayProvider.getApiKey()}`
+      Authorization: `Bearer ${await GatewayProvider.getApiKey()}`
     },
     body: JSON.stringify(body),
     method: 'POST',

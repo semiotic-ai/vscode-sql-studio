@@ -18,7 +18,7 @@ export class GatewayProvider {
 
   private static async fetchEndpoint() {
     try {
-      const response = await fetch('https://sql-studio-webapp.vercel.app/graph-node-endpoint');
+      const response = await fetch('https://sql-studio-webapp.vercel.app/api/graph-node-endpoint');
 
       GatewayProvider.endpoint = await response.text();
     } catch (error) {

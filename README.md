@@ -45,7 +45,7 @@ The SQL studio enables developers to query SQL-enabled subgraphs on The Graph.
 
 This extension contributes the following settings:
 
-- `graphsql.gateway`: Gateway url to execute sql graphql against.
+- `graphsql.gateway`: Gateway url to execute sql graphql against. If unset, the extension will attempt to use the semiotic gateway.
 - `graphsql.paths`: Maps indexed subgraphs to paths by name for the gateway url.
 
 ## Known Issues

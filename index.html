@@ -3,6 +3,7 @@
 <a id="md:demo" class="tsd-anchor"></a><h2><a href="#md:demo">Demo</a></h2><p><img src="https://sql-studio-webapp.vercel.app/studio.gif" alt="Demo"></p>
 <ol>
 <li>Open the extension on the <em>Activity Bar</em></li>
+<li>Use the <code>Set Api Key</code> command to enter your authentication token.</li>
 <li>Select the Substreams Uniswap v3 Ethereum subgraph (ID: HUZDsRpEVP2AvzDCyzDHtdc64dyDxx8FQjzsmqSg4H3B). You&#39;ll know it&#39;s selected when the icon next to it becomes a green circle.</li>
 <li>Run <code>New Query</code> or click on the new file button that you see when you hover your mouse over the <em>Available Subgraphs</em> menu. This will create a GSQL file with the ID field pre-populated.</li>
 <li>Type in a query. For instance, <code>SELECT * FROM token LIMIT 1;</code></li>
@@ -18,11 +19,12 @@
 <li><code>New Query</code> - Create a GSQL window to write a new query. If you&#39;ve already selected a subgraph in the <em>Available Subgraphs</em> menu, it will automatically populate the <code>ID</code> field in the document.</li>
 <li><code>Add Subgraph Info</code> (<code>C-m C-a</code>) - If you haven&#39;t yet added a subgraph to the document, it will add the name and ID of the currently selected subgraph.</li>
 <li><code>Replace Subgraph Info</code> (<code>C-m C-p</code>) - If there is no subgraph metadata in the document, add the metadata associated with the currently selected one. If there is, replace it with the currently selected one.</li>
-<li><code>Run Query</code> (<code>C-m C-r</code>) - Execute the query</li>
-<li><code>Cancel Query</code> (<code>C-m C-c</code>) - Cancel execution</li>
-<li><code>Show Results</code> (<code>C-m C-n</code>) - Show the results of the executed query</li>
-<li><code>Load More Subgraphs</code> (<code>C-m C-l</code>) - Load the available subgraphs by signalled amount</li>
-<li><code>Search Subgraph by Name and Description</code> (<code>C-m C-s</code>) - Search the subgraph by its name and description</li>
+<li><code>Run Query</code> (<code>C-m C-r</code>) - Execute the query.</li>
+<li><code>Cancel Query</code> (<code>C-m C-c</code>) - Cancel execution.</li>
+<li><code>Show Results</code> (<code>C-m C-n</code>) - Show the results of the executed query.</li>
+<li><code>Load More Subgraphs</code> (<code>C-m C-l</code>) - Load the available subgraphs by signalled amount.</li>
+<li><code>Search Subgraph by Name and Description</code> (<code>C-m C-s</code>) - Search the subgraph by its name and description.</li>
+<li><code>Set gateway API Key</code> - Prompt to set the API key necessary for querying. Can be run anytime via the command palette.</li>
 <li><code>Report a Bug</code> (<code>C-m C-b</code>) - Report a bug to us!</li>
 </ul>
 </li>

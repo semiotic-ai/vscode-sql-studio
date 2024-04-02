@@ -140,7 +140,7 @@
       },
       {
         "command": "gateway.setApiKey",
-        "title": "Set API Key gateway",
+        "title": "Set gateway API Key",
         "category": "GRAPHSQL"
       }
     ],

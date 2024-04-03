@@ -1,5 +1,6 @@
 import { parse } from './graphtables';
 import type { Layout } from './graphtables/layout';
+import { GatewayProvider } from './providers/gateway';
 
 export const DEFAULT_SUBGRAPH_API_ENDPOINT =
   'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum';
@@ -287,7 +288,8 @@ async function callGraphQL<B, R>(
     headers: {
       accept: 'application/graphql-response+json, application/json, multipart/mixed',
       'accept-language': 'en-US,en;q=0.5',
-      'content-type': 'application/json'
+      'content-type': 'application/json',
+      Authorization: `Bearer ${await GatewayProvider.getApiKey()}`
     },
     body: JSON.stringify(body),
     method: 'POST',

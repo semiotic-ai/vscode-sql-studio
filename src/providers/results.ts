@@ -1,32 +1,19 @@
 import * as vscode from 'vscode';
 import { IQueryResult, executeSQL, ISubgraphInfo } from '../service';
 import { write as writeCSV } from '../filetypes/csv';
-import fetch from 'node-fetch';
+import { GatewayProvider } from './gateway';
 
 class ResultsProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'tabularResult';
   private static readonly __knownPaths?: { [key: string]: string } = vscode.workspace
     .getConfiguration('graphsql')
     .get('paths');
-  private static __gateway?: string = vscode.workspace.getConfiguration('graphsql').get('gateway');
 
   private _view?: vscode.WebviewView;
 
   private abortController?: AbortController;
 
-  constructor(private readonly _extensionUri: vscode.Uri) {
-    ResultsProvider.fetchGateway();
-  }
-
-  private static async fetchGateway() {
-    try {
-      const response = await fetch('https://sql-studio-webapp.vercel.app/graph-node-endpoint');
-      const gateway = await response.text();
-      ResultsProvider.__gateway = gateway;
-    } catch (error) {
-      vscode.window.showErrorMessage('Failed to fetch gateway endpoint.');
-    }
-  }
+  constructor(private readonly _extensionUri: vscode.Uri) {}
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -68,7 +55,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
         throw new Error(`${info.displayName} is not yet supported/indexed.`);
       }
 
-      const endpoint = `${ResultsProvider.__gateway}/${path}`;
+      const endpoint = `${await GatewayProvider.getEndpoint()}/${path}`;
 
       this.abortController = new AbortController();
 

@@ -137,6 +137,11 @@
         "command": "bug.Report",
         "title": "Report a Bug",
         "category": "GRAPHSQL"
+      },
+      {
+        "command": "gateway.setApiKey",
+        "title": "Set gateway API Key",
+        "category": "GRAPHSQL"
       }
     ],
     "keybindings": [
@@ -235,12 +240,6 @@
     "configuration": {
       "title": "GRAPHSQL configuration",
       "properties": {
-        "graphsql.gateway": {
-          "type": "string",
-          "description": "Gateway",
-          "default": "http://eth.rubik.com.tr:8000/subgraphs/name",
-          "scope": "resource"
-        },
         "graphsql.paths": {
           "type": "object",
           "description": "Mapping of lower case subgraph names to their endpoints relative paths.",

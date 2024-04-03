@@ -9,13 +9,7 @@ export class GatewayProvider {
   private static endpoint: string | null = null;
 
   constructor() {
-    const endpointFromConfig = vscode.workspace.getConfiguration('graphsql').get('gateway');
-
-    if (typeof endpointFromConfig === 'string') {
-      GatewayProvider.endpoint = endpointFromConfig;
-    } else {
-      GatewayProvider.fetchEndpoint();
-    }
+    GatewayProvider.fetchEndpoint();
   }
 
   private static async fetchEndpoint() {

@@ -240,11 +240,6 @@
     "configuration": {
       "title": "GRAPHSQL configuration",
       "properties": {
-        "graphsql.gateway": {
-          "type": "string",
-          "description": "Gateway",
-          "scope": "resource"
-        },
         "graphsql.paths": {
           "type": "object",
           "description": "Mapping of lower case subgraph names to their endpoints relative paths.",

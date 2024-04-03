@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.12.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.11.0...v0.12.0) (2024-04-03)
+
+
+### Features
+
+* add command to configure gateway api key ([901bffb](https://github.com/semiotic-ai/vscode-sql-studio/commit/901bffbaf5ad01997848a725d86dfd452fc5dea7))
+
+
+### Bug Fixes
+
+* await async functions to configure gateway ([436e9c3](https://github.com/semiotic-ai/vscode-sql-studio/commit/436e9c398ec04ca2c5f6a1123a5ba9f64c6e2935))
+* correct command nomenclature ([d61ce2e](https://github.com/semiotic-ai/vscode-sql-studio/commit/d61ce2eff310a2d276e039efa89ac8283fc9067d))
+* fix typo in command title ([5195b0e](https://github.com/semiotic-ai/vscode-sql-studio/commit/5195b0e9bde3779b9f93726760c7f24a88cf7ce7))
+* remove gateway endpoint configuration property ([f2a66c8](https://github.com/semiotic-ai/vscode-sql-studio/commit/f2a66c863c557a1675fce2743a54fc1679ad6ca5))
+* update graph node endpoint to match new backend route ([5525ff6](https://github.com/semiotic-ai/vscode-sql-studio/commit/5525ff658469a325182bff7eb5c43408dce796aa))
+
+
+### Code Refactoring
+
+* extract sql studio endpoint to a constant ([518a4a6](https://github.com/semiotic-ai/vscode-sql-studio/commit/518a4a61649b2fa0913849dda90fb907e6db9d55))
+
 ## [0.11.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.10.0...v0.11.0) (2024-03-20)
 
 

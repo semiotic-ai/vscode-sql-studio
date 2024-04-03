@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 
 import fetch from 'node-fetch';
 
+const SQL_STUDIO_ENDPOINT = 'https://sql-studio-webapp.vercel.app/api';
+
 export class GatewayProvider {
   private static apiKey: string | null = null;
   private static endpoint: string | null = null;
@@ -18,7 +20,7 @@ export class GatewayProvider {
 
   private static async fetchEndpoint() {
     try {
-      const response = await fetch('https://sql-studio-webapp.vercel.app/api/graph-node-endpoint');
+      const response = await fetch(`${SQL_STUDIO_ENDPOINT}/graph-node-endpoint`);
 
       GatewayProvider.endpoint = await response.text();
     } catch (error) {

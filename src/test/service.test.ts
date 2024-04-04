@@ -1,8 +1,5 @@
 import * as assert from 'assert';
 import { searchSubgraph, searchSubgraphById } from '../service';
-import { GatewayProvider } from '../providers/gateway';
-
-GatewayProvider.setApiKey('mock');
 
 test('`Uniswap` search should return at least 1 result', async () => {
   const result = await searchSubgraph('Uniswap');

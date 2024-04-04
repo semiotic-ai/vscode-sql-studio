@@ -139,8 +139,8 @@
         "category": "GRAPHSQL"
       },
       {
-        "command": "gateway.setApiKey",
-        "title": "Set gateway API Key",
+        "command": "subgraphs.ClearAPIKey",
+        "title": "Clear API Key",
         "category": "GRAPHSQL"
       }
     ],
@@ -237,20 +237,6 @@
         "when": "workbenchState == empty"
       }
     ],
-    "configuration": {
-      "title": "GRAPHSQL configuration",
-      "properties": {
-        "graphsql.paths": {
-          "type": "object",
-          "description": "Mapping of lower case subgraph names to their endpoints relative paths.",
-          "default": {
-            "substreams uniswap v3 ethereum": "tumay/uniswap-v3",
-            "odos-v2-ethereum": "odos/v2"
-          },
-          "scope": "resource"
-        }
-      }
-    },
     "languages": [
       {
         "id": "gsql",

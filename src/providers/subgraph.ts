@@ -355,8 +355,7 @@ export class SubgraphPicker implements vscode.Disposable {
     this.subgraphPicker.placeholder = 'Search for a subgraph';
     this.subgraphPicker.onDidChangeValue(async (value) => {
       if (value.length > 2) {
-        const search = `'${value}'`;
-        const subgraphs = await searchSubgraph(search);
+        const subgraphs = await searchSubgraph(value);
         this.subgraphPicker.items = subgraphs.map(
           (subgraph) => new SubgraphQuickPickItem(subgraph)
         );

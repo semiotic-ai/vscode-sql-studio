@@ -1,6 +1,5 @@
 import { parse } from './graphtables';
 import type { Layout } from './graphtables/layout';
-import { GatewayProvider } from './providers/gateway';
 
 export const DEFAULT_SUBGRAPH_API_ENDPOINT =
   'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum';
@@ -13,35 +12,39 @@ interface ISubgraphQuery {
 }
 
 const SEARCH_TEMPLATE: ISubgraphQuery = {
-  query: `query SearchbyName($search:String!, $first:Int!) {
-		metas:subgraphMetadataSearch(first:$first,text:$search,where:{ subgraph_:{id_not:null}})
-		{
-		  id,
-		  displayName,
-		  image,
-		  description,
-		  subgraph {
-			id,
-			currentVersion {
-			  id,
-			  subgraphDeployment {
-				id,
-				 indexerAllocations(where: {activeForIndexer_not: null}) {
-					  activeForIndexer {
-						id
-					  }
-				},
-				manifest {
-					network
-					,schema {
-						id
-					}
-				}
-			  }
-			}
-		  }
-		}
-	  }
+  query: `query SearchbyName($search: String!, $first: Int!) {
+    metas:subgraphMetas(
+      where: {and: [{or: [{displayName_contains: $search}, {description_contains: $search}]}, {subgraph_: {id_not: null}}]}
+      first: $first
+    ) {
+      id
+      displayName
+      image
+      description
+      subgraph {
+        id
+        currentVersion {
+          id
+          version
+          subgraphDeployment {
+            id
+            ipfsHash
+            indexerAllocations(where: {activeForIndexer_not: null}) {
+              activeForIndexer {
+                id
+              }
+            }
+            manifest {
+              network
+              schema {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  }
     `,
   variables: { search: '', first: 5 },
   operationName: 'SearchbyName',
@@ -49,34 +52,36 @@ const SEARCH_TEMPLATE: ISubgraphQuery = {
 };
 
 const SEARCH_BYID_TEMPLATE: ISubgraphQuery = {
-  query: `query SearchbyId($id:ID!) {
-		metas:subgraphMetas(where:{subgraph_:{id:$id}}) {
-	  id,
-		displayName,
-	  image,
-	  description,
-	  subgraph {
-	  id,
-	  currentVersion {
-		id,
-		subgraphDeployment {
-		id,
-		 indexerAllocations(where: {activeForIndexer_not: null}) {
-			activeForIndexer {
-			id
-			}
-		},
-		manifest {
-		  network
-		  ,schema {
-			id
-		  }
-		}
-		}
-	  }
-	}
-	}
-	}`,
+  query: `query SearchbyId($id: ID!) {
+    metas: subgraphMetas(where: {subgraph_: {id: $id}}) {
+      id
+      displayName
+      image
+      description
+      subgraph {
+        id
+        currentVersion {
+          id
+          version
+          subgraphDeployment {
+            id
+            ipfsHash
+            indexerAllocations(where: {activeForIndexer_not: null}) {
+              activeForIndexer {
+                id
+              }
+            }
+            manifest {
+              network
+              schema {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
   variables: { id: '' },
   operationName: 'SearchById',
   extensions: {}
@@ -95,6 +100,7 @@ interface ISubgraphSearchResult {
           readonly id: string;
           readonly subgraphDeployment: {
             readonly id: string;
+            readonly ipfsHash: string;
             readonly indexerAllocations: {
               readonly activeForIndexer: {
                 readonly id: string;
@@ -126,6 +132,7 @@ export interface ISubgraphInfo {
   readonly network: string;
   readonly deploymentSchemaId: string;
   readonly activeIndexerAllocations: number;
+  readonly ipfsHash: string;
 }
 
 export function CheapCopy<T>(value: T): T {
@@ -174,6 +181,7 @@ fragment SubgraphCard__Subgraph on Subgraph {
     id
     subgraphDeployment {
       id
+      ipfsHash
       queryFeesAmount
       stakedTokens
       manifest {
@@ -214,6 +222,7 @@ interface PaginatedSubgraph {
         readonly id: string;
         readonly subgraphDeployment: {
           readonly id: string;
+          readonly ipfsHash: string;
           readonly manifest: {
             readonly network: string;
             readonly schema: {
@@ -273,6 +282,7 @@ export async function getSubgraphs(
     deploymentId: subgraph.currentVersion.subgraphDeployment.id,
     network: subgraph.currentVersion.subgraphDeployment.manifest.network,
     deploymentSchemaId: subgraph.currentVersion.subgraphDeployment.manifest.schema.id,
+    ipfsHash: subgraph.currentVersion.subgraphDeployment.ipfsHash,
     activeIndexerAllocations: 0
   }));
 }
@@ -280,7 +290,8 @@ export async function getSubgraphs(
 async function callGraphQL<B, R>(
   body: B,
   endpoint?: string,
-  abortSignal?: AbortSignal
+  abortSignal?: AbortSignal,
+  authorization?: string
 ): Promise<R> {
   endpoint = endpoint || DEFAULT_SUBGRAPH_API_ENDPOINT;
 
@@ -289,7 +300,7 @@ async function callGraphQL<B, R>(
       accept: 'application/graphql-response+json, application/json, multipart/mixed',
       'accept-language': 'en-US,en;q=0.5',
       'content-type': 'application/json',
-      Authorization: `Bearer ${await GatewayProvider.getApiKey()}`
+      Authorization: authorization || ''
     },
     body: JSON.stringify(body),
     method: 'POST',
@@ -319,6 +330,7 @@ function convertToSubgraphInfo(response: ISubgraphSearchResult): ISubgraphInfo[]
       deploymentId: meta.subgraph.currentVersion.subgraphDeployment.id,
       network: meta.subgraph.currentVersion.subgraphDeployment.manifest.network,
       deploymentSchemaId: meta.subgraph.currentVersion.subgraphDeployment.manifest.schema.id,
+      ipfsHash: meta.subgraph.currentVersion.subgraphDeployment.ipfsHash,
       activeIndexerAllocations:
         meta.subgraph.currentVersion.subgraphDeployment.indexerAllocations.length
     };
@@ -416,12 +428,14 @@ export async function getLayout(
 
 const SQL_QUERY_TEMPLATE: ISubgraphQuery = {
   query: `query SQL($query: String!) {
-        sql(input:{query : $query}) {
-			rowCount,
-			rows,
-			columns
-        }
-    }`,
+    sql(input: {query: $query}) {
+      ... on SqlJSONOutput {
+        columns
+        rows
+        rowCount
+      }
+    }
+  }`,
   variables: { query: '' },
   operationName: 'SQL',
   extensions: {}
@@ -447,13 +461,14 @@ export interface IQueryResult {
 export async function executeSQL(
   endpoint: string,
   query: string,
-  abortSignal?: AbortSignal
+  abortSignal?: AbortSignal,
+  authorization?: string
 ): Promise<IQueryResult> {
   const body = CheapCopy(SQL_QUERY_TEMPLATE);
 
   body.variables.query = query;
 
-  const json_response: IQueryResult = await callGraphQL(body, endpoint, abortSignal);
+  const json_response: IQueryResult = await callGraphQL(body, endpoint, abortSignal, authorization);
 
   return json_response;
 }

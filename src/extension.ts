@@ -8,7 +8,6 @@ import { addPropertyToEditor, getPropertyValue, replacePropertyInEditor } from '
 import { ISubgraphInfo } from './service';
 import { SqlDocumentDropProvider } from './providers/sqldoc';
 import { BugReporter } from './bug';
-import { GatewayProvider } from './providers/gateway';
 
 const LANGUAGE_ID = 'gsql';
 
@@ -27,7 +26,7 @@ class SubgraphExtension implements vscode.Disposable {
     this._subgraphsView = new SubgraphView('subgraphs');
     this._subgraphSchemaView = new SubgraphSchemaView('subgraphSchema');
     this._subgraphPicker = new SubgraphPicker();
-    this._resultsView = new ResultsView('tabularResult', context.extensionUri);
+    this._resultsView = new ResultsView('tabularResult', context);
     this._bugReporter = new BugReporter(
       'https://us-central1-graphplots.cloudfunctions.net/linear-cloud-sql-function'
     );
@@ -77,6 +76,10 @@ class SubgraphExtension implements vscode.Disposable {
 
   private async load() {
     await this._subgraphsView.loadMore();
+  }
+
+  private async clearAPIKey() {
+    await this._resultsView.clearAPIKey();
   }
 
   private async addSubgraphInfo() {
@@ -146,6 +149,7 @@ class SubgraphExtension implements vscode.Disposable {
       vscode.commands.registerTextEditorCommand('query.cancelQuery', this.cancelQuery, this),
       vscode.commands.registerCommand('subgraphs.Search', this.search, this),
       vscode.commands.registerCommand('subgraphs.Load', this.load, this),
+      vscode.commands.registerCommand('subgraphs.ClearAPIKey', this.clearAPIKey, this),
       vscode.commands.registerTextEditorCommand(
         'gsqlEditor.addSubgraphInfo',
         this.addSubgraphInfo,
@@ -193,23 +197,6 @@ export function activate(context: vscode.ExtensionContext) {
   const extension = new SubgraphExtension(context);
   context.subscriptions.push(extension);
   vscode.commands.executeCommand('tabularResult.focus');
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('gateway.setApiKey', async () => {
-      const apiKey = await vscode.window.showInputBox({
-        placeHolder: 'Enter your Sql Studio API Key',
-        prompt: 'API Key',
-        ignoreFocusOut: true
-      });
-
-      if (apiKey) {
-        GatewayProvider.setApiKey(apiKey);
-        vscode.window.showInformationMessage('GraphQL API Key set successfully!');
-      } else {
-        vscode.window.showErrorMessage('No API Key provided.');
-      }
-    })
-  );
 }
 
 // This method is called when your extension is deactivated

@@ -9,11 +9,13 @@ The SQL studio enables developers to query SQL-enabled subgraphs on The Graph.
 ![Demo](https://sql-studio-webapp.vercel.app/studio.gif)
 
 1. Open the extension on the *Activity Bar*
-3. Use the `Set Api Key` command to enter your authentication token.
-3. Select the Substreams Uniswap v3 Ethereum subgraph (ID: HUZDsRpEVP2AvzDCyzDHtdc64dyDxx8FQjzsmqSg4H3B). You'll know it's selected when the icon next to it becomes a green circle.
+2. Use search button that you see when you hover your mouse over the *Available Subgraphs* menu. Find `convex` subgraph and select. You'll know it's selected when the icon next to it becomes a green circle.
 4. Run `New Query` or click on the new file button that you see when you hover your mouse over the *Available Subgraphs* menu. This will create a GSQL file with the ID field pre-populated.
-5. Type in a query. For instance, `SELECT * FROM token LIMIT 1;`
+5. Type in a query. For instance, `SELECT * FROM pool LIMIT 1;`
 6. Run the query using either the `Run Query` command or `C-m C-r`
+7. Enter your gateway API Key if asked.
+
+You can clear your API key stored in vscode user session secrets by executing `Clear API Key` command.
 
 ## Features
 
@@ -30,8 +32,8 @@ The SQL studio enables developers to query SQL-enabled subgraphs on The Graph.
   - `Cancel Query` (`C-m C-c`) - Cancel execution.
   - `Show Results` (`C-m C-n`) - Show the results of the executed query.
   - `Load More Subgraphs` (`C-m C-l`) - Load the available subgraphs by signalled amount.
+  - `Clear API Key` - Clears gateway API Key stored in vscode user session secrets.
   - `Search Subgraph by Name and Description` (`C-m C-s`) - Search the subgraph by its name and description.
-  - `Set gateway API Key` - Prompt to set the API key necessary for querying. Can be run anytime via the command palette.
   - `Report a Bug` (`C-m C-b`) - Report a bug to us!
 - View result table with
   - Sort by clicking column names
@@ -44,8 +46,6 @@ The SQL studio enables developers to query SQL-enabled subgraphs on The Graph.
 ## Extension Settings
 
 This extension contributes the following settings:
-
-- `graphsql.paths`: Maps indexed subgraphs to paths by name for the gateway url.
 
 ## Known Issues
 

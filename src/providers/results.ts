@@ -1,19 +1,29 @@
 import * as vscode from 'vscode';
 import { IQueryResult, executeSQL, ISubgraphInfo } from '../service';
 import { write as writeCSV } from '../filetypes/csv';
-import { GatewayProvider } from './gateway';
+
+const SQL_STUDIO_ENDPOINT = 'https://sql-studio-webapp.vercel.app/api';
+const API_KEY = 'graph.apikey';
+
+interface IGateWayStatus {
+  endpoint: string;
+  subgraphs: Map<string, string>; // SQL enabled subgraph id to subgraph name
+}
 
 class ResultsProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'tabularResult';
-  private static readonly __knownPaths?: { [key: string]: string } = vscode.workspace
-    .getConfiguration('graphsql')
-    .get('paths');
 
   private _view?: vscode.WebviewView;
 
   private abortController?: AbortController;
+  private gatewayStatus?: IGateWayStatus;
+  private _extensionUri: vscode.Uri;
+  private _secrets: vscode.SecretStorage;
 
-  constructor(private readonly _extensionUri: vscode.Uri) {}
+  constructor(context: vscode.ExtensionContext) {
+    this._extensionUri = context.extensionUri;
+    this._secrets = context.secrets;
+  }
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -49,18 +59,44 @@ class ResultsProvider implements vscode.WebviewViewProvider {
         throw new Error('No subgraph selected');
       }
 
-      const path = ResultsProvider.__knownPaths?.[info.displayName.toLowerCase()];
+      let apikey: string | undefined = await this._secrets.get(API_KEY);
 
-      if (!path) {
-        throw new Error(`${info.displayName} is not yet supported/indexed.`);
+      if (!apikey || apikey.trim() === '') {
+        apikey = await vscode.window.showInputBox({
+          placeHolder: 'Enter your API key',
+          prompt: 'Enter your API key'
+        });
+        if (!apikey || apikey.trim() === '') {
+          throw new Error('No API key provided');
+        }
+        await this._secrets.store(API_KEY, apikey);
       }
 
-      const endpoint = `${await GatewayProvider.getEndpoint()}/${path}`;
+      const authorization = `Bearer ${apikey}`;
+
+      if (!this.gatewayStatus) {
+        try {
+          const response = await fetch(`${SQL_STUDIO_ENDPOINT}/graph-node-endpoint`);
+          const json_response: any = await response.json();
+          this.gatewayStatus = {
+            endpoint: json_response.endpoint,
+            subgraphs: new Map(Object.entries(json_response.subgraphs))
+          };
+        } catch (error) {
+          throw new Error('Failed to fetch gateway status from sql studio.');
+        }
+      }
+
+      if (!this.gatewayStatus.subgraphs.has(info.ipfsHash)) {
+        throw new Error('Subgraph is not SQL enabled.');
+      }
+
+      const endpoint = `${this.gatewayStatus.endpoint}/subgraphs/id/${info.ipfsHash}`;
 
       this.abortController = new AbortController();
 
       await this.postMessage({ type: 'start', data: info.image });
-      const result = await executeSQL(endpoint, query!, this.abortController.signal);
+      const result = await executeSQL(endpoint, query!, this.abortController.signal, authorization);
       await this.postMessage({ type: 'finish', data: result });
     } catch (error: any) {
       await this.postMessage({ type: 'clear' });
@@ -68,6 +104,10 @@ class ResultsProvider implements vscode.WebviewViewProvider {
     } finally {
       this.abortController = undefined;
     }
+  }
+
+  public async clearAPIKey() {
+    await this._secrets.delete(API_KEY);
   }
 
   public cancel() {
@@ -137,8 +177,8 @@ export class ResultsView implements vscode.Disposable {
   private readonly _provider: ResultsProvider;
   private readonly _view: vscode.Disposable;
 
-  constructor(viewId: string, extensionUri: vscode.Uri) {
-    this._provider = new ResultsProvider(extensionUri);
+  constructor(viewId: string, context: vscode.ExtensionContext) {
+    this._provider = new ResultsProvider(context);
     this._view = vscode.window.registerWebviewViewProvider(viewId, this._provider);
   }
 
@@ -149,6 +189,10 @@ export class ResultsView implements vscode.Disposable {
     } finally {
       await vscode.commands.executeCommand('setContext', 'subgraph.queryRunning', false);
     }
+  }
+
+  public async clearAPIKey() {
+    await this._provider.clearAPIKey();
   }
 
   public cancel() {

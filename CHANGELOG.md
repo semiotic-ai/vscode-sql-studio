@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.12.0...v0.12.1) (2024-04-04)
+
+
+### Bug Fixes
+
+* Gateway setup from studio wweb site and search functionality ([494360b](https://github.com/semiotic-ai/vscode-sql-studio/commit/494360b68a18335d6a55480f6e86306d015b52d4))
+
 ## [0.12.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.11.0...v0.12.0) (2024-04-03)
 
 

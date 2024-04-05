@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.12.1...v0.12.2) (2024-04-05)
+
+
+### Bug Fixes
+
+* correct typo in renderResult function ([20a7d84](https://github.com/semiotic-ai/vscode-sql-studio/commit/20a7d84ef13f9d52681abf7f9c5c425b3e42dc6f))
+
 ## [0.12.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.12.0...v0.12.1) (2024-04-04)
 
 

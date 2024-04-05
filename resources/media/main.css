@@ -101,3 +101,7 @@ body {
 .datatable-array DIV {
   padding-left: 13px;
 }
+
+tr:nth-child(even) {
+  background-color: var(--vscode-list-hoverBackground);
+}

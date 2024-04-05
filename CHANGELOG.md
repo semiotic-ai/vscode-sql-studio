@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.3](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.12.2...v0.12.3) (2024-04-05)
+
+
+### Bug Fixes
+
+* improve table header sort icons contrast ([3fce8e4](https://github.com/semiotic-ai/vscode-sql-studio/commit/3fce8e4d37b941be5bf9d8a9df7c0fa318e28626))
+
 ## [0.12.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.12.1...v0.12.2) (2024-04-05)
 
 

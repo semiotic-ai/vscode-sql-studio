@@ -105,3 +105,21 @@ body {
 tr:nth-child(even) {
   background-color: var(--vscode-list-hoverBackground);
 }
+
+/* The little triangles that indicate sorting direction in the header are made using css border hacks.
+ * here we override their colors with theme variables so they have sufficient contrast and respect user theme.
+*/
+.datatable-sorter::before {
+  border-top: 4px solid var(--vscode-inputOption-activeForeground) !important;
+}
+
+.datatable-sorter::after {
+  border-bottom: 4px solid var(--vscode-inputOption-activeForeground) !important;
+}
+
+.datatable-ascending .datatable-sorter::after,
+.datatable-descending .datatable-sorter::before,
+.datatable-ascending .datatable-filter::after,
+.datatable-descending .datatable-filter::before {
+  opacity: 0.8 !important;
+}

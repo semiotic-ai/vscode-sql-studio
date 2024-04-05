@@ -11,7 +11,7 @@
   const previousResult = vscode.getState();
 
   if (previousResult) {
-    rendeResult(previousResult);
+    renderResult(previousResult);
   }
 
   function cleanContainer() {
@@ -38,12 +38,12 @@
     } else if (message.type === 'finish') {
       const result = message.data.data.sql;
       result.rows = result.rows.map((r) => Object.values(r));
-      rendeResult(result);
+      renderResult(result);
       vscode.setState(result);
     }
   });
 
-  function rendeResult(result) {
+  function renderResult(result) {
     const datatable = new DataTable(container, {
       data: {
         headings: result.columns,

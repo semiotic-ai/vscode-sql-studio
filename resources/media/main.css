@@ -123,3 +123,24 @@ tr:nth-child(even) {
 .datatable-descending .datatable-filter::before {
   opacity: 0.8 !important;
 }
+
+/* simple-datatables overrides some button styles. Here we just copied the base vscode styles and added
+* !important to make sure they override the package's colors.
+*/
+button:focus {
+  outline-color: var(--vscode-focusBorder) !important;
+}
+button {
+  border: none !important;
+  padding: var(--input-padding-vertical) var(--input-padding-horizontal) !important;
+  color: var(--vscode-button-foreground) !important;
+}
+
+.datatable-pagination .datatable-active a,
+.datatable-pagination .datatable-active a:focus,
+.datatable-pagination .datatable-active a:hover,
+.datatable-pagination .datatable-active button,
+.datatable-pagination .datatable-active button:focus,
+.datatable-pagination .datatable-active button:hover {
+  background-color: var(--vscode-button-background) !important;
+}

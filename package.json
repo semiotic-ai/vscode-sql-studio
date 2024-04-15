@@ -65,17 +65,17 @@
       "view/title": [
         {
           "command": "subgraphs.newQuery",
-          "group": "navigation",
-          "when": "view == subgraphs"
-        },
-        {
-          "command": "subgraphs.Search",
-          "group": "navigation",
+          "group": "navigation@1",
           "when": "view == subgraphs"
         },
         {
           "command": "subgraphs.Load",
-          "group": "navigation",
+          "group": "navigation@2",
+          "when": "view == subgraphs"
+        },
+        {
+          "command": "subgraphs.Search",
+          "group": "navigation@3",
           "when": "view == subgraphs"
         }
       ],

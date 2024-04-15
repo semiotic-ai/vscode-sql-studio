@@ -1,0 +1,199 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "Statistical aggregate functions https://www.postgresql.org/docs/14/functions-aggregate.html#FUNCTIONS-AGGREGATE-STATISTICS-TABLE",
+	"name": "Statistics",
+	"keywords": {
+		"corr": [
+			{
+				"description": "Computes the correlation coefficient.",
+				"example": "SELECT corr(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"covar_pop": [
+			{
+				"description": "Computes the population covariance.",
+				"example": "SELECT covar_pop(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"covar_samp": [
+			{
+				"description": "Computes the sample covariance.",
+				"example": "SELECT covar_samp(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"regr_avgx": [
+			{
+				"description": "Computes the average of the independent variable, sum(X)/N.",
+				"example": "SELECT regr_avgx(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"regr_avgy": [
+			{
+				"description": "Computes the average of the dependent variable, sum(Y)/N.",
+				"example": "SELECT regr_avgy(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"regr_count": [
+			{
+				"description": "Computes the number of rows in which both inputs are non-null.",
+				"example": "SELECT regr_count(1, 2);",
+				"returns": "bigint",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"regr_intercept": [
+			{
+				"description": "Computes the y-intercept of the least-squares-fit linear equation determined by the (X, Y) pairs.",
+				"example": "SELECT regr_intercept(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"regr_r2": [
+			{
+				"description": "Computes the square of the correlation coefficient.",
+				"example": "SELECT regr_r2(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"regr_slope": [
+			{
+				"description": "Computes the slope of the least-squares-fit linear equation determined by the (X, Y) pairs.",
+				"example": "SELECT regr_slope(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"regr_sxx": [
+			{
+				"description": "Computes the “sum of squares” of the independent variable, sum(X^2) - sum(X)^2/N.",
+				"example": "SELECT regr_sxx(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"regr_sxy": [
+			{
+				"description": "Computes the “sum of products” of independent times dependent variables, sum(X*Y) - sum(X) * sum(Y)/N.",
+				"example": "SELECT regr_sxy(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"regr_syy": [
+			{
+				"description": "Computes the “sum of squares” of the dependent variable, sum(Y^2) - sum(Y)^2/N.",
+				"example": "SELECT regr_syy(1, 2);",
+				"returns": "double precision",
+				"parameters": {
+					"value1": "double precision",
+					"value2": "double precision"
+				}
+			}
+		],
+		"stddev": [
+			{
+				"description": "This is a historical alias for stddev_samp.",
+				"example": "SELECT stddev(1);",
+				"returns": "double precision",
+				"parameters": {
+					"value": "numeric_type"
+				}
+			}
+		],
+		"stddev_pop": [
+			{
+				"description": "Computes the population standard deviation of the input values.",
+				"example": "SELECT stddev_pop(1);",
+				"returns": "double precision",
+				"parameters": {
+					"value": "numeric_type"
+				}
+			}
+		],
+		"stddev_samp": [
+			{
+				"description": "Computes the sample standard deviation of the input values.",
+				"example": "SELECT stddev_samp(1);",
+				"returns": "double precision",
+				"parameters": {
+					"value": "numeric_type"
+				}
+			}
+		],
+		"variance": [
+			{
+				"description": "This is a historical alias for var_samp.",
+				"example": "SELECT variance(1);",
+				"returns": "double precision",
+				"parameters": {
+					"value": "numeric_type"
+				}
+			}
+		],
+		"var_pop": [
+			{
+				"description": "Computes the population variance of the input values (square of the population standard deviation).",
+				"example": "SELECT var_pop(1);",
+				"returns": "double precision",
+				"parameters": {
+					"value": "numeric_type"
+				}
+			}
+		],
+		"var_samp": [
+			{
+				"description": "Computes the sample variance of the input values (square of the sample standard deviation).",
+				"example": "SELECT var_samp(1);",
+				"returns": "double precision",
+				"parameters": {
+					"value": "numeric_type"
+				}
+			}
+		]
+	}
+}

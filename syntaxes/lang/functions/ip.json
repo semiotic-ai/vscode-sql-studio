@@ -1,0 +1,167 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "IP Address Functions see https://www.postgresql.org/docs/14/functions-net.html",
+	"name": "IP Address Functions",
+	"keywords": {
+		"abbrev": [
+			{
+				"description": "Creates an abbreviated display format as text",
+				"example": "SELECT abbrev(inet '10.1.0.0/32')",
+				"returns": "text",
+				"parameters": {
+					"inet": "inet"
+				}
+			},
+			{
+				"description": "Creates an abbreviated display format as text",
+				"example": "SELECT abbrev(cidr '10.1.0.0/16')",
+				"returns": "text",
+				"parameters": {
+					"cidr ": "cidr"
+				}
+			}
+		],
+		"broadcast": [
+			{
+				"description": "Computes the broadcast address for the address's network",
+				"example": "SELECT broadcast(inet '192.168.1.5/24');",
+				"returns": "inet",
+				"parameters": {
+					"inet": "inet"
+				}
+			}
+		],
+		"family": [
+			{
+				"description": "Returns the address's family: 4 for IPv4, 6 for IPv6",
+				"example": "SELECT family(inet '::1')",
+				"returns": "integer",
+				"parameters": {
+					"inet": "inet"
+				}
+			}
+		],
+		"host": [
+			{
+				"description": "Returns the IP address as text, ignoring the netmask",
+				"example": "SELECT host(inet '192.168.1.0/24')",
+				"returns": "text",
+				"parameters": {
+					"inet": "inet"
+				}
+			}
+		],
+		"hostmask": [
+			{
+				"description": "Computes the host mask for the address's network",
+				"example": "SELECT hostmask(inet '192.168.23.20/30')",
+				"returns": "inet",
+				"parameters": {
+					"inet": "inet"
+				}
+			}
+		],
+		"inet_merge": [
+			{
+				"description": "Computes the smallest network that includes both of the given networks",
+				"example": "SELECT inet_merge(inet '192.168.1.5/24', inet '192.168.2.5/24')",
+				"returns": "inet",
+				"parameters": {
+					"inet1": "inet",
+					"inet2": "inet"
+				}
+			}
+		],
+		"inet_same_family": [
+			{
+				"description": "Tests whether the addresses belong to the same IP family",
+				"example": "SELECT inet_same_family(inet '192.168.1.5/24', inet '::1')",
+				"returns": "boolean",
+				"parameters": {
+					"inet1": "inet",
+					"inet2": "inet"
+				}
+			}
+		],
+		"masklen": [
+			{
+				"description": "Returns the netmask length in bits",
+				"example": "SELECT masklen(inet '192.168.1.5/24')",
+				"returns": "integer",
+				"parameters": {
+					"inet": "inet"
+				}
+			}
+		],
+		"netmask": [
+			{
+				"description": "Computes the network mask for the address's network",
+				"example": "SELECT netmask(inet '192.168.1.5/24')",
+				"returns": "inet",
+				"parameters": {
+					"inet": "inet"
+				}
+			}
+		],
+		"network": [
+			{
+				"description": "Returns the network part of the address, zeroing out whatever is to the right of the netmask",
+				"example": "SELECT network(inet '192.168.1.5/24')",
+				"returns": "inet",
+				"parameters": {
+					"inet": "inet"
+				}
+			}
+		],
+		"set_masklen": [
+			{
+				"description": "Sets the netmask length for an inet value. The address part does not change",
+				"example": "SELECT set_masklen(inet '192.168.1.5/24', 16)",
+				"returns": "inet",
+				"parameters": {
+					"inet": "inet",
+					"newmask": "integer"
+				}
+			}
+		],
+		"text": [
+			{
+				"description": "Returns the unabbreviated IP address and netmask length as text",
+				"example": "SELECT text(inet '192.168.1.5')",
+				"returns": "text",
+				"parameters": {
+					"inet": "inet"
+				}
+			}
+		],
+		"trunc": [
+			{
+				"description": "Sets the last 3 bytes of the address to zero.",
+				"example": "SELECT trunc(macaddr '12:34:56:78:90:ab')",
+				"returns": "macaddr",
+				"parameters": {
+					"macaddr": "macaddr",
+					"n": "integer"
+				}
+			},
+			{
+				"description": "Sets the last 5 bytes of the address to zero.",
+				"example": "SELECT trunc(macaddr8 '12:34:56:78:90:ab:cd:ef')",
+				"returns": "macaddr8",
+				"parameters": {
+					"macaddr": "macaddr8"
+				}
+			}
+		],
+		"macaddr8_set7bit": [
+			{
+				"description": "Sets the 7th bit of a MAC address to 0",
+				"example": "SELECT macaddr8_set7bit(macaddr8 '01:23:45:67:89:ab:cd:ef')",
+				"returns": "macaddr8",
+				"parameters": {
+					"macaddr": "macaddr8"
+				}
+			}
+		]
+	}
+}

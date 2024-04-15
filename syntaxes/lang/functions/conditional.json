@@ -1,0 +1,39 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "Conditional Expressions https://www.postgresql.org/docs/14/functions-conditional.html",
+	"name": "Conditional Expressions",
+	"keywords": {
+		"coalesce": [
+			{
+				"description": "Return first non-null argument.",
+				"example": "SELECT coalesce(NULL, 1);",
+				"returns": "any",
+				"parameters": { "value": "[,any]" }
+			}
+		],
+		"nullif": [
+			{
+				"description": "Return null if two arguments are equal, otherwise return the first argument.",
+				"example": "SELECT nullif(1, 1);",
+				"returns": "any",
+				"parameters": { "value1": "any", "value2": "any" }
+			}
+		],
+		"greatest": [
+			{
+				"description": "Return greatest of a list of values.",
+				"example": "SELECT greatest(1, 2, 3);",
+				"returns": "any",
+				"parameters": { "value": "[,any]" }
+			}
+		],
+		"least": [
+			{
+				"description": "Return smallest of a list of values.",
+				"example": "SELECT least(1, 2, 3);",
+				"returns": "any",
+				"parameters": { "value": "[,any]" }
+			}
+		]
+	}
+}

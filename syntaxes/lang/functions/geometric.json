@@ -1,0 +1,122 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "Geometric Functions see https://www.postgresql.org/docs/14/functions-geometry.html",
+	"name": "Geometric Functions",
+	"keywords": {
+		"area": [
+			{
+				"description": "Computes area",
+				"example": "SELECT area(box '(2,2),(0,0)')",
+				"returns": "double precision",
+				"parameters": { "value": "geometric_type" }
+			}
+		],
+		"center": [
+			{
+				"description": "Computes center point",
+				"example": "SELECT center(box '(2,2),(0,0)')",
+				"returns": "point",
+				"parameters": { "value": "geometric_type" }
+			}
+		],
+		"diagonal": [
+			{
+				"description": "Extracts box's diagonal as a line segment (same as lseg(box))",
+				"example": "SELECT diagonal(box '(2,2),(0,0)')",
+				"returns": "lseg",
+				"parameters": { "value": "box" }
+			}
+		],
+		"diameter": [
+			{
+				"description": "Computes diameter of circle",
+				"example": "SELECT diameter(circle '((0,0),5)')",
+				"returns": "double precision",
+				"parameters": { "value": "circle" }
+			}
+		],
+		"height": [
+			{
+				"description": "Computes vertical size of box",
+				"example": "SELECT height(box '(2,2),(0,0)')",
+				"returns": "double precision",
+				"parameters": { "value": "box" }
+			}
+		],
+		"isclosed": [
+			{
+				"description": "Is path closed?",
+				"example": "SELECT isclosed(path '((0,0),(1,1))')",
+				"returns": "boolean",
+				"parameters": { "value": "path" }
+			}
+		],
+		"isopen": [
+			{
+				"description": "Is path open?",
+				"example": "SELECT isopen(path '((0,0),(1,1))')",
+				"returns": "boolean",
+				"parameters": { "value": "path" }
+			}
+		],
+		"length": [
+			{
+				"description": "Computes the total length",
+				"example": "SELECT length(path '((0,0),(1,1))')",
+				"returns": "double precision",
+				"parameters": { "value": "geometric_type" }
+			}
+		],
+		"npoints": [
+			{
+				"description": "Returns the number of points",
+				"example": "SELECT npoints(path '((0,0),(1,1))')",
+				"returns": "integer",
+				"parameters": { "value": "geometric_type" }
+			}
+		],
+		"pclose": [
+			{
+				"description": "Converts path to closed form",
+				"example": "SELECT pclose(path '((0,0),(1,1))')",
+				"returns": "path",
+				"parameters": { "value": "path" }
+			}
+		],
+		"popen": [
+			{
+				"description": "Converts path to open form",
+				"example": "SELECT popen(path '((0,0),(1,1))')",
+				"returns": "path",
+				"parameters": { "value": "path" }
+			}
+		],
+		"radius": [
+			{
+				"description": "Computes radius of circle",
+				"example": "SELECT radius(circle '((0,0),5)')",
+				"returns": "double precision",
+				"parameters": { "value": "circle" }
+			}
+		],
+		"slope": [
+			{
+				"description": "Computes slope of a line drawn through the two points",
+				"example": "SELECT slope(point '(0,0)', point '(1,1)')",
+				"returns": "double precision",
+				"parameters": {
+					"pt1": "point",
+					"pt2": "point"
+				}
+			}
+		],
+		"width": [
+			{
+				"description": "Computes horizontal size of box",
+				"example": "SELECT width(box '(2,2),(0,0)')",
+				"returns": "double precision",
+				"parameters": { "value": "box" }
+			}
+		]
+	}
+}

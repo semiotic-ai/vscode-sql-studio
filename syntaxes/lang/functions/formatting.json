@@ -1,0 +1,57 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "Formatting Functions see https://www.postgresql.org/docs/14/functions-formatting.html#FUNCTIONS-FORMATTING-TABLE",
+	"name": "Formatting Functions",
+	"keywords": {
+		"to_char": [
+			{
+				"description": "Converts time stamp to string according to the given format.",
+				"example": "SELECT to_char(timestamp '2002-04-20 17:31:12.66', 'HH12:MI:SS');",
+				"returns": "text",
+				"parameters": { "value": "timestamp", "format": "text" }
+			},
+			{
+				"description": "Converts time stamp witn time zone  to string according to the given format.",
+				"example": "SELECT to_char(timestamp '2002-04-20 17:31:12.66', 'HH12:MI:SS');",
+				"returns": "text",
+				"parameters": { "value": "timestamp with time zone", "format": "text" }
+			},
+			{
+				"description": "Converts interval to string according to the given format.",
+				"example": "SELECT to_char(interval '15h 2m 12s', 'HH24:MI:SS');",
+				"returns": "text",
+				"parameters": { "value": "interval", "format": "text" }
+			},
+			{
+				"description": "Converts number to a string according to the given format.",
+				"example": "SELECT to_char(12345.67, '99999D99');",
+				"returns": "text",
+				"parameters": { "value": "numeric_type", "format": "text" }
+			}
+		],
+		"to_date": [
+			{
+				"description": "Converts string to date.",
+				"example": "SELECT to_date('05 Dec 2000', 'DD Mon YYYY');",
+				"returns": "date",
+				"parameters": { "value": "text", "format": "text" }
+			}
+		],
+		"to_number": [
+			{
+				"description": "Converts string to number.",
+				"example": "SELECT to_number('12,454.67', '99,999D99');",
+				"returns": "numeric",
+				"parameters": { "value": "text", "format": "text" }
+			}
+		],
+		"to_timestamp": [
+			{
+				"description": "Converts string to timestamp with time zone.",
+				"example": "SELECT to_timestamp('05 Dec 2000', 'DD Mon YYYY');",
+				"returns": "timestamp with time zone",
+				"parameters": { "value": "text", "format": "text" }
+			}
+		]
+	}
+}

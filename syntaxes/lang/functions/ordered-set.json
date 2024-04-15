@@ -1,0 +1,48 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "Ordered-set aggregate functions https://www.postgresql.org/docs/14/functions-aggregate.html#FUNCTIONS-AGGREGATE-ORDEREDSET-TABLE",
+	"name": "Ordered Set Aggregate Functions",
+	"keywords": {
+		"mode": [
+			{
+				"description": "Computes the mode (most frequent value) of the input values.",
+				"example": "SELECT mode() WITHIN GROUP (ORDER BY column) FROM table",
+				"signature": "mode() WITHIN GROUP (ORDER BY anyelement) → anyelement"
+			}
+		],
+		"percentile_cont": [
+			{
+				"description": "Computes the continuous percentile of the input values.",
+				"example": "SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY column) FROM table",
+				"signature": "percentile_cont(fraction double precision) WITHIN GROUP (ORDER BY double precision) → double precision"
+			},
+			{
+				"description": "Computes the continuous percentile of the input values.",
+				"example": "SELECT percentile_cont(ARRAY[0.5, 0.9]) WITHIN GROUP (ORDER BY column) FROM table",
+				"signature": "percentile_cont(fractions double precision) WITHIN GROUP (ORDER BY interval) → interval"
+			},
+			{
+				"description": "Computes multiple continuous percentiles.",
+				"example": "SELECT percentile_cont(ARRAY[0.5, 0.9]) WITHIN GROUP (ORDER BY column) FROM table",
+				"signature": "percentile_cont(fractions double precision[]) WITHIN GROUP (ORDER BY double precision) → double precision[]"
+			},
+			{
+				"description": "Computes multiple continuous percentiles.",
+				"example": "SELECT percentile_cont(ARRAY[0.5, 0.9]) WITHIN GROUP (ORDER BY column) FROM table",
+				"signature": "percentile_cont(fractions double precision[]) WITHIN GROUP (ORDER BY interval) → interval[]"
+			}
+		],
+		"percentile_disc": [
+			{
+				"description": "Computes the discrete percentile of the input values.",
+				"example": "SELECT percentile_disc(0.5) WITHIN GROUP (ORDER BY column) FROM table",
+				"signature": "percentile_disc(fraction double precision) WITHIN GROUP (ORDER BY anyelement) → anyelement"
+			},
+			{
+				"description": "Computes multiple discrete percentiles.",
+				"example": "SELECT percentile_disc(ARRAY[0.5, 0.9]) WITHIN GROUP (ORDER BY column) FROM table",
+				"signature": "percentile_disc(fractions double precision[]) WITHIN GROUP (ORDER BY anyelement) → anyarray"
+			}
+		]
+	}
+}

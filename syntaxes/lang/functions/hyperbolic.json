@@ -1,0 +1,55 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "Hyperbolic Functions see https://www.postgresql.org/docs/14/functions-math.html#FUNCTIONS-MATH-HYP-TABLE",
+	"name": "Hyperbolic Functions",
+	"keywords": {
+		"sinh": [
+			{
+				"description": "Hyperbolic sine",
+				"example": "SELECT sinh(0.5);",
+				"returns": "double precision",
+				"parameters": { "number": "double precision" }
+			}
+		],
+		"cosh": [
+			{
+				"description": "Hyperbolic cosine",
+				"example": "SELECT cosh(0.5);",
+				"returns": "double precision",
+				"parameters": { "number": "double precision" }
+			}
+		],
+		"tanh": [
+			{
+				"description": "Hyperbolic tangent",
+				"example": "SELECT tanh(0.5);",
+				"returns": "double precision",
+				"parameters": { "number": "double precision" }
+			}
+		],
+		"asinh": [
+			{
+				"description": "Inverse hyperbolic sine",
+				"example": "SELECT asinh(0.5);",
+				"returns": "double precision",
+				"parameters": { "number": "double precision" }
+			}
+		],
+		"acosh": [
+			{
+				"description": "Inverse hyperbolic cosine",
+				"example": "SELECT acosh(1.5);",
+				"returns": "double precision",
+				"parameters": { "number": "double precision" }
+			}
+		],
+		"atanh": [
+			{
+				"description": "Inverse hyperbolic tangent",
+				"example": "SELECT atanh(0.5);",
+				"returns": "double precision",
+				"parameters": { "number": "double precision" }
+			}
+		]
+	}
+}

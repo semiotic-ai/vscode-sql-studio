@@ -1,0 +1,196 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "Geometric Type Conversion Functions see https://www.postgresql.org/docs/14/functions-geometry.html",
+	"name": "Geometric Type Conversion Functions",
+	"keywords": {
+		"box": [
+			{
+				"description": "Computes box inscribed within the circle.",
+				"example": "SELECT box(circle '<(0,0),2>');",
+				"returns": "box",
+				"parameters": {
+					"circle": "circle"
+				}
+			},
+			{
+				"description": "Converts point to empty box.",
+				"example": "SELECT box(point '(1,0)');",
+				"returns": "box",
+				"parameters": {
+					"point": "point"
+				}
+			},
+			{
+				"description": "Converts any two corner points to box.",
+				"example": "SELECT box(point(1, 2), point(3, 4));",
+				"returns": "box",
+				"parameters": {
+					"point1": "point",
+					"point2": "point"
+				}
+			},
+			{
+				"description": "Computes bounding box of polygon.",
+				"example": "SELECT box(polygon '((0,0),(1,1),(1,0))');",
+				"returns": "box",
+				"parameters": {
+					"polygon": "polygon"
+				}
+			},
+			{
+				"description": "Computes bounding box of two boxes.",
+				"example": "SELECT box(box '(0,0),(1,1)', box '(1,1),(2,2)');",
+				"returns": "box",
+				"parameters": {
+					"box1": "box",
+					"box2": "box"
+				}
+			}
+		],
+		"circle": [
+			{
+				"description": "Computes smallest circle enclosing box.",
+				"example": "SELECT circle(box '(0,0),(1,1)');",
+				"returns": "circle",
+				"parameters": {
+					"box": "box"
+				}
+			},
+			{
+				"description": "Constructs circle from center and radius.",
+				"example": "SELECT circle(point '(0,0)', 2.0);",
+				"returns": "circle",
+				"parameters": {
+					"point": "point",
+					"radius": "double precision"
+				}
+			},
+			{
+				"description": "Converts polygon to circle.",
+				"example": "SELECT circle(polygon '((0,0),(1,1),(1,0))');",
+				"returns": "circle",
+				"parameters": {
+					"polygon": "polygon"
+				}
+			}
+		],
+		"line": [
+			{
+				"description": "Converts two points to the line through them.",
+				"example": "SELECT line(point '(-1,0)', point '(1,0)');",
+				"returns": "line",
+				"parameters": {
+					"point1": "point",
+					"point2": "point"
+				}
+			}
+		],
+		"lseg": [
+			{
+				"description": "Extracts box's diagonal as a line segment.",
+				"example": "SELECT lseg(box '(1,0),(-1,0)');",
+				"returns": "lseg",
+				"parameters": {
+					"box ": "box "
+				}
+			},
+			{
+				"description": "Constructs line segment from two endpoints.",
+				"example": "SELECT lseg(point '(-1,0)', point '(1,0)');",
+				"returns": "lseg",
+				"parameters": {
+					"point1": "point",
+					"point2": "point"
+				}
+			}
+		],
+		"path": [
+			{
+				"description": "Converts polygon to path.",
+				"example": "SELECT path(polygon '((0,0),(1,1),(1,0))');",
+				"returns": "path",
+				"parameters": {
+					"polygon": "polygon"
+				}
+			}
+		],
+		"point": [
+			{
+				"description": "Constructs point from coordinates.",
+				"example": "SELECT point(1, 2);",
+				"returns": "point",
+				"parameters": {
+					"x": "double precision",
+					"y": "double precision"
+				}
+			},
+			{
+				"description": "Converts box to its center point.",
+				"example": "SELECT point(box '(1,0),(2,1)');",
+				"returns": "point",
+				"parameters": {
+					"box": "box"
+				}
+			},
+			{
+				"description": "Converts circle to its center point.",
+				"example": "SELECT point(circle '<(0,0),2>');",
+				"returns": "point",
+				"parameters": {
+					"circle": "circle"
+				}
+			},
+			{
+				"description": "Converts lseg to its midpoint.",
+				"example": "SELECT point(lseg '(-1,0),(1,0)');",
+				"returns": "point",
+				"parameters": {
+					"lseg": "lseg"
+				}
+			},
+			{
+				"description": "Converts polygon to its centroid point.",
+				"example": "SELECT point(polygon '((0,0),(1,1),(1,0))');",
+				"returns": "point",
+				"parameters": {
+					"polygon": "polygon"
+				}
+			}
+		],
+		"polygon": [
+			{
+				"description": "Converts box to polygon.",
+				"example": "SELECT polygon(box '(0,0),(1,1)');",
+				"returns": "polygon",
+				"parameters": {
+					"box": "box"
+				}
+			},
+			{
+				"description": "Converts circle to a 12-point polygon.",
+				"example": "SELECT polygon(circle '<(0,0),2>');",
+				"returns": "polygon",
+				"parameters": {
+					"circle": "circle"
+				}
+			},
+			{
+				"description": "Converts circle to an n-point polygon.",
+				"example": "SELECT polygon(4, circle '<(3,0),1>') ;",
+				"returns": "polygon",
+				"parameters": {
+					"n": "integer",
+					"circle": "circle"
+				}
+			},
+			{
+				"description": "Converts path to polygon.",
+				"example": "SELECT polygon(path '((0,0),(1,1),(1,0))');",
+				"returns": "polygon",
+				"parameters": {
+					"path": "path"
+				}
+			}
+		]
+	}
+}

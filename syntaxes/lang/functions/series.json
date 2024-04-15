@@ -1,0 +1,70 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "Set returning functions https://www.postgresql.org/docs/14/functions-srf.html",
+	"name": "Set Returning Functions",
+	"keywords": {
+		"generate_series": [
+			{
+				"description": "Expands range arguments into a set of rows.",
+				"example": "SELECT * FROM generate_series(1, 5);",
+				"returns": "integer",
+				"parameters": {
+					"start": "integer",
+					"stop": "integer",
+					"step": "integer"
+				}
+			},
+			{
+				"description": "Expands range arguments into a set of rows.",
+				"example": "SELECT * FROM generate_series(1, 5, 2);",
+				"returns": "bigint",
+				"parameters": {
+					"start": "bigint",
+					"stop": "bigint",
+					"step": "bigint"
+				}
+			},
+			{
+				"description": "Expands range arguments into a set of rows.",
+				"example": "SELECT * FROM generate_series(1, 5, 0.5);",
+				"returns": "numeric",
+				"parameters": {
+					"start": "numeric",
+					"stop": "numeric",
+					"step": "numeric"
+				}
+			},
+			{
+				"description": "Expands range arguments into a set of rows.",
+				"example": "SELECT * FROM generate_series(to_timestamp(10) without time zone,to_timestamp(22) without time zone,'1 second'::interval);",
+				"returns": "timestamp",
+				"parameters": {
+					"start": "timestamp",
+					"stop": "timestamp",
+					"step": "interval"
+				}
+			},
+			{
+				"description": "Expands range arguments into a set of rows.",
+				"example": "SELECT * FROM generate_series(to_timestamp(10) at time zone 'Etc/UTC',to_timestamp(22),'1 second'::interval)",
+				"returns": "timestamp with time zone",
+				"parameters": {
+					"start": "timestamp with time zone",
+					"stop": "timestamp with time zone",
+					"step": "interval"
+				}
+			}
+		],
+		"generate_subscripts": [
+			{
+				"description": "Expands array arguments into a set of rows.",
+				"example": "SELECT * FROM generate_subscripts(ARRAY[1,2,3], 1);",
+				"returns": "setof integer",
+				"parameters": {
+					"array": "anyarray",
+					"dimension": "integer"
+				}
+			}
+		]
+	}
+}

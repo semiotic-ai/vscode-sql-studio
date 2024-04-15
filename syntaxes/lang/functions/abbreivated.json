@@ -1,0 +1,28 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "Abbreivated syntax for common functions",
+	"keywords": {
+		"pow": [
+			{
+				"description": "a raised to the power of b",
+				"example": "SELECT pow(2.0, 3.0);",
+				"returns": "numeric",
+				"parameters": { "a": "numeric", "b": "numeric" }
+			},
+			{
+				"description": "a raised to the power of b",
+				"example": "SELECT pow(2.0, 3.0);",
+				"returns": "double precision",
+				"parameters": { "a": "double precision", "b": "double precision" }
+			}
+		],
+		"date": [
+			{
+				"description": "Converts string to date.",
+				"example": "SELECT date('05 Dec 2000);",
+				"returns": "date",
+				"parameters": { "value": "text", "format": "text" }
+			}
+		]
+	}
+}

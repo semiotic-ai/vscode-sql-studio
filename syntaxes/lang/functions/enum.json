@@ -1,0 +1,37 @@
+{
+	"$schema": "../schema/function.schema.json",
+	"description": "Enum support functions see https://www.postgresql.org/docs/14/functions-enum.html#FUNCTIONS-ENUM-SUPPORT",
+	"name": "Enum Support Functions",
+	"keywords": {
+		"enum_first": [
+			{
+				"description": "Returns the first value of an enum type",
+				"example": "SELECT enum_first(anyenum)",
+				"returns": "anyenum",
+				"parameters": {
+					"value": "anyenum"
+				}
+			}
+		],
+		"enum_last": [
+			{
+				"description": "Returns the last value of an enum type",
+				"example": "SELECT enum_last(anyenum)",
+				"returns": "anyenum",
+				"parameters": {
+					"value": "anyenum"
+				}
+			}
+		],
+		"enum_range": [
+			{
+				"description": "Returns a range of values of an enum type",
+				"example": "SELECT enum_range(anyenum)",
+				"returns": "anyenum[]",
+				"parameters": {
+					"value": "anyenum"
+				}
+			}
+		]
+	}
+}

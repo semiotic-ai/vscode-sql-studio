@@ -259,7 +259,7 @@
     ]
   },
   "scripts": {
-    "lang": "js-yaml syntaxes/gsql.tmLanguage.yaml > syntaxes/gsql.tmLanguage.json",
+    "lang": "js-yaml syntaxes/gsql.tmLanguage.yaml > syntaxes/gsql.tmLanguage.json && ts-node ./syntaxes/lang/build.ts",
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
     "watch": "webpack --watch",
@@ -298,6 +298,7 @@
     "semantic-release-stop-before-publish": "^1.0.0",
     "semantic-release-vsce": "^5.6.4",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "typedoc": "^0.25.7",
     "typedoc-theme-hierarchy": "^4.1.2",
     "typescript": "^5.3.3",
@@ -309,7 +310,8 @@
     "@vscode/codicons": "^0.0.35",
     "graphql": "^16.8.1",
     "node-fetch": "^2.7.0",
-    "simple-datatables": "^9.0.0"
+    "simple-datatables": "^9.0.0",
+    "sql-surveyor": "^1.4.1"
   },
   "volta": {
     "node": "20.11.0",

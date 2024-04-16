@@ -109,7 +109,10 @@
         "command": "subgraphs.newQuery",
         "title": "New Query",
         "category": "GRAPHSQL",
-        "icon": "$(new-file)"
+        "icon": {
+          "light": "/resources/light-new-query.svg",
+          "dark": "/resources/dark-new-query.svg"
+        }
       },
       {
         "command": "gsqlEditor.addSubgraphInfo",

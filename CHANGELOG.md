@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.12.3...v0.13.0) (2024-04-17)
+
+
+### Features
+
+* add uri handler for automatically saving api keys from website ([e33c6fd](https://github.com/semiotic-ai/vscode-sql-studio/commit/e33c6fd7b721c73f72cb9bdc6296e9e49a7c03e6))
+
 ## [0.12.3](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.12.2...v0.12.3) (2024-04-05)
 
 

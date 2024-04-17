@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import { IQueryResult, executeSQL, ISubgraphInfo } from '../service';
 import { write as writeCSV } from '../filetypes/csv';
+import { SECRETS } from '../constants';
 
 const SQL_STUDIO_ENDPOINT = 'https://sql-studio-webapp.vercel.app/api';
-const API_KEY = 'graph.apikey';
 
 interface IGateWayStatus {
   endpoint: string;
@@ -59,7 +59,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
         throw new Error('No subgraph selected');
       }
 
-      let apikey: string | undefined = await this._secrets.get(API_KEY);
+      let apikey: string | undefined = await this._secrets.get(SECRETS.API_KEY);
 
       if (!apikey || apikey.trim() === '') {
         apikey = await vscode.window.showInputBox({
@@ -69,7 +69,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
         if (!apikey || apikey.trim() === '') {
           throw new Error('No API key provided');
         }
-        await this._secrets.store(API_KEY, apikey);
+        await this._secrets.store(SECRETS.API_KEY, apikey);
       }
 
       const authorization = `Bearer ${apikey}`;
@@ -107,7 +107,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
   }
 
   public async clearAPIKey() {
-    await this._secrets.delete(API_KEY);
+    await this._secrets.delete(SECRETS.API_KEY);
   }
 
   public cancel() {

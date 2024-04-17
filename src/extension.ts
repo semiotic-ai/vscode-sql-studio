@@ -8,6 +8,7 @@ import { addPropertyToEditor, getPropertyValue, replacePropertyInEditor } from '
 import { ISubgraphInfo } from './service';
 import { SqlDocumentDropProvider } from './providers/sqldoc';
 import { BugReporter } from './bug';
+import { SECRETS } from './constants';
 
 const LANGUAGE_ID = 'gsql';
 
@@ -197,6 +198,19 @@ export function activate(context: vscode.ExtensionContext) {
   const extension = new SubgraphExtension(context);
   context.subscriptions.push(extension);
   vscode.commands.executeCommand('tabularResult.focus');
+
+  // Register URI handler to get API key from sql-studio-webapp
+  // This will handle links in format `vscode://SemioticLabs.semiotic-sql-studio`
+  vscode.window.registerUriHandler({
+    handleUri({ query }: vscode.Uri) {
+      // get `api-key` from query string
+      const apiKey = query.split('=')[1];
+
+      context.secrets.store(SECRETS.API_KEY, apiKey).then(() => {
+        vscode.window.showInformationMessage('API Key has been updated.');
+      });
+    }
+  });
 }
 
 // This method is called when your extension is deactivated

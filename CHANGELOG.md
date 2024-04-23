@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.13.0...v0.13.1) (2024-04-23)
+
+
+### Code Refactoring
+
+* rename GRAPHSQL to Semiotic SQL ([d2279fd](https://github.com/semiotic-ai/vscode-sql-studio/commit/d2279fd8a7c50c57b136e170bda6476d638375e1))
+
 ## [0.13.0](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.12.3...v0.13.0) (2024-04-17)
 
 

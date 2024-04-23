@@ -24,7 +24,7 @@ You can clear your API key stored in vscode user session secrets by executing `C
 - View subgraph database layout
 - Supports dragging and dropping database table and columns into the sql text editor
 - Syntax highlighting and autocompletion
-- From the command menu `C-S-p`, you have access to all commands with the heading `GRAPHSQL`. These include:
+- From the command menu `C-S-p`, you have access to all commands with the heading `Semiotic SQL`. These include:
   - `New Query` - Create a GSQL window to write a new query. If you've already selected a subgraph in the *Available Subgraphs* menu, it will automatically populate the `ID` field in the document.
   - `Add Subgraph Info` (`C-m C-a`) - If you haven't yet added a subgraph to the document, it will add the name and ID of the currently selected subgraph.
   - `Replace Subgraph Info` (`C-m C-p`) - If there is no subgraph metadata in the document, add the metadata associated with the currently selected one. If there is, replace it with the currently selected one.

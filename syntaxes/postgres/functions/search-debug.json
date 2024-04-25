@@ -1,0 +1,67 @@
+{
+  "$schema": "../schema/function.schema.json",
+  "description": "Text search debugging functions see https://www.postgresql.org/docs/14/functions-textsearch.html#TEXTSEARCH-FUNCTIONS-DEBUG-TABLE",
+  "name": "Text Search Debugging Functions",
+  "keywords": {
+    "ts_debug": [
+      {
+        "description": "Extracts and normalizes tokens from the document according to the specified or default text search configuration, and returns information about how each token was processed.",
+        "example": "SELECT * FROM ts_debug('english', 'a fat cat sat on a mat - it ate a fat rat')",
+        "returns": "setof record",
+        "parameters": {
+          "document": "text",
+          "config": "regconfig"
+        }
+      }
+    ],
+    "ts_lexize": [
+      {
+        "description": "Returns an array of replacement lexemes if the input token is known to the dictionary, or an empty array if the token is known to the dictionary but it is a stop word, or NULL if it is not a known word.",
+        "example": "SELECT * FROM ts_lexize('english_stem', 'cats')",
+        "returns": "text[]",
+        "parameters": {
+          "dictname": "regdictionary",
+          "token": "text"
+        }
+      }
+    ],
+    "ts_parse": [
+      {
+        "description": "Extracts tokens from the document using the named parser.",
+        "example": "SELECT * FROM ts_parse('default', 'foo - bar')",
+        "returns": "setof record ( tokid integer, token text )",
+        "parameters": {
+          "parser_name ": "text",
+          "document": "text"
+        }
+      },
+      {
+        "description": "Extracts tokens from the document using a parser specified by OID.",
+        "example": "SELECT * FROM ts_parse(3722, 'foo - bar')",
+        "returns": "setof record ( tokid integer, token text )",
+        "parameters": {
+          "parser_oid  ": "oid",
+          "document": "text"
+        }
+      }
+    ],
+    "ts_token_type": [
+      {
+        "description": "Returns a table that describes each type of token the named parser can recognize.",
+        "example": "SELECT * FROM ts_token_type('default')",
+        "returns": "setof record ( tokid integer, alias text, description text )",
+        "parameters": {
+          "parser_name ": "text"
+        }
+      },
+      {
+        "description": "Returns a table that describes each type of token the parser specified by OID can recognize.",
+        "example": "SELECT * FROM ts_token_type(3722)",
+        "returns": "setof record ( alias text, description text, token_type integer )",
+        "parameters": {
+          "parser_oid  ": "oid"
+        }
+      }
+    ]
+  }
+}

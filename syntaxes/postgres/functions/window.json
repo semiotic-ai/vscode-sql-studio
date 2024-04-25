@@ -1,0 +1,107 @@
+{
+  "$schema": "../schema/function.schema.json",
+  "description": "Window functions https://www.postgresql.org/docs/14/functions-window.html#FUNCTIONS-WINDOW-TABLE",
+  "name": "Window Functions",
+  "keywords": {
+    "row_number": [
+      {
+        "description": "Number of the current row within its partition, counting from 1.",
+        "returns": "bigint",
+        "example": "SELECT row_number() OVER () FROM generate_series(1, 10);"
+      }
+    ],
+    "rank": [
+      {
+        "description": "Rank of the current row with gaps; same as row_number of its first peer.",
+        "returns": "bigint",
+        "example": "SELECT rank() OVER () FROM generate_series(1, 10);"
+      }
+    ],
+    "dense_rank": [
+      {
+        "description": "Rank of the current row without gaps; this function counts peer groups.",
+        "returns": "bigint",
+        "example": "SELECT dense_rank() OVER () FROM generate_series(1, 10);"
+      }
+    ],
+    "percent_rank": [
+      {
+        "description": "Relative rank of the current row: (rank - 1) / (total rows - 1).",
+        "returns": "double precision",
+        "example": "SELECT percent_rank() OVER () FROM generate_series(1, 10);"
+      }
+    ],
+    "cume_dist": [
+      {
+        "description": "Relative rank of the current row with respect to the non-null values in the group.",
+        "returns": "double precision",
+        "example": "SELECT cume_dist() OVER () FROM generate_series(1, 10);"
+      }
+    ],
+    "ntile": [
+      {
+        "description": "Integer ranging from 1 to the argument value, dividing the partition as equally as possible.",
+        "returns": "integer",
+        "example": "SELECT ntile(4) OVER () FROM generate_series(1, 10);",
+        "parameters": {
+          "num_buckets": "integer"
+        }
+      }
+    ],
+    "lag": [
+      {
+        "description": "Returns value evaluated at the row that is offset rows before the current row within the partition; if there is no such row, instead returns default (which must be of a type compatible with value).",
+        "returns": "anycompatible",
+        "example": "SELECT lag(price,2,0) OVER (partition by address,date) FROM token_hour_data;",
+        "parameters": {
+          "value": "anycompatible",
+          "offset": "integer",
+          "default": "anycompatible"
+        }
+      }
+    ],
+    "lead": [
+      {
+        "description": "Returns value evaluated at the row that is offset rows after the current row within the partition; if there is no such row, instead returns default (which must be of a type compatible with value).",
+        "returns": "anycompatible",
+        "example": "SELECT lead(price,2,0) OVER (partition by address,date) FROM token_hour_data;",
+        "parameters": {
+          "value": "anycompatible",
+          "offset": "integer",
+          "default": "anycompatible"
+        }
+      }
+    ],
+    "first_value": [
+      {
+        "description": "Returns value evaluated at the row that is the first row of the window frame.",
+        "returns": "anycompatible",
+        "example": "SELECT first_value(price) OVER (partition by address,date) FROM token_hour_data;",
+        "parameters": {
+          "value": "anycompatible"
+        }
+      }
+    ],
+    "last_value": [
+      {
+        "description": "Returns value evaluated at the row that is the last row of the window frame.",
+        "returns": "anycompatible",
+        "example": "SELECT last_value(price) OVER (partition by address,date) FROM token_hour_data;",
+        "parameters": {
+          "value": "anycompatible"
+        }
+      }
+    ],
+    "nth_value": [
+      {
+        "description": "Returns value evaluated at the row that is the n'th row of the window frame (counting from 1); returns NULL if there is no such row.",
+        "returns": "anycompatible",
+        "example": "SELECT nth_value(price,2) OVER (partition by address,date) FROM token_hour_data;",
+        "parameters": {
+          "value": "anycompatible",
+          "n": "integer"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "$schema": "../schema/function.schema.json",
+  "description": "Trigonometric Functions see https://www.postgresql.org/docs/14/functions-math.html#FUNCTIONS-MATH-TRIG-TABLE",
+  "name": "Trigonometric Functions",
+  "keywords": {
+    "acos": [
+      {
+        "description": "Arc cosine, result in radians",
+        "example": "SELECT acos(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "acosd": [
+      {
+        "description": "Arc cosine, result in degrees",
+        "example": "SELECT acosd(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "asin": [
+      {
+        "description": "Arc sine, result in radians",
+        "example": "SELECT asin(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "asind": [
+      {
+        "description": "Arc sine, result in degrees",
+        "example": "SELECT asind(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "atan": [
+      {
+        "description": "Arc tangent, result in radians",
+        "example": "SELECT atan(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "atand": [
+      {
+        "description": "Arc tangent, result in degrees",
+        "example": "SELECT atand(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "atan2": [
+      {
+        "description": "Arc tangent of y/x, result in radians",
+        "example": "SELECT atan2(1.0, 1.0);",
+        "returns": "double precision",
+        "parameters": {
+          "y": "double precision",
+          "x": "double precision"
+        }
+      }
+    ],
+    "atan2d": [
+      {
+        "description": "Arc tangent of y/x, result in degrees",
+        "example": "SELECT atan2d(1.0, 1.0);",
+        "returns": "double precision",
+        "parameters": {
+          "y": "double precision",
+          "x": "double precision"
+        }
+      }
+    ],
+    "cos": [
+      {
+        "description": "Cosine, argument in radians",
+        "example": "SELECT cos(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "cosd": [
+      {
+        "description": "Cosine, argument in degrees",
+        "example": "SELECT cosd(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "cot": [
+      {
+        "description": "Cotangent, argument in radians",
+        "example": "SELECT cot(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "cotd": [
+      {
+        "description": "Cotangent, argument in degrees",
+        "example": "SELECT cotd(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "sin": [
+      {
+        "description": "Sine, argument in radians",
+        "example": "SELECT sin(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "sind": [
+      {
+        "description": "Sine, argument in degrees",
+        "example": "SELECT sind(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "tan": [
+      {
+        "description": "Tangent, argument in radians",
+        "example": "SELECT tan(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ],
+    "tand": [
+      {
+        "description": "Tangent, argument in degrees",
+        "example": "SELECT tand(0.5);",
+        "returns": "double precision",
+        "parameters": {
+          "number": "double precision"
+        }
+      }
+    ]
+  }
+}

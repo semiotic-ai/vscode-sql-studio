@@ -15,12 +15,27 @@ import {
 import { Column, ColumnType, Layout, Relation, Table, TypeKind } from '../graphtables/layout';
 
 import { SQLSurveyor, SQLDialect, ParsedSql, ParsedQuery } from 'sql-surveyor';
+import { AutocompleteOptionType, SQLAutocomplete } from 'sql-autocomplete';
 
 import * as functions from '../../dist/functions.json';
 import { OutputColumn } from 'sql-surveyor/dist/src/models/OutputColumn';
+import { stripProperties } from '../editor/property';
 
 function getAllOutputColumns(query: ParsedQuery): OutputColumn[] {
   return [...query.outputColumns, ...Object.values(query.subqueries).flatMap(getAllOutputColumns)];
+}
+
+function optionTypeSortOrder(type: AutocompleteOptionType): number {
+  switch (type) {
+    case AutocompleteOptionType.COLUMN:
+      return 0;
+    case AutocompleteOptionType.TABLE:
+      return 1;
+    case AutocompleteOptionType.KEYWORD:
+      return 2;
+    default:
+      return 3;
+  }
 }
 
 export class GraphSQLProvider
@@ -47,26 +62,70 @@ export class GraphSQLProvider
     context: CompletionContext
   ): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
     // Return only the
-    const statement = document.getText();
-    const index = document.offsetAt(position);
+    let statement = document.getText();
+
+    if (statement.length === 0) {
+      return undefined;
+    }
+
+    const offset = document.offsetAt(position);
     const surveyor = new SQLSurveyor(SQLDialect.PLpgSQL);
     const parsedStatement = surveyor.survey(statement);
-    const aliasTables = new Map<string, Table>();
-    const outputColumns = new Map<string, Column>();
+
+    const tableNames: string[] = this.layout ? [...this.layout.tables.keys()] : [];
+    const columnNames: string[] = this.layout
+      ? [...this.layout.tables.entries()].flatMap(([table_name, table]) =>
+          [...table.columns.keys()].map((column_name) => `${table_name}.${column_name}`)
+        )
+      : [];
 
     Object.values(parsedStatement.parsedQueries).forEach((query) => {
       Object.values(query.getAllReferencedTables()).forEach((table) => {
         const originalTable = this.layout?.tables.get(table.tableName);
         table.aliases.forEach((alias) => {
-          aliasTables.set(alias, {
-            columns: originalTable?.columns || new Map<string, Column>(),
-            relations: originalTable?.relations || new Map<string, Relation[]>()
-          });
+          if (originalTable) {
+            tableNames.push(alias);
+            [...originalTable.columns.keys()].forEach((column_name) => {
+              columnNames.push(`${alias}.${column_name}`);
+            });
+          }
         });
+      });
+
+      getAllOutputColumns(query).forEach((column) => {
+        if (column.columnAlias) {
+          columnNames.push(column.columnAlias);
+        }
       });
     });
 
-    return null;
+    const result = new Set<CompletionItem>();
+
+    const autocomplete = new SQLAutocomplete(SQLDialect.PLpgSQL, tableNames, columnNames);
+
+    const suggestions = autocomplete.autocomplete(statement, offset);
+    suggestions.forEach((opt) => {
+      if (opt.value) {
+        const completion = new CompletionItem(opt.value);
+        switch (opt.optionType) {
+          case 'KEYWORD':
+            completion.kind = CompletionItemKind.Keyword;
+            break;
+          case 'TABLE':
+            completion.kind = CompletionItemKind.Class;
+            break;
+          case 'COLUMN':
+            completion.kind = CompletionItemKind.Field;
+            break;
+          default:
+            completion.kind = CompletionItemKind.Variable;
+        }
+        const typeOrder = optionTypeSortOrder(opt.optionType);
+        completion.sortText = `${typeOrder} ${opt.value}`;
+        result.add(completion);
+      }
+    });
+    return [...result];
   }
 
   resolveCompletionItem?(

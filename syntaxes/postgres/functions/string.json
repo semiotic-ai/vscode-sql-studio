@@ -1,0 +1,162 @@
+{
+  "$schema": "../schema/function.schema.json",
+  "description": "String Functions see https://www.postgresql.org/docs/14/functions-string.html#FUNCTIONS-STRING-SQL",
+  "name": "String Functions",
+  "keywords": {
+    "bit_length": [
+      {
+        "description": "Number of bits in string",
+        "example": "SELECT bit_length('ABC');",
+        "returns": "integer",
+        "parameters": {
+          "string": "text"
+        }
+      }
+    ],
+    "char_length": [
+      {
+        "description": "Number of characters in string",
+        "example": "SELECT char_length('ABC');",
+        "returns": "integer",
+        "parameters": {
+          "string": "text"
+        }
+      }
+    ],
+    "character_length": [
+      {
+        "description": "Synonym for char_length",
+        "example": "SELECT character_length('ABC');",
+        "returns": "integer",
+        "parameters": {
+          "string": "text"
+        }
+      }
+    ],
+    "lower": [
+      {
+        "description": "Convert string to lower case",
+        "example": "SELECT lower('ABC');",
+        "returns": "text",
+        "parameters": {
+          "string": "text"
+        }
+      }
+    ],
+    "normalize": [
+      {
+        "description": "Convert string to specified Unicode normalization form",
+        "example": "SELECT normalize('ABC', 'NFC');",
+        "returns": "text",
+        "parameters": {
+          "string": "text",
+          "form": "text"
+        }
+      }
+    ],
+    "octet_length": [
+      {
+        "description": "Number of bytes in string",
+        "example": "SELECT octet_length('ABC');",
+        "returns": "integer",
+        "parameters": {
+          "string": "text"
+        }
+      },
+      {
+        "description": "Number of bytes in string",
+        "example": "SELECT octet_length('abc '::character(4));",
+        "returns": "integer",
+        "parameters": {
+          "character ": "character "
+        }
+      }
+    ],
+    "overlay": [
+      {
+        "description": "Replace substring with another string at specified position and length",
+        "example": "SELECT overlay('ABCdef' PLACING 'xxx' FROM 4 FOR 3);",
+        "snippet": ["overlay(${1:string} PLACING ${2:replacing} FROM ${3:start} FOR ${4:count})"],
+        "returns": "text",
+        "parameters": {
+          "string": "text",
+          "replacing": "text",
+          "from": "integer",
+          "for": "integer"
+        }
+      }
+    ],
+    "position": [
+      {
+        "description": "Location of specified substring",
+        "example": "SELECT position('def' IN 'ABCdef');",
+        "snippet": ["position(${1:substring} IN ${2:string})"],
+        "returns": "integer",
+        "parameters": {
+          "substring": "text",
+          "string": "text"
+        }
+      }
+    ],
+    "substring": [
+      {
+        "description": "Extract substring",
+        "example": "SELECT substring('ABCdef' FROM 4 FOR 3);",
+        "snippet": ["substring(${1:string} FROM ${2:from} FOR ${3:for})"],
+        "returns": "text",
+        "parameters": {
+          "string": "text",
+          "from": "integer",
+          "for": "integer"
+        }
+      },
+      {
+        "description": "Extracts the first substring matching POSIX regular expression",
+        "example": "SELECT substring('Thomas' from '...$');",
+        "snippet": ["substring(${1:string} FROM ${2:pattern})"],
+        "returns": "text",
+        "parameters": {
+          "string": "text",
+          "pattern ": "text"
+        }
+      },
+      {
+        "description": "Extracts the first substring matching SQL regular expression",
+        "example": "SELECT substring('Thomas' similar '%#\"o_a#\"_' escape '#');",
+        "snippet": ["substring(${1:string} SIMILAR  ${2:pattern} ESCAPE ${3:escape})"],
+        "returns": "text",
+        "parameters": {
+          "string": "text",
+          "pattern ": "text",
+          "escape ": "text"
+        }
+      }
+    ],
+    "trim": [
+      {
+        "description": "Remove leading and trailing characters",
+        "example": "SELECT trim(LEADING 'ABC' FROM 'ABCdefABC');",
+        "snippet": [
+          "trim(LEADING ${1:characters} FROM ${2:string})",
+          "trim(TRAILING ${1:characters} FROM ${2:string})",
+          "trim(BOTH ${1:characters} FROM ${2:string})"
+        ],
+        "returns": "text",
+        "parameters": {
+          "characters": "text",
+          "string": "text"
+        }
+      }
+    ],
+    "upper": [
+      {
+        "description": "Convert string to upper case",
+        "example": "SELECT upper('ABC');",
+        "returns": "text",
+        "parameters": {
+          "string": "text"
+        }
+      }
+    ]
+  }
+}

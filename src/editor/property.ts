@@ -145,3 +145,20 @@ export async function replacePropertyInEditor(property: string, information: str
     });
   }
 }
+
+/**
+ * Strips all properties from a document, returning only the text content.
+ * @param document The document to strip properties from.
+ * @returns The text content of the document without properties.
+ */
+export function stripProperties(document: vscode.TextDocument): string {
+  const text = document.getText();
+  const lines = text.split('\n');
+  let result = '';
+  for (const line of lines) {
+    if (!/^--\+[A-Z]+: /.test(line)) {
+      result += line + '\n';
+    }
+  }
+  return result.trim();
+}

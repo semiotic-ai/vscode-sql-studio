@@ -1,0 +1,177 @@
+{
+  "$schema": "../schema/function.schema.json",
+  "description": "Binary String Functions see https://www.postgresql.org/docs/14/functions-binarystring.html#FUNCTIONS-BINARYSTRING-OTHER",
+  "name": "Binary String Functions",
+  "keywords": {
+    "bit_count": [
+      {
+        "description": "Number of bits set in the argument",
+        "example": "SELECT bit_count('\\x1234567890'::bytea);",
+        "returns": "bigint",
+        "parameters": {
+          "bytes": "bytea"
+        }
+      }
+    ],
+    "btrim": [
+      {
+        "description": "Remove the longest string containing only bytes appearing in bytesremoved from the start and end of bytes.",
+        "example": "SELECT btrim('\\x1234567890'::bytea, '\\x9012'::bytea) ;",
+        "returns": "bytea",
+        "parameters": {
+          "bytes": "bytea",
+          "bytesremoved": "bytea"
+        }
+      }
+    ],
+    "get_bit": [
+      {
+        "description": "Extracts the n'th bit from string",
+        "example": "SELECT get_bit('\\x1234567890'::bytea, 3);",
+        "returns": "integer",
+        "parameters": {
+          "bytes": "bytea",
+          "n": "integer"
+        }
+      }
+    ],
+    "get_byte": [
+      {
+        "description": "Extracts the n'th byte from string",
+        "example": "SELECT get_byte('\\x1234567890'::bytea, 3);",
+        "returns": "integer",
+        "parameters": {
+          "bytes": "bytea",
+          "n": "integer"
+        }
+      }
+    ],
+    "length": [
+      {
+        "description": "Number of bytes in the binary string",
+        "example": "SELECT length('\\x1234567890'::bytea);",
+        "returns": "integer",
+        "parameters": {
+          "bytes": "bytea"
+        }
+      },
+      {
+        "description": "Returns the number of characters in the binary string, assuming that it is text in the given encoding.",
+        "example": "SELECT length('jose'::bytea, 'UTF8');",
+        "returns": "integer",
+        "parameters": {
+          "bytes": "bytea",
+          "encoding": "text"
+        }
+      }
+    ],
+    "ltrim": [
+      {
+        "description": "Removes the longest string containing only bytes appearing in bytesremoved from the start of bytes.",
+        "example": "SELECT ltrim('\\x1234567890'::bytea, '\\x9012'::bytea);",
+        "returns": "bytea",
+        "parameters": {
+          "bytes": "bytea",
+          "bytesremoved": "bytea"
+        }
+      }
+    ],
+    "md5": [
+      {
+        "description": "Computes the MD5 hash of the binary string, with the result written in hexadecimal.",
+        "example": "SELECT md5('ABC'::bytea);",
+        "returns": "text",
+        "parameters": {
+          "value": "bytea"
+        }
+      }
+    ],
+    "rtrim": [
+      {
+        "description": "Removes the longest string containing only bytes appearing in bytesremoved from the end of bytes.",
+        "example": "SELECT rtrim('\\x1234567890'::bytea, '\\x9012'::bytea);",
+        "returns": "bytea",
+        "parameters": {
+          "bytes": "bytea",
+          "bytesremoved": "bytea"
+        }
+      }
+    ],
+    "set_bit": [
+      {
+        "description": "Sets the n'th bit in string to newvalue",
+        "example": "SELECT set_bit('\\x1234567890'::bytea, 3, 1);",
+        "returns": "bytea",
+        "parameters": {
+          "bytes": "bytea",
+          "n": "integer",
+          "newvalue": "integer"
+        }
+      }
+    ],
+    "set_byte": [
+      {
+        "description": "Sets the n'th byte in string to newvalue",
+        "example": "SELECT set_byte('\\x1234567890'::bytea, 3, 255);",
+        "returns": "bytea",
+        "parameters": {
+          "bytes": "bytea",
+          "n": "integer",
+          "newvalue": "integer"
+        }
+      }
+    ],
+    "sha224": [
+      {
+        "description": "Compute SHA-224 hash",
+        "example": "SELECT sha224('ABC'::bytea);",
+        "returns": "bytea",
+        "parameters": {
+          "bytes": "bytea"
+        }
+      }
+    ],
+    "sha256": [
+      {
+        "description": "Compute SHA-256 hash",
+        "example": "SELECT sha256('ABC'::bytea);",
+        "returns": "bytea",
+        "parameters": {
+          "bytes": "bytea"
+        }
+      }
+    ],
+    "sha384": [
+      {
+        "description": "Compute SHA-384 hash",
+        "example": "SELECT sha384('ABC'::bytea);",
+        "returns": "bytea",
+        "parameters": {
+          "bytes": "bytea"
+        }
+      }
+    ],
+    "sha512": [
+      {
+        "description": "Compute SHA-512 hash",
+        "example": "SELECT sha512('ABC'::bytea);",
+        "returns": "bytea",
+        "parameters": {
+          "bytes": "bytea"
+        }
+      }
+    ],
+    "substr": [
+      {
+        "description": "xtracts the substring of bytes starting at the start'th byte, and extending for count bytes if that is specified.",
+        "example": "SELECT substr('\\x1234567890'::bytea, 3, 2);",
+        "returns": "bytea",
+        "parameters": {
+          "bytes": "bytea",
+          "start": "integer",
+          "count": "integer"
+        }
+      }
+    ]
+  }
+}

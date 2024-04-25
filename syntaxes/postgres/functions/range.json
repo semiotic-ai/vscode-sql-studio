@@ -1,0 +1,172 @@
+{
+  "$schema": "../schema/function.schema.json",
+  "description": "Range Functions https://www.postgresql.org/docs/14/functions-range.html#RANGE-FUNCTIONS-TABLE",
+  "name": "Range Functions",
+  "keywords": {
+    "lower": [
+      {
+        "description": "Extracts the lower bound of the range (NULL if the range is empty or the lower bound is infinite).",
+        "example": "SELECT lower(int4range(1, 10));",
+        "returns": "anyelement",
+        "parameters": {
+          "range": "anyrange"
+        }
+      },
+      {
+        "description": "Extracts the lower bound of the multirange (NULL if the multirange is empty or the lower bound is infinite).",
+        "example": "SELECT lower(int4multirange(int4range(1, 10), int4range(20, 30))",
+        "returns": "anyelement",
+        "parameters": {
+          "range": "anymultirange"
+        }
+      }
+    ],
+    "upper": [
+      {
+        "description": "Extracts the upper bound of the range (NULL if the range is empty or the upper bound is infinite).",
+        "example": "SELECT upper(int4range(1, 10));",
+        "returns": "anyelement",
+        "parameters": {
+          "range": "anyrange"
+        }
+      },
+      {
+        "description": "Extracts the upper bound of the multirange (NULL if the multirange is empty or the upper bound is infinite).",
+        "example": "SELECT upper(int4multirange(int4range(1, 10), int4range(20, 30))",
+        "returns": "anyelement",
+        "parameters": {
+          "range": "anymultirange"
+        }
+      }
+    ],
+    "isempty": [
+      {
+        "description": "Is the range empty?",
+        "example": "SELECT isempty(int4range(1, 10));",
+        "returns": "boolean",
+        "parameters": {
+          "range": "anyrange"
+        }
+      },
+      {
+        "description": "Is the multirange empty?",
+        "example": "SELECT isempty(int4multirange(int4range(1, 10), int4range(20, 30))",
+        "returns": "boolean",
+        "parameters": {
+          "range": "anymultirange"
+        }
+      }
+    ],
+    "lower_inc": [
+      {
+        "description": "Is the range's lower bound inclusive?",
+        "example": "SELECT lower_inc(int4range(1, 10));",
+        "returns": "boolean",
+        "parameters": {
+          "range": "anyrange"
+        }
+      },
+      {
+        "description": "Is the multirange's lower bound inclusive?",
+        "example": "SELECT lower_inc(int4multirange(int4range(1, 10), int4range(20, 30))",
+        "returns": "boolean",
+        "parameters": {
+          "range": "anymultirange"
+        }
+      }
+    ],
+    "upper_inc": [
+      {
+        "description": "Is the range's upper bound inclusive?",
+        "example": "SELECT upper_inc(int4range(1, 10));",
+        "returns": "boolean",
+        "parameters": {
+          "range": "anyrange"
+        }
+      },
+      {
+        "description": "Is the multirange's upper bound inclusive?",
+        "example": "SELECT upper_inc(int4multirange(int4range(1, 10), int4range(20, 30))",
+        "returns": "boolean",
+        "parameters": {
+          "range": "anymultirange"
+        }
+      }
+    ],
+    "lower_inf": [
+      {
+        "description": "Is the range's lower bound infinite?",
+        "example": "SELECT lower_inf(int4range(1, 10));",
+        "returns": "boolean",
+        "parameters": {
+          "range": "anyrange"
+        }
+      },
+      {
+        "description": "Is the multirange's lower bound infinite?",
+        "example": "SELECT lower_inf(int4multirange(int4range(1, 10), int4range(20, 30))",
+        "returns": "boolean",
+        "parameters": {
+          "range": "anymultirange"
+        }
+      }
+    ],
+    "upper_inf": [
+      {
+        "description": "Is the range's upper bound infinite?",
+        "example": "SELECT upper_inf(int4range(1, 10));",
+        "returns": "boolean",
+        "parameters": {
+          "range": "anyrange"
+        }
+      },
+      {
+        "description": "Is the multirange's upper bound infinite?",
+        "example": "SELECT upper_inf(int4multirange(int4range(1, 10), int4range(20, 30))",
+        "returns": "boolean",
+        "parameters": {
+          "range": "anymultirange"
+        }
+      }
+    ],
+    "range_merge": [
+      {
+        "description": "Computes the smallest range that includes both of the given ranges.",
+        "example": "SELECT range_merge(int4range(1, 10), int4range(5, 15));",
+        "returns": "anyrange",
+        "parameters": {
+          "range1": "anyrange",
+          "range2": "anyrange"
+        }
+      },
+      {
+        "description": "Computes the smallest anymultirange that includes entire multirange.",
+        "example": "SELECT range_merge(range_merge('{[1,2), [3,4)}'::int4multirange));",
+        "returns": "anyrange",
+        "parameters": {
+          "range": "multirange"
+        }
+      }
+    ],
+    "multirange": [
+      {
+        "description": "Creates a multirange from the given ranges.",
+        "example": "SELECT multirange(int4range(1, 10));",
+        "returns": "anymultirange",
+        "parameters": {
+          "range": "anyrange"
+        }
+      }
+    ],
+    "unnest": [
+      {
+        "description": "Expands the multirange into a set of ranges.",
+        "example": "SELECT * FROM unnest(int4multirange(int4range(1, 10), int4range(20, 30)));",
+        "returns": "setof anyrange",
+        "parameters": {
+          "multirange": "anymultirange"
+        }
+      }
+    ]
+  }
+}

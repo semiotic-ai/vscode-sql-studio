@@ -1,0 +1,241 @@
+{
+  "$schema": "../schema/function.schema.json",
+  "description": "XML Functions see https://www.postgresql.org/docs/14/functions-xml.html",
+  "name": "XML Functions",
+  "keywords": {
+    "standalone": [],
+    "yes": [],
+    "value": [],
+    "node": [],
+    "name": [],
+    "version": [],
+    "passing": [],
+    "ref": [],
+    "columns": [],
+    "xmlattributes": [],
+    "path": [],
+    "xmlcomment": [
+      {
+        "description": "Creates an XML comment",
+        "example": "SELECT xmlcomment('This is a comment') AS result;",
+        "returns": "xml",
+        "parameters": {
+          "comment": "text"
+        },
+        "antlr": ["XMLCOMMENT LEFT_PAREN vex RIGHT_PAREN"]
+      }
+    ],
+    "xmlconcat": [
+      {
+        "description": "Concatenates XML values",
+        "example": "SELECT xmlconcat('<a>1</a>', '<b>2</b>') AS result;",
+        "signature": "xmlconcat(xml [, ...]) → xml",
+        "returns": "xml",
+        "parameters": {
+          "xml": "[,text]"
+        },
+        "antlr": ["XMLCONCAT LEFT_PAREN vex (COMMA vex)* RIGHT_PAREN"]
+      }
+    ],
+    "xmlelement": [
+      {
+        "description": "Creates an XML element",
+        "example": "SELECT xmlelement(name foo, xmlattributes('xyz' as bar));",
+        "snippet": [
+          "xmlelement(name ${1:name}, xmlattributes('${3:attr_value}' as ${2:attr_name}),'${4:content}')"
+        ],
+        "returns": "xml",
+        "signature": "xmlelement ( NAME name [, XMLATTRIBUTES ( attvalue [ AS attname ] [, ...] ) ] [, content [, ...]] ) → xml",
+        "parameters": {
+          "name": "name",
+          "attr_name as attr_value": "[,xmlattributes]",
+          "content": "[,text]"
+        },
+        "antlr": [
+          "XMLELEMENT LEFT_PAREN NAME name=identifier",
+          "(COMMA XMLATTRIBUTES LEFT_PAREN vex (AS attname=identifier)? (COMMA vex (AS attname=identifier)?)* RIGHT_PAREN)?",
+          "(COMMA vex)* RIGHT_PAREN"
+        ]
+      }
+    ],
+    "xmlforest": [
+      {
+        "description": "Creates an XML forest (sequence) of elements",
+        "example": "SELECT xmlforest('1' as a, '2' as b) AS result;",
+        "snippet": ["xmlforest('${1:content1}' as ${2:name1}, '${3:content2}' as ${4:name2})"],
+        "signature": "xmlforest ( content [ AS name ] [, ...] ) → xml",
+        "returns": "xml",
+        "parameters": {
+          "content": "[,xml]"
+        },
+        "antlr": [
+          "XMLFOREST LEFT_PAREN vex (AS name=identifier)? (COMMA vex (AS name=identifier)?)* RIGHT_PAREN"
+        ]
+      }
+    ],
+    "xmlpi": [
+      {
+        "description": "Creates an XML processing instruction",
+        "example": "SELECT xmlpi(NAME 'xml-stylesheet', 'type=\"text/xsl\" href=\"foo.xsl\"') AS result;",
+        "snippet": ["xmlpi(NAME '${1:NAME}', '${2:content}')"],
+        "signature": "xmlpi ( NAME name [, content ] ) → xml",
+        "returns": "xml",
+        "parameters": {
+          "name": "text",
+          "content": "[,text]"
+        },
+        "antlr": ["XMLPI LEFT_PAREN NAME name=identifier (COMMA vex)? RIGHT_PAREN"]
+      }
+    ],
+    "xmlroot": [
+      {
+        "description": "The xmlroot expression alters the properties of the root node of an XML value.",
+        "example": "SELECT xmlroot('<a>1</a>', version '1.0', standalone no) AS result;",
+        "snippet": ["xmlroot('${1:xml}', version '${2:version}', standalone ${3:standalone})"],
+        "signature": "xmlroot ( xml, VERSION {text|NO VALUE} [, STANDALONE {YES|NO|NO VALUE} ] ) → xml",
+        "returns": "xml",
+        "parameters": {
+          "xml": "xml",
+          "version": "text",
+          "standalone": "yes | no"
+        },
+        "antlr": [
+          "XMLROOT LEFT_PAREN vex COMMA VERSION (vex | NO VALUE) (COMMA STANDALONE (YES | NO | NO VALUE))? RIGHT_PAREN"
+        ]
+      }
+    ],
+    "xmlagg": [
+      {
+        "description": "Concatenates the input values to the aggregate function call, much like xmlconcat does, except that concatenation occurs across rows rather than across expressions in a single row.",
+        "example": "SELECT xmlagg(xmlelement(name foo, xmlattributes('xyz' as bar))) AS result;",
+        "returns": "xml",
+        "parameters": {
+          "xml": "xml"
+        },
+        "antlr": [
+          "XMLAGG LEFT_PAREN NAME name=identifier",
+          "(COMMA XMLATTRIBUTES LEFT_PAREN vex (AS attname=identifier)? (COMMA vex (AS attname=identifier)?)* RIGHT_PAREN)?",
+          "(COMMA vex)* RIGHT_PAREN"
+        ]
+      }
+    ],
+    "xmlexists": [
+      {
+        "description": "Evaluates an XPath 1.0 expression (the first argument), with the passed XML value as its context item.",
+        "example": "SELECT xmlexists('//foo' PASSING '<foo>bar</foo>') AS result;",
+        "signature": "xmlexists ( xpath text PASSING BY VALUE xml ) → boolean",
+        "snippet": ["xmlexists('${1:xpath}' PASSING BY VALUE ${2:xml})"],
+        "returns": "boolean",
+        "parameters": {
+          "xpath": "text",
+          "xml": "xml"
+        },
+        "antlr": ["XMLEXISTS LEFT_PAREN vex PASSING (BY REF)? vex (BY REF)? RIGHT_PAREN"]
+      }
+    ],
+    "xml_is_well_formed": [
+      {
+        "description": "Checks whether the argument is a well-formed XML document or fragment.",
+        "example": "SELECT xml_is_well_formed('<foo>bar</foo>') AS result;",
+        "returns": "boolean",
+        "parameters": {
+          "text": "text"
+        },
+        "antlr": ["XML_IS_WELL_FORMED LEFT_PAREN vex RIGHT_PAREN"]
+      }
+    ],
+    "xml_is_well_formed_content": [
+      {
+        "description": "Checks whether the argument is a well-formed XML document or fragment, and that it contains no document type declaration.",
+        "example": "SELECT xml_is_well_formed_content('<foo>bar</foo>') AS result;",
+        "returns": "boolean",
+        "parameters": {
+          "text": "text"
+        },
+        "antlr": ["XML_IS_WELL_FORMED_CONTENT LEFT_PAREN vex RIGHT_PAREN"]
+      }
+    ],
+    "xml_is_well_formed_document": [
+      {
+        "description": "Checks whether the argument is a well-formed XML document.",
+        "example": "SELECT xml_is_well_formed_document('<foo>bar</foo>') AS result;",
+        "returns": "boolean",
+        "parameters": {
+          "text": "text"
+        },
+        "antlr": ["XML_IS_WELL_FORMED_DOCUMENT LEFT_PAREN vex RIGHT_PAREN"]
+      }
+    ],
+    "xpath": [
+      {
+        "description": "Evaluates the XPath 1.0 expression xpath (given as text) against the XML value xml.",
+        "example": "SELECT xpath('/my:a/text()', '<my:a xmlns:my=\"http://example.com\">test</my:a>',ARRAY[ARRAY['my', 'http://example.com']]);",
+        "returns": "xml[]",
+        "parameters": {
+          "xpath": "text",
+          "xml": "xml",
+          "nsarray": "[,text[]]"
+        },
+        "antlr": [
+          "XPATH LEFT_PAREN",
+          "vex COMMA vex (ARRAY LEFT_BRACKET ARRAY LEFT_BRACKET (vex COMMA vex)? RIGHT_BRACKET RIGHT_BRACKET)?",
+          "RIGHT_PAREN"
+        ]
+      }
+    ],
+    "xpath_exists": [
+      {
+        "description": "Evaluates the XPath 1.0 expression xpath (given as text) against the XML value xml, and returns true if the expression selects at least one node, otherwise false.",
+        "example": "SELECT xpath_exists('/my:a/text()', '<my:a xmlns:my=\"http://example.com\">test</my:a>',ARRAY[ARRAY['my', 'http://example.com']]);",
+        "returns": "boolean",
+        "parameters": {
+          "xpath": "text",
+          "xml": "xml",
+          "nsarray": "[,text[]]"
+        },
+        "antlr": [
+          "XPATH_EXISTS LEFT_PAREN",
+          "vex COMMA vex (ARRAY LEFT_BRACKET ARRAY LEFT_BRACKET (vex COMMA vex)? RIGHT_BRACKET RIGHT_BRACKET)?",
+          "RIGHT_PAREN"
+        ]
+      }
+    ],
+    "xmltable": [
+      {
+        "description": "Expands an XML value into a table whose columns match the rowtype defined by the function's parameter list.",
+        "example": "SELECT * FROM xmltable('for $i in 1 to 3 return <row><i>{$i}</i><s>{string($i)}</s></row>' PASSING '<doc/>' COLUMNS i int, s text);",
+        "signature": "xmltable (row_xpath PASSING xml COLUMNS name type PATH col_xpath [, ...]) → setof record",
+        "returns": "setof record",
+        "parameters": {
+          "xpath": "text",
+          "xml": "xml",
+          "columns": "[,column]"
+        },
+        "antlr": [
+          "XMLTABLE LEFT_PAREN",
+          "(XMLNAMESPACES LEFT_PAREN vex AS name=identifier (COMMA vex AS name=identifier)* RIGHT_PAREN COMMA)?",
+          "vex PASSING (BY REF)? vex (BY REF)?",
+          "COLUMNS name=identifier (data_type (PATH vex)? (DEFAULT vex)? (NOT? NULL)? | FOR ORDINALITY) ",
+          "(COMMA name=identifier (data_type (PATH vex)? (DEFAULT vex)? (NOT? NULL)? | FOR ORDINALITY))*",
+          "RIGHT_PAREN"
+        ]
+      }
+    ],
+    "table_to_xml": [
+      {
+        "description": "Converts a table to XML.",
+        "example": "SELECT table_to_xml('my_table', true, false, '') AS result;",
+        "returns": "xml",
+        "parameters": {
+          "table": "regclass",
+          "nulls": "boolean",
+          "tableforest": "boolean",
+          "targetns": "text"
+        },
+        "antlr": [
+          "TABLE_TO_XML LEFT_PAREN identifier COMMA boolean_value COMMA boolean_value COMMA vex RIGHT_PAREN"
+        ]
+      }
+    ]
+  }
+}

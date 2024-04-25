@@ -4,7 +4,8 @@ import {
   addPropertyToEditor,
   getPropertyValue,
   replacePropertyInEditor,
-  getPropertyLineNumber
+  getPropertyLineNumber,
+  stripProperties
 } from '../editor/property';
 import * as path from 'path';
 
@@ -120,5 +121,16 @@ suite('replacePropertyInEditor', () => {
     const newValue = getPropertyValue(property, editor.document);
     assert.strictEqual(newValue, '12345');
     await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+  });
+});
+
+suite('stripProperties', () => {
+  test('It should remove all properties from a document', async () => {
+    const uri = vscode.Uri.file(
+      path.join(__dirname, '..', '..', 'src', 'test', 'samples', 'query-with-properties.gsql')
+    );
+    const document = await vscode.workspace.openTextDocument(uri);
+    const stripped = stripProperties(document);
+    assert.strictEqual(stripped, 'SELECT 1');
   });
 });

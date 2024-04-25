@@ -1,0 +1,21 @@
+{
+  "$schema": "../schema/function.schema.json",
+  "description": "Random Functions see https://www.postgresql.org/docs/14/functions-math.html#FUNCTIONS-MATH-RANDOM-TABLE",
+  "name": "Random Functions",
+  "keywords": {
+    "random": [
+      {
+        "description": "Returns a random value in the range 0.0 <= x < 1.0",
+        "example": "SELECT random();",
+        "returns": "double precision"
+      }
+    ],
+    "setseed": [
+      {
+        "description": "Sets the seed for subsequent random() calls; argument must be between -1.0 and 1.0, inclusive",
+        "example": "SELECT setseed(0.5);",
+        "parameters": { "seed": "double precision" }
+      }
+    ]
+  }
+}

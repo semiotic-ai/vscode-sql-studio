@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/function.schema.json",
+  "description": "String conversion functions see https://www.postgresql.org/docs/14/functions-binarystring.html#FUNCTIONS-BINARYSTRING-CONVERSIONS",
+  "name": "String Conversion Functions",
+  "keywords": {
+    "convert": [
+      {
+        "description": "Converts a binary string representing text in encoding src_encoding to a binary string in encoding dest_encoding",
+        "example": "SELECT convert('ABC'::bytea, 'LATIN1', 'UTF8');",
+        "returns": "bytea",
+        "parameters": { "bytes": "bytea", "src_encoding": "name", "dest_encoding": "name" }
+      }
+    ],
+    "convert_from": [
+      {
+        "description": "Converts a binary string representing text in encoding src_encoding to text in the database encoding",
+        "example": "SELECT convert_from('ABC'::bytea, 'LATIN1');",
+        "returns": "text",
+        "parameters": { "bytes": "bytea", "src_encoding": "name" }
+      }
+    ],
+    "convert_to": [
+      {
+        "description": "Converts a text string (in the database encoding) to a binary string encoded in encoding dest_encoding",
+        "example": "SELECT convert_to('ABC', 'LATIN1');",
+        "returns": "bytea",
+        "parameters": { "string": "text", "dest_encoding": "name" }
+      }
+    ],
+    "encode": [
+      {
+        "description": "Encodes binary data into a textual representation",
+        "example": "SELECT encode('ABC'::bytea, 'base64');",
+        "returns": "text",
+        "parameters": { "bytes": "bytea", "format": "text" }
+      }
+    ],
+    "decode": [
+      {
+        "description": "Decodes binary data from a textual representation",
+        "example": "SELECT decode('QUJD'::text, 'base64');",
+        "returns": "bytea",
+        "parameters": { "string": "text", "format": "text" }
+      }
+    ]
+  }
+}

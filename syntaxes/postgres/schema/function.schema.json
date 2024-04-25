@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://semiotic.ai/sql-studio/lang/functions.schema.json",
+  "title": "Functions",
+  "description": "A group of language function definitions for SQL Studio",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "A description of the function group"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the group"
+    },
+    "keywords": {
+      "title": "Map of function keyword and signatures",
+      "patternProperties": {
+        ".{1,}": {
+          "type": "array",
+          "description": "A list of function signatures.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "A description of the function signature"
+              },
+              "example": {
+                "type": "string",
+                "description": "An example of the function signature in use"
+              },
+              "snippet": {
+                "type": "array",
+                "description": "Code snippets in markdown lang",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1
+              },
+              "returns": {
+                "type": "string",
+                "description": "The type of the return value"
+              },
+              "parameters": {
+                "title": "Map of function argument name and type signatures",
+                "patternProperties": {
+                  ".{1,}": {
+                    "oneOf": [
+                      { "type": "string", "description": "Type of the argument" },
+                      {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "A list of types the argument can be"
+                      }
+                    ]
+                  }
+                }
+              },
+              "signature": {
+                "type": "string",
+                "description": "The function signature"
+              },
+              "antlr": {
+                "type": "array",
+                "description": "The parse rule lines for the antlr function signature",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["description"]
+          }
+        },
+        "description": "A list of function definitions"
+      }
+    }
+  },
+  "required": ["description", "keywords"]
+}

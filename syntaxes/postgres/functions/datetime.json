@@ -1,0 +1,337 @@
+{
+  "$schema": "../schema/function.schema.json",
+  "description": "Date/Time Functions see https://www.postgresql.org/docs/14/functions-datetime.html",
+  "name": "Date/Time Functions",
+  "keywords": {
+    "age": [
+      {
+        "description": "Subtract arguments, producing a “symbolic” result that uses years and months, rather than just days",
+        "example": "SELECT age(timestamp '2001-04-10', timestamp '1957-06-13');",
+        "returns": "interval",
+        "parameters": {
+          "timestamp1": "timestamp",
+          "timestamp2": "timestamp"
+        }
+      },
+      {
+        "description": "Subtract argument from current_date (at midnight)",
+        "example": "SELECT age(date '2001-04-10')",
+        "returns": "interval",
+        "parameters": {
+          "date": "date"
+        }
+      }
+    ],
+    "clock_timestamp": [
+      {
+        "description": "Current date and time (changes during statement execution)",
+        "example": "SELECT clock_timestamp",
+        "returns": "timestamp with time zone"
+      }
+    ],
+    "current_date": [
+      {
+        "description": "Current date",
+        "example": "SELECT current_date",
+        "returns": "date"
+      }
+    ],
+    "current_time": [
+      {
+        "description": "Current time of day",
+        "example": "SELECT current_time",
+        "returns": "time with time zone"
+      },
+      {
+        "description": "Current time of day, with limited precision",
+        "example": "SELECT current_time(2)",
+        "returns": "time with time zone",
+        "parameters": {
+          "precision": "integer"
+        }
+      }
+    ],
+    "current_timestamp": [
+      {
+        "description": "Current date and time (start of current transaction)",
+        "example": "SELECT current_timestamp",
+        "returns": "timestamp with time zone"
+      },
+      {
+        "description": "Current date and time (start of current transaction), with limited precision",
+        "example": "SELECT current_timestamp",
+        "returns": "timestamp with time zone",
+        "parameters": {
+          "precision": "integer"
+        }
+      }
+    ],
+    "date_bin": [
+      {
+        "description": "Bin input into specified interval aligned with specified origin",
+        "example": "SELECT date_bin('15 minutes', timestamp '2001-02-16 20:38:40', timestamp '2001-02-16 20:05:00')",
+        "returns": "timestamp",
+        "parameters": {
+          "bin_width": "interval",
+          "timestamp": "timestamp",
+          "origin": "timestamp"
+        }
+      }
+    ],
+    "date_part": [
+      {
+        "description": "Get timestamp subfield (equivalent to extract)",
+        "example": "SELECT date_part('hour', timestamp '2001-02-16 20:38:40')",
+        "returns": "double precision",
+        "parameters": {
+          "field": "text",
+          "source": "timestamp"
+        }
+      },
+      {
+        "description": "Get interval subfield (equivalent to extract)",
+        "example": "SELECT date_part('hour', timestamp '2001-02-16 20:38:40')",
+        "returns": "double precision",
+        "parameters": {
+          "field": "text",
+          "source": "interval"
+        }
+      }
+    ],
+    "date_trunc": [
+      {
+        "description": "Truncate to specified precision",
+        "example": "SELECT date_trunc('hour', timestamp '2001-02-16 20:38:40')",
+        "returns": "timestamp",
+        "parameters": {
+          "field": "text",
+          "source": "timestamp"
+        }
+      },
+      {
+        "description": "Truncate to specified precision in the specified time zone",
+        "example": "SELECT date_trunc('day', timestamptz '2001-02-16 20:38:40+00', 'Australia/Sydney')",
+        "returns": "timestamp with time zone",
+        "parameters": {
+          "field": "text",
+          "source": "timestamp with time zone",
+          "timezone": "text"
+        }
+      },
+      {
+        "description": "Truncate to specified precision",
+        "example": "SELECT date_trunc('day', timestamptz '2001-02-16 20:38:40+00', 'Australia/Sydney')",
+        "returns": "interval",
+        "parameters": {
+          "field": "text",
+          "source": "interval"
+        }
+      }
+    ],
+    "extract": [
+      {
+        "description": "Get timestamp subfield",
+        "example": "SELECT extract('hour' FROM timestamp '2001-02-16 20:38:40')",
+        "returns": "numeric",
+        "parameters": {
+          "field": "text",
+          "source": "timestamp"
+        }
+      },
+      {
+        "description": "Get interval subfield",
+        "example": "SELECT extract('hour' FROM interval '3 days 2 hours 40 minutes')",
+        "returns": "numeric",
+        "parameters": {
+          "field": "text",
+          "source": "interval"
+        }
+      }
+    ],
+    "isfinite": [
+      {
+        "description": "Test for finite date (not +/-infinity)",
+        "example": "SELECT isfinite((date '2001-02-16')",
+        "returns": "boolean",
+        "parameters": {
+          "source": "date"
+        }
+      },
+      {
+        "description": "Test for finite timestamp (not +/-infinity)",
+        "example": "SELECT isfinite((timestamp '2001-02-16 20:38:40')",
+        "returns": "boolean",
+        "parameters": {
+          "source": "timestamp"
+        }
+      },
+      {
+        "description": "Test for finite date (not +/-infinity)",
+        "example": "SELECT isfinite((interval '3 days 04:05:06')",
+        "returns": "boolean",
+        "parameters": {
+          "source": "interval"
+        }
+      }
+    ],
+    "justify_days": [
+      {
+        "description": "Adjust interval so 30-day time periods are represented as months",
+        "example": "SELECT justify_days(interval '30 days')",
+        "returns": "interval",
+        "parameters": {
+          "source": "interval"
+        }
+      }
+    ],
+    "justify_hours": [
+      {
+        "description": "Adjust interval so 24-hour time periods are represented as days",
+        "example": "SELECT justify_hours(interval '24 hours')",
+        "returns": "interval",
+        "parameters": {
+          "source": "interval"
+        }
+      }
+    ],
+    "justify_interval": [
+      {
+        "description": "Adjust interval using justify_days and justify_hours, with additional sign adjustments",
+        "example": "SELECT justify_interval(interval '30 days 24 hours')",
+        "returns": "interval",
+        "parameters": {
+          "source": "interval"
+        }
+      }
+    ],
+    "localtime": [
+      {
+        "description": "Current time of day",
+        "example": "SELECT localtime()",
+        "returns": "time"
+      },
+      {
+        "description": "Current time of day, with limited precision",
+        "example": "SELECT localtime(2)",
+        "returns": "time",
+        "parameters": {
+          "precision": "integer"
+        }
+      }
+    ],
+    "localtimestamp": [
+      {
+        "description": "Current date and time (start of current transaction)",
+        "example": "SELECT localtimestamp()",
+        "returns": "timestamp"
+      },
+      {
+        "description": "Current date and time (start of current transaction), with limited precision",
+        "example": "SELECT localtimestamp(2)",
+        "returns": "timestamp",
+        "parameters": {
+          "precision": "integer"
+        }
+      }
+    ],
+    "make_date": [
+      {
+        "description": "Create date from year, month and day fields (negative years signify BC)",
+        "example": "SELECT make_date(2021, 12, 25)",
+        "returns": "date",
+        "parameters": {
+          "year": "integer",
+          "month": "integer",
+          "day": "integer"
+        }
+      }
+    ],
+    "make_interval": [
+      {
+        "description": "Create interval from years, months, weeks, days, hours, minutes and seconds fields, each of which can default to zero",
+        "example": "SELECT make_interval(days => 10)",
+        "returns": "interval",
+        "parameters": {
+          "years": "integer",
+          "months": "integer",
+          "weeks": "integer",
+          "days": "integer",
+          "hours": "integer",
+          "minutes": "integer",
+          "seconds": "integer"
+        }
+      }
+    ],
+    "make_time": [
+      {
+        "description": "Create time from hour, minute and seconds fields",
+        "example": "SELECT make_time(12, 30, 45)",
+        "returns": "time",
+        "parameters": {
+          "hour": "integer",
+          "minute": "integer",
+          "second": "double precision"
+        }
+      }
+    ],
+    "make_timestamp": [
+      {
+        "description": "Create timestamp from year, month, day, hour, minute and seconds fields (negative years signify BC)",
+        "example": "SELECT make_timestamp(2021, 12, 25, 12, 30, 45)",
+        "returns": "timestamp",
+        "parameters": {
+          "year": "integer",
+          "month": "integer",
+          "day": "integer",
+          "hour": "integer",
+          "minute": "integer",
+          "second": "double precision"
+        }
+      }
+    ],
+    "make_timestamptz": [
+      {
+        "description": "Create timestamp with time zone from year, month, day, hour, minute and seconds fields (negative years signify BC).",
+        "example": "SELECT make_timestamptz(2021, 12, 25, 12, 30, 45, 'Australia/Sydney')",
+        "returns": "timestamp with time zone",
+        "parameters": {
+          "year": "integer",
+          "month": "integer",
+          "day": "integer",
+          "hour": "integer",
+          "minute": "integer",
+          "second": "double precision",
+          "timezone": "text"
+        }
+      }
+    ],
+    "now": [
+      {
+        "description": "Current date and time (start of current transaction)",
+        "example": "SELECT now()",
+        "returns": "timestamp"
+      }
+    ],
+    "statement_timestamp": [
+      {
+        "description": "Current date and time (start of current statement)",
+        "example": "SELECT statement_timestamp()",
+        "returns": "timestamp"
+      }
+    ],
+    "timeofday": [
+      {
+        "description": "Current date and time (like clock_timestamp, but as a text string)",
+        "example": "SELECT timeofday()",
+        "returns": "text"
+      }
+    ],
+    "transaction_timestamp": [
+      {
+        "description": "Current date and time (start of current transaction)",
+        "example": "SELECT transaction_timestamp()",
+        "returns": "timestamp"
+      }
+    ]
+  }
+}

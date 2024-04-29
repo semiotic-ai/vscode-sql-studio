@@ -4,7 +4,7 @@ import {
   FailedPredicateException,
   NoViableAltException,
   InputMismatchException
-} from 'antlr4ts-sql';
+} from 'antlr4ts';
 import { ParsingError } from '../models/ParsingError';
 import { Token } from '../models/Token';
 import { TokenLocation } from '../models/TokenLocation';
@@ -54,8 +54,6 @@ export class TrackingErrorStrategy extends DefaultErrorStrategy {
 
   _getToken(recognizer: Parser): Token {
     const token = new Token(
-      null,
-      null,
       new TokenLocation(
         recognizer.currentToken.line,
         recognizer.currentToken.line,

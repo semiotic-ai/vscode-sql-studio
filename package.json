@@ -254,12 +254,12 @@
       {
         "language": "gsql",
         "scopeName": "source.gsql",
-        "path": "./syntaxes/postgres/tmLanguage.json"
+        "path": "./syntaxes/postgres/gsql.tmLanguage.json"
       }
     ]
   },
   "scripts": {
-    "lang-antlr4ts": "antlr4ts -Xexact-output-dir -o src/providers/autocomplete/postgres -package parsers syntaxes/postgres/grammar/PostgresLexer.g4 syntaxes/postgres/grammar/PostgresParser.g4",
+    "lang-antlr4ts": "antlr4ts -Xexact-output-dir -o src/autocomplete/postgres -package parsers syntaxes/postgres/grammar/PostgresLexer.g4 syntaxes/postgres/grammar/PostgresParser.g4",
     "lang-build": "ts-node syntaxes/postgres/build.ts && npm run lang-antlr4ts",
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
@@ -310,13 +310,10 @@
   },
   "dependencies": {
     "@vscode/codicons": "^0.0.35",
-    "antlr4-c3": "^3.4.1",
     "antlr4ts": "^0.5.0-alpha.4",
     "graphql": "^16.8.1",
     "node-fetch": "^2.7.0",
-    "simple-datatables": "^9.0.0",
-    "sql-autocomplete": "^1.1.1",
-    "sql-surveyor": "^1.4.1"
+    "simple-datatables": "^9.0.0"
   },
   "volta": {
     "node": "20.11.0",

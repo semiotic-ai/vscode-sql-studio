@@ -5,17 +5,17 @@ import { ParserRuleContext } from 'antlr4ts';
 
 export class BaseSqlQueryListener {
   input: string;
-  options: SQLSurveyorOptions;
-  tableNameLocations: { [tableName: string]: TokenLocation[] };
-  tableAlias: { [tableName: string]: string[] };
+  options?: SQLSurveyorOptions;
+  tableNameLocations: Map<string, TokenLocation[]>;
+  tableAlias: Map<string, string[]>;
 
   parsedSql: ParsedSql;
 
-  constructor(input: string, options: SQLSurveyorOptions) {
+  constructor(input: string, options?: SQLSurveyorOptions) {
     this.input = input;
     this.options = options;
-    this.tableNameLocations = {};
-    this.tableAlias = {};
+    this.tableNameLocations = new Map();
+    this.tableAlias = new Map();
 
     this.parsedSql = new ParsedSql();
   }
@@ -106,37 +106,34 @@ export class BaseSqlQueryListener {
   _getFunctionArgumentLocation(
     ctx: ParserRuleContext,
     columnLocation: TokenLocation,
-    functionRules: ParserRuleContext[],
-    argumentRules: ParserRuleContext[]
-  ): TokenLocation {
-    while (ctx !== undefined && ctx.childCount > 0) {
-      let currentChild = ctx.children[0];
+    functionRules: Function[],
+    argumentRules: Function[]
+  ): TokenLocation | undefined {
+    while (ctx && ctx.childCount > 0) {
+      const currentChild = ctx.getChild(0) as ParserRuleContext;
       if (
-        currentChild._start.start === columnLocation.startIndex &&
-        currentChild._stop.stop === columnLocation.stopIndex
+        currentChild._start.startIndex === columnLocation.startIndex &&
+        currentChild._stop?.stopIndex === columnLocation.stopIndex
       ) {
         for (const functionRule of functionRules) {
           if (currentChild instanceof functionRule && currentChild.childCount > 0) {
             for (const argumentRule of argumentRules) {
-              for (const child of currentChild.children) {
-                if (child instanceof argumentRule) {
-                  return new TokenLocation(
-                    (child._start as any)._line,
-                    (child._stop as any)._line,
-                    (child._start as any).start,
-                    (child._stop as any).stop
-                  );
+              if (currentChild.children) {
+                for (const child of currentChild.children) {
+                  if (child instanceof argumentRule) {
+                    return this._getClauseLocation(child as ParserRuleContext);
+                  }
                 }
               }
             }
           }
         }
       } else {
-        return null;
+        return undefined;
       }
       ctx = currentChild;
     }
-    return null;
+    return undefined;
   }
 
   _handleError(error: Error) {

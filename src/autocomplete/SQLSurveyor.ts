@@ -1,52 +1,33 @@
 import { ParsedSql } from './models/ParsedSql';
-import { TSqlQueryListener } from './parsing/TSQLQueryListener';
 import { TokenLocation } from './models/TokenLocation';
 import { TrackingErrorStrategy } from './parsing/TrackingErrorStrategy';
-import { PlSqlQueryListener } from './parsing/PlSqlQueryListener';
-import { MySQLQueryListener } from './parsing/MySQLQueryListener';
+import { PostgresQueryListener } from './postgres/PostgresQueryListener';
 import { BaseSqlQueryListener } from './parsing/BaseSqlQueryListener';
-import { PLpgSQLQueryListener } from './parsing/PLpgSQLQueryListener';
-import {
-  antlr4tsSQL,
-  SQLDialect,
-  ParseTreeWalker,
-  PredictionMode,
-  CommonTokenStream,
-  Parser,
-  Token
-} from 'antlr4ts-sql';
+import { Token } from './models/Token';
+import { antlr4tsSQL } from './antlr4tsSQL';
+
+import { Token as CommonToken, CommonTokenStream, Parser } from 'antlr4ts';
+
+import { PredictionMode } from 'antlr4ts/atn';
+import { ParseTreeWalker } from 'antlr4ts/tree';
+
 import { TokenTypeIdentifier } from './lexing/TokenTypeIdentifier';
 import { SQLSurveyorOptions } from './SQLSurveyorOptions';
+import { ParsedQuery } from './models/ParsedQuery';
 
 export class SQLSurveyor {
-  _dialect: SQLDialect;
   _antlr4tssql: antlr4tsSQL;
-  _options: SQLSurveyorOptions;
+  _options?: SQLSurveyorOptions;
 
-  constructor(dialect: SQLDialect, options?: SQLSurveyorOptions) {
-    this._dialect = dialect;
-    if (this._dialect === null || this._dialect === undefined) {
-      this._dialect = SQLDialect.TSQL;
-    }
-    this._antlr4tssql = new antlr4tsSQL(this._dialect);
-    this._options = null;
-    if (options !== null && options !== undefined) {
+  constructor(options?: SQLSurveyorOptions) {
+    this._antlr4tssql = new antlr4tsSQL();
+    if (options) {
       this._options = options;
     }
   }
 
-  setDialect(dialect: SQLDialect): void {
-    this._dialect = dialect;
-    this._antlr4tssql = new antlr4tsSQL(this._dialect);
-  }
-
   survey(sqlScript: string): ParsedSql {
     let removedTrailingPeriod: boolean = false;
-    if (sqlScript.endsWith('.') && this._dialect === SQLDialect.MYSQL) {
-      // The MySQL Parser struggles with trailing '.' on incomplete SQL statements
-      sqlScript = sqlScript.substring(0, sqlScript.length - 1);
-      removedTrailingPeriod = true;
-    }
     const tokens = this._getTokens(sqlScript);
     const parser = this._getParser(tokens);
     const parsedTree = this._antlr4tssql.getParseTree(parser);
@@ -67,19 +48,21 @@ export class SQLSurveyor {
     }
 
     // Load the tokens
-    const tokenTypeIdentifier = new TokenTypeIdentifier(this._dialect, parser);
-    for (const commonToken of tokens.getTokens() as any[]) {
-      if (commonToken.channel !== Token.HIDDEN_CHANNEL) {
+    const tokenTypeIdentifier = new TokenTypeIdentifier(parser);
+    for (const commonToken of tokens.getTokens()) {
+      if (commonToken.channel !== CommonToken.HIDDEN_CHANNEL) {
         const tokenLocation: TokenLocation = new TokenLocation(
-          commonToken._line,
-          commonToken._line,
-          commonToken.start,
-          commonToken.stop
+          commonToken.line,
+          commonToken.line,
+          commonToken.startIndex,
+          commonToken.stopIndex
         );
-        let parsedQuery = listener.parsedSql.getQueryAtLocation(commonToken.start);
-        if (parsedQuery !== null) {
+        let parsedQuery: ParsedQuery | undefined = listener.parsedSql.getQueryAtLocation(
+          commonToken.startIndex
+        );
+        if (parsedQuery) {
           const token = tokenLocation.getToken(sqlScript);
-          while (parsedQuery !== null) {
+          while (parsedQuery) {
             if (token.length > 0) {
               parsedQuery._addToken(
                 tokenLocation,
@@ -87,9 +70,11 @@ export class SQLSurveyor {
                 token
               );
             }
-            let subParsedQuery = parsedQuery._getCommonTableExpressionAtLocation(commonToken.start);
-            if (subParsedQuery === null) {
-              subParsedQuery = parsedQuery._getSubqueryAtLocation(commonToken.start);
+            let subParsedQuery = parsedQuery._getCommonTableExpressionAtLocation(
+              commonToken.startIndex
+            );
+            if (!subParsedQuery) {
+              subParsedQuery = parsedQuery._getSubqueryAtLocation(commonToken.startIndex);
             }
             parsedQuery = subParsedQuery;
           }
@@ -147,15 +132,6 @@ export class SQLSurveyor {
   }
 
   _getListener(sqlScript: string): BaseSqlQueryListener {
-    if (this._dialect === SQLDialect.TSQL) {
-      return new TSqlQueryListener(sqlScript, this._options);
-    } else if (this._dialect === SQLDialect.PLSQL) {
-      return new PlSqlQueryListener(sqlScript, this._options);
-    } else if (this._dialect === SQLDialect.PLpgSQL) {
-      return new PLpgSQLQueryListener(sqlScript, this._options);
-    } else if (this._dialect === SQLDialect.MYSQL) {
-      return new MySQLQueryListener(sqlScript, this._options);
-    }
-    return null;
+    return new PostgresQueryListener(sqlScript, this._options);
   }
 }

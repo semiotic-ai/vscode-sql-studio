@@ -169,18 +169,14 @@ export class ParsedQuery {
     }
 
     const currentStartIndex = tokenStartIndexes[currentIndex];
-    const currentToken = this.tokens.get(currentStartIndex)!;
+    const currentToken = this.tokens.get(currentStartIndex);
 
     if (
-      currentIndex === tokenStartIndexes.length - 1 &&
-      currentStartIndex + currentToken.value.length <= stringIndex
+      currentToken &&
+      (currentToken.location.stopIndex <= stringIndex || // We're past the current token, but before the next token
+        (currentIndex === tokenStartIndexes.length - 1 &&
+          currentStartIndex + (currentToken.value?.length || 0) <= stringIndex)) // Index is past the tokens in this query, previous token is the last & this token
     ) {
-      // Index is past the tokens in this query, previous token is the last & this token
-      return currentToken;
-    }
-
-    if (currentToken.location.stopIndex <= stringIndex) {
-      // We're past the current token, but before the next token
       return currentToken;
     }
 
@@ -231,11 +227,11 @@ export class ParsedQuery {
    * the specified index
    * @param stringIndex
    */
-  getSmallestQueryAtLocation(stringIndex: number): ParsedQuery | undefined {
-    let smallestQuery: ParsedQuery | undefined = this;
+  getSmallestQueryAtLocation(stringIndex: number): ParsedQuery {
+    let smallestQuery: ParsedQuery = this;
     let smallerQuery: ParsedQuery | undefined = this;
     while (smallerQuery) {
-      smallerQuery = smallestQuery?._getCommonTableExpressionAtLocation(stringIndex);
+      smallerQuery = smallestQuery._getCommonTableExpressionAtLocation(stringIndex);
       if (!smallerQuery) {
         smallerQuery = smallestQuery._getSubqueryAtLocation(stringIndex);
       }
@@ -273,31 +269,35 @@ export class ParsedQuery {
     this.commonTableExpressions.set(parsedQuery.queryLocation.startIndex, parsedQuery);
   }
 
-  _addOutputColumn(columnName: string, columnAlias: string, tableNameOrAlias: string): void {
-    let tableName = this.getTableFromAlias(tableNameOrAlias);
+  _addOutputColumn(columnName: string, tableNameOrAlias?: string, columnAlias?: string): void {
+    let tableName = tableNameOrAlias ? this.getTableFromAlias(tableNameOrAlias) : undefined;
     let tableAlias: string | undefined;
     if (tableName) {
       tableAlias = tableNameOrAlias;
     } else {
       tableName = tableNameOrAlias;
     }
-    const outputColumn = new OutputColumn(columnName, columnAlias, tableName, tableAlias);
+    const outputColumn = new OutputColumn(columnName, tableName, columnAlias, tableAlias);
     this.outputColumns.push(outputColumn);
   }
 
   _addReferencedColumn(
     columnName: string,
-    tableNameOrAlias: string,
-    location: TokenLocation
+    location: TokenLocation,
+    tableNameOrAlias?: string
   ): void {
-    let tableName = this.getTableFromAlias(tableNameOrAlias);
+    let tableName: string | undefined;
     let tableAlias: string | undefined;
 
-    if (tableName) {
-      tableAlias = tableNameOrAlias;
-    } else {
-      tableName = tableNameOrAlias;
+    if (tableNameOrAlias) {
+      tableName = this.getTableFromAlias(tableNameOrAlias);
+      if (tableName) {
+        tableAlias = tableNameOrAlias;
+      } else {
+        tableName = tableNameOrAlias;
+      }
     }
+
     const existingReferencedColumn = this.getReferencedColumn(columnName, tableName, tableAlias);
     if (existingReferencedColumn) {
       existingReferencedColumn.locations.add(location);
@@ -337,8 +337,8 @@ export class ParsedQuery {
     this.referencedTables.get(tableName)!.locations.add(location);
   }
 
-  _addToken(location: TokenLocation, type: TokenType, token: string): void {
-    this.tokens.set(location.startIndex, new Token(token, type, location));
+  _addToken(location: TokenLocation, type?: TokenType, token?: string): void {
+    this.tokens.set(location.startIndex, new Token(location, token, type));
   }
 
   /**
@@ -363,10 +363,12 @@ export class ParsedQuery {
     }
 
     for (const outputColumn of this.outputColumns) {
-      const realTableName = this.getTableFromAlias(outputColumn.tableName);
-      if (realTableName) {
-        outputColumn.tableAlias = outputColumn.tableName;
-        outputColumn.tableName = realTableName;
+      if (outputColumn.tableName) {
+        const realTableName = this.getTableFromAlias(outputColumn.tableName);
+        if (realTableName) {
+          outputColumn.tableAlias = outputColumn.tableName;
+          outputColumn.tableName = realTableName;
+        }
       }
     }
   }
@@ -379,7 +381,7 @@ export class ParsedQuery {
     for (const cte of this.commonTableExpressions.values()) {
       let cteName: string | undefined;
       for (const token of cte.tokens.values()) {
-        if (token.value.toUpperCase() !== 'WITH') {
+        if (token.value && token.value.toUpperCase() !== 'WITH') {
           cteName = token.value;
           break;
         }

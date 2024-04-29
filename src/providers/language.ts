@@ -12,14 +12,12 @@ import {
   SignatureHelpProvider,
   TextDocument
 } from 'vscode';
-import { Column, ColumnType, Layout, Relation, Table, TypeKind } from '../graphtables/layout';
 
-import { SQLSurveyor, SQLDialect, ParsedSql, ParsedQuery } from 'sql-surveyor';
-import { AutocompleteOptionType, SQLAutocomplete } from 'sql-autocomplete';
+import { Layout } from '../graphtables/layout';
 
-import * as functions from '../../dist/functions.json';
-import { OutputColumn } from 'sql-surveyor/dist/src/models/OutputColumn';
-import { stripProperties } from '../editor/property';
+import { SQLSurveyor, ParsedQuery, AutocompleteOptionType, SQLAutocomplete } from '../autocomplete';
+
+import { OutputColumn } from '../autocomplete/models/OutputColumn';
 
 function getAllOutputColumns(query: ParsedQuery): OutputColumn[] {
   return [...query.outputColumns, ...Object.values(query.subqueries).flatMap(getAllOutputColumns)];
@@ -69,7 +67,7 @@ export class GraphSQLProvider
     }
 
     const offset = document.offsetAt(position);
-    const surveyor = new SQLSurveyor(SQLDialect.PLpgSQL);
+    const surveyor = new SQLSurveyor();
     const parsedStatement = surveyor.survey(statement);
 
     const tableNames: string[] = this.layout ? [...this.layout.tables.keys()] : [];
@@ -79,8 +77,8 @@ export class GraphSQLProvider
         )
       : [];
 
-    Object.values(parsedStatement.parsedQueries).forEach((query) => {
-      Object.values(query.getAllReferencedTables()).forEach((table) => {
+    [...parsedStatement.parsedQueries.values()].forEach((query) => {
+      [...query.getAllReferencedTables().values()].forEach((table) => {
         const originalTable = this.layout?.tables.get(table.tableName);
         table.aliases.forEach((alias) => {
           if (originalTable) {
@@ -101,7 +99,7 @@ export class GraphSQLProvider
 
     const result = new Set<CompletionItem>();
 
-    const autocomplete = new SQLAutocomplete(SQLDialect.PLpgSQL, tableNames, columnNames);
+    const autocomplete = new SQLAutocomplete(tableNames, columnNames);
 
     const suggestions = autocomplete.autocomplete(statement, offset);
     suggestions.forEach((opt) => {

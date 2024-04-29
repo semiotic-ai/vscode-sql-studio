@@ -2,13 +2,13 @@ import { TokenLocation } from './TokenLocation';
 
 export class ReferencedColumn {
   columnName: string;
-  tableName: string;
+  tableName?: string;
   tableAlias?: string;
   locations: Set<TokenLocation>;
 
   constructor(
     columnName: string,
-    tableName: string,
+    tableName?: string,
     tableAlias?: string,
     location?: TokenLocation
   ) {

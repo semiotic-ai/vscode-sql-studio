@@ -3,12 +3,7 @@ import { IQueryResult, executeSQL, ISubgraphInfo } from '../service';
 import { write as writeCSV } from '../filetypes/csv';
 import { SECRETS } from '../constants';
 
-const SQL_STUDIO_ENDPOINT = 'https://sql-studio-webapp.vercel.app/api';
-
-interface IGateWayStatus {
-  endpoint: string;
-  subgraphs: Map<string, string>; // SQL enabled subgraph id to subgraph name
-}
+const SQL_GATEWAY_URL = 'https://sql.gateway.thegraph.semiotic.ai';
 
 class ResultsProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'tabularResult';
@@ -16,7 +11,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
 
   private abortController?: AbortController;
-  private gatewayStatus?: IGateWayStatus;
+  private sqlEnabledDeployments?: Map<string, number>; // Sql enabled subgraph deployments id and number of indexers
   private _extensionUri: vscode.Uri;
   private _secrets: vscode.SecretStorage;
 
@@ -74,24 +69,21 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 
       const authorization = `Bearer ${apikey}`;
 
-      if (!this.gatewayStatus) {
+      if (!this.sqlEnabledDeployments) {
         try {
-          const response = await fetch(`${SQL_STUDIO_ENDPOINT}/graph-node-endpoint`);
+          const response = await fetch(`${SQL_GATEWAY_URL}/discovery?service_type=Sql`);
           const json_response: any = await response.json();
-          this.gatewayStatus = {
-            endpoint: json_response.endpoint,
-            subgraphs: new Map(Object.entries(json_response.subgraphs))
-          };
+          this.sqlEnabledDeployments = new Map(Object.entries(json_response));
         } catch (error) {
-          throw new Error('Failed to fetch gateway status from sql studio.');
+          throw new Error('Failed to fetch sql enabled subgraphs from gateway.');
         }
       }
 
-      if (!this.gatewayStatus.subgraphs.has(info.ipfsHash)) {
+      if (!this.sqlEnabledDeployments.has(info.ipfsHash)) {
         throw new Error('Subgraph is not SQL enabled.');
       }
 
-      const endpoint = `${this.gatewayStatus.endpoint}/subgraphs/id/${info.ipfsHash}`;
+      const endpoint = `${SQL_GATEWAY_URL}/api/deployments/id/${info.deploymentId}`;
 
       this.abortController = new AbortController();
 

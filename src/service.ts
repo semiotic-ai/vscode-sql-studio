@@ -2,7 +2,7 @@ import { parse } from './graphtables';
 import type { Layout } from './graphtables/layout';
 
 export const DEFAULT_SUBGRAPH_API_ENDPOINT =
-  'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum';
+  'https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum-sepolia';
 
 interface ISubgraphQuery {
   readonly query: string;

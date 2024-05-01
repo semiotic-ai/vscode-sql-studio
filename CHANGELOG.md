@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.13.1...v0.13.2) (2024-05-01)
+
+
+### Bug Fixes
+
+* Use gateway for discovery of sql enabled deployments and SQL execution ([8480a7f](https://github.com/semiotic-ai/vscode-sql-studio/commit/8480a7fed9e100cddc78f39669ca2dc29fa0ae42))
+
 ## [0.13.1](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.13.0...v0.13.1) (2024-04-23)
 
 

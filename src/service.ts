@@ -1,3 +1,4 @@
+import { SQL_GATEWAY_URL } from './constants';
 import { parse } from './graphtables';
 import type { Layout } from './graphtables/layout';
 
@@ -133,10 +134,34 @@ export interface ISubgraphInfo {
   readonly deploymentSchemaId: string;
   readonly activeIndexerAllocations: number;
   readonly ipfsHash: string;
+  readonly sqlIndexers?: number;
 }
 
 export function CheapCopy<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
+}
+
+async function fetchSqlEnabledDeployments(): Promise<Map<string, number>> {
+  try {
+    const response = await fetch(`${SQL_GATEWAY_URL}/discovery?service_type=Sql`);
+    const json_response: any = await response.json();
+    return new Map(Object.entries(json_response));
+  } catch (error) {
+    throw new Error('Failed to fetch sql enabled subgraphs from gateway.');
+  }
+}
+
+export async function getSqlEnabledSubgraphs(): Promise<ISubgraphInfo[]> {
+  const sqlEnabledDeployments = await fetchSqlEnabledDeployments();
+
+  const subgraphs = await searchSubgraphByIPFS(Array.from(sqlEnabledDeployments.keys()));
+
+  return subgraphs.map((subgraph) => {
+    return {
+      ...subgraph,
+      sqlIndexers: sqlEnabledDeployments.get(subgraph.ipfsHash)
+    } as ISubgraphInfo;
+  });
 }
 
 const PAGINATED_SUBGRAPH_TEMPLATE: ISubgraphQuery = {
@@ -440,6 +465,112 @@ const SQL_QUERY_TEMPLATE: ISubgraphQuery = {
   operationName: 'SQL',
   extensions: {}
 };
+
+const SEARCH_BYIPFS_TEMPLATE: ISubgraphQuery = {
+  query: `query SearchbyIPFS($ipfs_list: [String!]) {
+    metas: subgraphDeployments(where: {ipfsHash_in: $ipfs_list}) {
+      id
+      ipfsHash
+      indexerAllocations(where: {activeForIndexer_not: null}) {
+        activeForIndexer {
+          id
+        }
+      }
+      manifest {
+        network
+        schema {
+          id
+        }
+      }
+      versions {
+        id
+        version
+        subgraph {
+          id
+          metadata {
+            id
+            displayName
+            image
+            description
+          }
+        }
+      }
+    }
+  }`,
+  variables: { ipfs_list: [] },
+  operationName: 'SearchbyIPFS',
+  extensions: {}
+};
+
+interface IIPFSSearchResult {
+  readonly data: {
+    readonly metas: {
+      readonly id: string;
+      readonly ipfsHash: string;
+      readonly indexerAllocations: {
+        readonly activeForIndexer: {
+          readonly id: string;
+        };
+      }[];
+      readonly manifest: {
+        readonly schema: {
+          readonly id: string;
+        };
+        readonly network: string;
+      };
+      readonly versions: {
+        readonly id: string;
+        readonly version: number;
+        readonly subgraph: {
+          readonly id: string;
+          readonly metadata: {
+            readonly id: string;
+            readonly displayName: string;
+            readonly image: string;
+            readonly description: string;
+          };
+        };
+      }[];
+    }[];
+  };
+}
+
+/**
+ * Search for subgraphs by name or description from a graph network subgraph API endpoint
+ * @param ipfs_list Array of deployment ipfs hashes of the subgraphs
+ * @param endpoint url of the graph network subgraph API endpoint (ie: https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-arbitrum)
+ * @param abortSignal signal to cancel the request
+ * @returns a list of `ISubgraphInfo` matching the search criteria
+ */
+export async function searchSubgraphByIPFS(
+  ipfs_list: string[],
+  endpoint?: string,
+  abortSignal?: AbortSignal
+): Promise<ISubgraphInfo[]> {
+  const body = CheapCopy(SEARCH_BYIPFS_TEMPLATE);
+
+  body.variables.ipfs_list = ipfs_list;
+
+  const json_response: IIPFSSearchResult = await callGraphQL(body, endpoint, abortSignal);
+
+  const results = json_response.data.metas.map((meta) => {
+    const result: ISubgraphInfo = {
+      id: meta.versions[0].subgraph.id,
+      displayName: meta.versions[0].subgraph.metadata.displayName,
+      description: meta.versions[0].subgraph.metadata.description,
+      image: meta.versions[0].subgraph.metadata.image,
+      currentVersion: meta.versions[0].id,
+      deploymentId: meta.id,
+      network: meta.manifest.network,
+      deploymentSchemaId: meta.manifest.schema.id,
+      ipfsHash: meta.ipfsHash,
+      activeIndexerAllocations: meta.indexerAllocations.length
+    };
+    return result;
+  });
+
+  return results;
+}
 
 export interface IQueryResult {
   readonly data: {

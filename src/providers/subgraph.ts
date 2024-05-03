@@ -4,15 +4,26 @@ import {
   ISubgraphInfo,
   searchSubgraph,
   getSubgraphs,
-  searchSubgraphById
+  searchSubgraphById,
+  getSqlEnabledSubgraphs
 } from '../service';
 import { ColumnType, Layout, TypeKind, Column, Table } from '../graphtables/layout';
 import path from 'path';
 
 const PAGE_SIZE = 20;
-const DEFAULT_SUBGRAPH_ICON = new vscode.ThemeIcon(`database`);
+const GSQL_ENABLED_COLOR = new vscode.ThemeColor('gsql.enabled');
+const SQL_ENABLED_SUBGRAPH_ICON = vscode.Uri.file(
+  path.join(__dirname, '..', 'resources', 'sql_subgraph.svg')
+);
+const DEFAULT_SUBGRAPH_ICON = vscode.Uri.file(
+  path.join(__dirname, '..', 'resources', 'nosql_subgraph.svg')
+);
+
+const SQL_ENABLED_SELECTED_SUBGRAPH_ICON = vscode.Uri.file(
+  path.join(__dirname, '..', 'resources', 'sql_subgraph_sel.svg')
+);
 const SELECTED_SUBGRAPH_ICON = vscode.Uri.file(
-  path.join(__dirname, '..', 'resources', 'green-dot.svg')
+  path.join(__dirname, '..', 'resources', 'nosql_subgraph_sel.svg')
 );
 
 /**
@@ -30,6 +41,7 @@ export class SubgraphView implements vscode.TreeDataProvider<ISubgraphInfo>, vsc
 
   private selected?: ISubgraphInfo;
 
+  private _sqlEnabledDeploymentsCount?: number; // Sql enabled subgraph deployments id and number of indexers
   private _selectionChangedPromiseResolve: ((value: unknown) => void) | null;
   private _onDidChangeSelectionPromise: Promise<unknown>;
 
@@ -139,12 +151,21 @@ export class SubgraphView implements vscode.TreeDataProvider<ISubgraphInfo>, vsc
     this._itemEmitter.dispose();
   }
 
+  getTreeItemIcon(element: ISubgraphInfo): vscode.ThemeIcon | vscode.Uri {
+    if (element.sqlIndexers && element.sqlIndexers > 0) {
+      return this.selected?.id === element.id
+        ? SQL_ENABLED_SELECTED_SUBGRAPH_ICON
+        : SQL_ENABLED_SUBGRAPH_ICON;
+    } else {
+      return this.selected?.id === element.id ? SELECTED_SUBGRAPH_ICON : DEFAULT_SUBGRAPH_ICON;
+    }
+  }
+
   getTreeItem(element: ISubgraphInfo): vscode.TreeItem {
     const item = new vscode.TreeItem(element.displayName);
     item.tooltip = `${element.displayName}-${element.currentVersion}`;
     item.description = element.currentVersion;
-    item.iconPath =
-      this.selected?.id === element.id ? SELECTED_SUBGRAPH_ICON : DEFAULT_SUBGRAPH_ICON;
+    item.iconPath = this.getTreeItemIcon(element);
     return item;
   }
 
@@ -165,7 +186,7 @@ export class SubgraphView implements vscode.TreeDataProvider<ISubgraphInfo>, vsc
   }
 
   /**
-   * Fetches subgraphs from the data source and updates the cache. If `addRows` is true or the cache is empty,
+   * Fetches subgraphs from the data source and updates the cache.Initially sql enabled items recieved from the gateway are stored in a map.
    * new subgraphs are fetched and added to the cache. This method also updates the selection state of each subgraph
    * based on the current selection.
    *
@@ -185,8 +206,15 @@ export class SubgraphView implements vscode.TreeDataProvider<ISubgraphInfo>, vsc
    * per request, and relies on the `getSubgraphs` function to actually retrieve subgraph data.
    */
   async fetchSubgraphs() {
-    const offset = this._cache.size;
-    const data = await getSubgraphs(PAGE_SIZE, offset); // Simulated fetch function
+    let data: ISubgraphInfo[] = [];
+
+    if (!this._sqlEnabledDeploymentsCount) {
+      data = await getSqlEnabledSubgraphs();
+      this._sqlEnabledDeploymentsCount = data.length;
+    } else {
+      const offset = this._cache.size - this._sqlEnabledDeploymentsCount;
+      data = await getSubgraphs(PAGE_SIZE, offset);
+    }
 
     if (data.length > 0) {
       data.forEach((subgraph) => {

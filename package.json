@@ -259,6 +259,18 @@
         "scopeName": "source.gsql",
         "path": "./syntaxes/gsql.tmLanguage.json"
       }
+    ],
+    "colors": [
+      {
+        "id": "gsql.enabled",
+        "description": "The color used to highlight SQL enabled subgraphs",
+        "defaults": {
+          "dark": "#00FF00",
+          "light": "#00FF00",
+          "highContrast": "#00FF00",
+          "highContrastLight": "#00FF00"
+        }
+      }
     ]
   },
   "scripts": {

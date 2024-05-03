@@ -1,9 +1,7 @@
 import * as vscode from 'vscode';
 import { IQueryResult, executeSQL, ISubgraphInfo } from '../service';
 import { write as writeCSV } from '../filetypes/csv';
-import { SECRETS } from '../constants';
-
-const SQL_GATEWAY_URL = 'https://sql.gateway.thegraph.semiotic.ai';
+import { SECRETS, SQL_GATEWAY_URL } from '../constants';
 
 class ResultsProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'tabularResult';
@@ -11,7 +9,6 @@ class ResultsProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
 
   private abortController?: AbortController;
-  private sqlEnabledDeployments?: Map<string, number>; // Sql enabled subgraph deployments id and number of indexers
   private _extensionUri: vscode.Uri;
   private _secrets: vscode.SecretStorage;
 
@@ -69,17 +66,7 @@ class ResultsProvider implements vscode.WebviewViewProvider {
 
       const authorization = `Bearer ${apikey}`;
 
-      if (!this.sqlEnabledDeployments) {
-        try {
-          const response = await fetch(`${SQL_GATEWAY_URL}/discovery?service_type=Sql`);
-          const json_response: any = await response.json();
-          this.sqlEnabledDeployments = new Map(Object.entries(json_response));
-        } catch (error) {
-          throw new Error('Failed to fetch sql enabled subgraphs from gateway.');
-        }
-      }
-
-      if (!this.sqlEnabledDeployments.has(info.ipfsHash)) {
+      if (!info.sqlIndexers || info.sqlIndexers === 0) {
         throw new Error('Subgraph is not SQL enabled.');
       }
 

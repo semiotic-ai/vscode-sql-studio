@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.3](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.13.2...v0.13.3) (2024-05-03)
+
+
+### Bug Fixes
+
+* Subgraphs  initially shows  sql enabled subgraphs (from gateway) ([1100b3e](https://github.com/semiotic-ai/vscode-sql-studio/commit/1100b3e41a8ad21662fdf153eda01460cfa490bb))
+
 ## [0.13.2](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.13.1...v0.13.2) (2024-05-01)
 
 

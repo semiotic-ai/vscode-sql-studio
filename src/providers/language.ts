@@ -15,21 +15,15 @@ import {
 
 import { Layout } from '../graphtables/layout';
 
-import { SQLSurveyor, ParsedQuery, AutocompleteOptionType, SQLAutocomplete } from '../autocomplete';
+import { Autocomplete, Suggestion, SuggestionType } from '../autocomplete';
 
-import { OutputColumn } from '../autocomplete/models/OutputColumn';
-
-function getAllOutputColumns(query: ParsedQuery): OutputColumn[] {
-  return [...query.outputColumns, ...[...query.subqueries.values()].flatMap(getAllOutputColumns)];
-}
-
-function optionTypeSortOrder(type: AutocompleteOptionType): number {
+function optionTypeSortOrder(type: SuggestionType): number {
   switch (type) {
-    case AutocompleteOptionType.COLUMN:
+    case SuggestionType.COLUMN:
       return 0;
-    case AutocompleteOptionType.TABLE:
+    case SuggestionType.TABLE:
       return 1;
-    case AutocompleteOptionType.KEYWORD:
+    case SuggestionType.KEYWORD:
       return 2;
     default:
       return 3;
@@ -39,7 +33,7 @@ function optionTypeSortOrder(type: AutocompleteOptionType): number {
 export class GraphSQLProvider
   implements SignatureHelpProvider, CompletionItemProvider<CompletionItem>
 {
-  layout: Layout | undefined;
+  private autocomplete: Autocomplete = new Autocomplete();
 
   /**
    * Provides completion items for SQL queries within a text document. When the trigger character '.' is encountered,
@@ -67,49 +61,15 @@ export class GraphSQLProvider
     }
 
     const offset = document.offsetAt(position);
-    const surveyor = new SQLSurveyor();
-    const parsedStatement = surveyor.survey(statement);
 
-    // const osurveyor = new OriginalSurveyor(SQLDialect.PLpgSQL);
-    // const oparsedStatement = osurveyor.survey(statement);
-
-    const tableNames: string[] = this.layout ? [...this.layout.tables.keys()] : [];
-    const columnNames: string[] = this.layout
-      ? [...this.layout.tables.entries()].flatMap(([table_name, table]) =>
-          [...table.columns.keys()].map((column_name) => `${table_name}.${column_name}`)
-        )
-      : [];
-
-    [...parsedStatement.parsedQueries.values()].forEach((query) => {
-      [...query.getAllReferencedTables().values()].forEach((table) => {
-        const originalTable = this.layout?.tables.get(table.tableName);
-        table.aliases.forEach((alias) => {
-          if (originalTable) {
-            tableNames.push(alias);
-            [...originalTable.columns.keys()].forEach((column_name) => {
-              columnNames.push(`${alias}.${column_name}`);
-            });
-          }
-        });
-      });
-
-      getAllOutputColumns(query).forEach((column) => {
-        if (column.columnAlias) {
-          columnNames.push(column.columnAlias);
-        }
-      });
-    });
+    const suggestions = this.autocomplete.suggest(statement, offset);
 
     const result = new Set<CompletionItem>();
-
-    const autocomplete = new SQLAutocomplete(tableNames, columnNames);
-
-    const suggestions = autocomplete.autocomplete(statement, offset);
 
     suggestions.forEach((opt) => {
       if (opt.value) {
         const completion = new CompletionItem(opt.value);
-        switch (opt.optionType) {
+        switch (opt.type) {
           case 'KEYWORD':
             completion.kind = CompletionItemKind.Keyword;
             break;
@@ -122,7 +82,7 @@ export class GraphSQLProvider
           default:
             completion.kind = CompletionItemKind.Variable;
         }
-        const typeOrder = optionTypeSortOrder(opt.optionType);
+        const typeOrder = optionTypeSortOrder(opt.type);
         completion.sortText = `${typeOrder} ${opt.value}`;
         result.add(completion);
       }
@@ -146,7 +106,7 @@ export class GraphSQLProvider
     return undefined;
   }
 
-  public updateLayout(layout: Layout | undefined) {
-    this.layout = layout;
+  public updateLayout(layout?: Layout) {
+    this.autocomplete.updateLayout(layout);
   }
 }

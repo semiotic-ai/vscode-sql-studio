@@ -57,8 +57,7 @@ export class PostgresQueryListener extends BaseSqlQueryListener implements Postg
   enterSelect_stmt_no_parens(ctx: Select_stmt_no_parensContext) {
     try {
       const subqueryLocation = this._getClauseLocation(ctx);
-      let parsedQuery = this.parsedSql.getQueryAtLocation(subqueryLocation.startIndex);
-      parsedQuery = parsedQuery.getSmallestQueryAtLocation(subqueryLocation.startIndex);
+      const parsedQuery = this.parsedSql.getSmallestQueryAtLocation(subqueryLocation.startIndex);
       parsedQuery._addSubQuery(
         new ParsedQuery(subqueryLocation.getToken(this.input), subqueryLocation)
       );
@@ -70,8 +69,7 @@ export class PostgresQueryListener extends BaseSqlQueryListener implements Postg
   enterWith_query(ctx: With_queryContext) {
     try {
       const cteLocation: TokenLocation = this._getClauseLocation(ctx);
-      let parsedQuery = this.parsedSql.getQueryAtLocation(cteLocation.startIndex);
-      parsedQuery = parsedQuery.getSmallestQueryAtLocation(cteLocation.startIndex);
+      const parsedQuery = this.parsedSql.getSmallestQueryAtLocation(cteLocation.startIndex);
       parsedQuery._addCommonTableExpression(
         new ParsedQuery(cteLocation.getToken(this.input), cteLocation)
       );
@@ -86,8 +84,7 @@ export class PostgresQueryListener extends BaseSqlQueryListener implements Postg
       const referencedTable = this.parseContextToReferencedTable(
         ctx.parent!.getChild(0) as ParserRuleContext
       );
-      let parsedQuery = this.parsedSql.getQueryAtLocation(aliasLocation.startIndex);
-      parsedQuery = parsedQuery.getSmallestQueryAtLocation(aliasLocation.startIndex);
+      const parsedQuery = this.parsedSql.getSmallestQueryAtLocation(aliasLocation.startIndex);
       let aliasName = this.unquote(aliasLocation.getToken(this.input));
       const aliasStartIndex = this._getAliasStartIndex(aliasName);
       if (aliasStartIndex) {
@@ -114,8 +111,7 @@ export class PostgresQueryListener extends BaseSqlQueryListener implements Postg
         parentContext = parentContext._parent;
       }
       const columnLocation = this._getClauseLocation(ctx);
-      let parsedQuery = this.parsedSql.getQueryAtLocation(columnLocation.startIndex);
-      parsedQuery = parsedQuery.getSmallestQueryAtLocation(columnLocation.startIndex);
+      const parsedQuery = this.parsedSql.getSmallestQueryAtLocation(columnLocation.startIndex);
       const columnText = columnLocation.getToken(this.input);
       let columnName = columnText;
       let tableNameOrAlias: string | undefined;
@@ -145,11 +141,21 @@ export class PostgresQueryListener extends BaseSqlQueryListener implements Postg
     }
   }
 
+  exitSchema_qualified_name(ctx: any) {
+    try {
+      const tableLocation = this._getClauseLocation(ctx);
+      const parsedQuery = this.parsedSql.getSmallestQueryAtLocation(tableLocation.startIndex);
+      const referencedTable = this.parseContextToReferencedTable(ctx);
+      parsedQuery._addTableNameLocation(referencedTable.tableName, tableLocation);
+    } catch (err) {
+      this._handleError(err as Error);
+    }
+  }
+
   exitSelect_sublist(ctx: Select_sublistContext) {
     try {
       let columnLocation = this._getClauseLocation(ctx);
-      let parsedQuery = this.parsedSql.getQueryAtLocation(columnLocation.startIndex);
-      parsedQuery = parsedQuery.getSmallestQueryAtLocation(columnLocation.startIndex);
+      const parsedQuery = this.parsedSql.getSmallestQueryAtLocation(columnLocation.startIndex);
       let columnText = columnLocation.getToken(this.input);
       let columnName = columnText;
       let columnAlias: string | undefined;

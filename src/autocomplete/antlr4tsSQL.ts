@@ -15,7 +15,7 @@ export class antlr4tsSQL {
     const stream = CharStreams.fromString(sqlScript);
     const lexer = new PostgresLexer(stream);
 
-    if (errorListeners !== null && errorListeners !== undefined) {
+    if (errorListeners) {
       lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
       for (const listener of errorListeners) {
         lexer.addErrorListener(listener);
@@ -27,7 +27,7 @@ export class antlr4tsSQL {
 
   getParser(tokens: CommonTokenStream, errorListeners?: ANTLRErrorListener<any>[]): Parser {
     const parser = new PostgresParser(tokens);
-    if (errorListeners !== null && errorListeners !== undefined) {
+    if (errorListeners) {
       parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
       for (const listener of errorListeners) {
         parser.addErrorListener(listener);

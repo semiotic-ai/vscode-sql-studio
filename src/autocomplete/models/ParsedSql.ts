@@ -8,37 +8,34 @@ export class ParsedSql {
     this.parsedQueries = new Map();
   }
 
-  getQueryAtLocation(stringIndex: number): ParsedQuery {
-    const queryIndex = this.getQueryIndexAtLocation(stringIndex);
-    return Object.values(this.parsedQueries)[queryIndex];
-  }
+  getQueryAtLocation(stringIndex: number): ParsedQuery | undefined {
+    const queryStartIndex = [...this.parsedQueries.keys()]
+      .sort()
+      .find(
+        (startIndex, index, values) =>
+          startIndex <= stringIndex && (values[index + 1] || stringIndex + 1) > stringIndex
+      );
 
-  getQueryIndexAtLocation(stringIndex: number): number {
-    const queryStartIndices = [...this.parsedQueries.keys()];
-
-    for (let i = 0; i < queryStartIndices.length; i++) {
-      const currentQueryStartIndex: number = Number(queryStartIndices[i]);
-      let nextQueryStartIndex: number | undefined;
-      if (queryStartIndices[i + 1] !== undefined) {
-        nextQueryStartIndex = Number(queryStartIndices[i + 1]);
-      }
-      if (
-        stringIndex >= currentQueryStartIndex &&
-        (!nextQueryStartIndex || stringIndex < nextQueryStartIndex)
-      ) {
-        return i;
-      }
+    if (queryStartIndex !== undefined) {
+      // Use absolute non equality due to 0 accepted as a false value
+      return this.parsedQueries.get(queryStartIndex);
     }
 
-    return 0;
+    return undefined;
+  }
+
+  getSmallestQueryAtLocation(stringIndex: number): ParsedQuery {
+    let parsedQuery = this.getQueryAtLocation(stringIndex);
+    if (parsedQuery) {
+      parsedQuery = parsedQuery.getSmallestQueryAtLocation(stringIndex);
+      return parsedQuery;
+    } else {
+      throw new Error(`No parsed query found for index ${stringIndex}`);
+    }
   }
 
   getQueryLocations(): TokenLocation[] {
-    const locations: TokenLocation[] = [];
-    for (const parsedQuery of this.parsedQueries.values()) {
-      locations.push(parsedQuery.queryLocation);
-    }
-    return locations;
+    return [...this.parsedQueries.values()].map((parsedQuery) => parsedQuery.queryLocation);
   }
 
   _addQuery(parsedQuery: ParsedQuery): void {

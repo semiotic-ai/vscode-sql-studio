@@ -28,17 +28,6 @@ export class SimpleSQLTokenizer implements TokenSource {
     '\u2029'
   ];
 
-  // @ts-ignore TODO fix library TS checks.
-  line: number;
-  // @ts-ignore TODO fix library TS checks.
-  charPositionInLine: number;
-  // @ts-ignore TODO fix library TS checks.
-  inputStream: CharStream | undefined;
-  // @ts-ignore TODO fix library TS checks.
-  sourceName: string;
-  // @ts-ignore TODO fix library TS checks.
-  tokenFactory: TokenFactory; // I have no idea how to satisfy the types correctly so this bodge
-
   constructor(value: string, tokenizeWhitespace: boolean) {
     this.value = value;
     this._currentIndex = 0;
@@ -81,7 +70,7 @@ export class SimpleSQLTokenizer implements TokenSource {
           Token.DEFAULT_CHANNEL,
           this.value.substring(start, stop + 1),
           {},
-          undefined,
+          null,
           start,
           stop
         );
@@ -92,7 +81,7 @@ export class SimpleSQLTokenizer implements TokenSource {
           Token.DEFAULT_CHANNEL,
           currentChar,
           {},
-          undefined,
+          null,
           this._currentIndex - 1,
           this._currentIndex - 1
         );
@@ -101,4 +90,15 @@ export class SimpleSQLTokenizer implements TokenSource {
     }
     return new CommonToken(Token.EOF);
   }
+
+  // @ts-ignore TODO fix library TS checks.
+  line: number;
+  // @ts-ignore TODO fix library TS checks.
+  charPositionInLine: number;
+  // @ts-ignore TODO fix library TS checks.
+  inputStream: CharStream | undefined;
+  // @ts-ignore TODO fix library TS checks.
+  sourceName: string;
+  // @ts-ignore TODO fix library TS checks.
+  tokenFactory: TokenFactory; // I have no idea how to satisfy the types correctly so this bodge
 }

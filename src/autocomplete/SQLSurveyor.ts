@@ -43,7 +43,7 @@ export class SQLSurveyor {
         console.error(e);
       }
     }
-    for (const parsedQuery of Object.values(listener.parsedSql.parsedQueries)) {
+    for (const parsedQuery of listener.parsedSql.parsedQueries.values()) {
       parsedQuery._consolidateTables();
     }
 
@@ -57,9 +57,7 @@ export class SQLSurveyor {
           commonToken.startIndex,
           commonToken.stopIndex
         );
-        let parsedQuery: ParsedQuery | undefined = listener.parsedSql.getQueryAtLocation(
-          commonToken.startIndex
-        );
+        let parsedQuery = listener.parsedSql.getQueryAtLocation(commonToken.startIndex);
         if (parsedQuery) {
           const token = tokenLocation.getToken(sqlScript);
           while (parsedQuery) {
@@ -84,8 +82,8 @@ export class SQLSurveyor {
 
     if (removedTrailingPeriod) {
       let parsedQuery = listener.parsedSql.getQueryAtLocation(sqlScript.length);
-      if (parsedQuery !== null && Object.keys(parsedQuery.tokens).length > 0) {
-        const queryTokens = Object.values(parsedQuery.tokens);
+      if (parsedQuery && parsedQuery.tokens.size > 0) {
+        const queryTokens = [...parsedQuery.tokens.values()];
         const lastToken = queryTokens[queryTokens.length - 1];
         parsedQuery._addToken(
           new TokenLocation(
@@ -101,15 +99,14 @@ export class SQLSurveyor {
     }
 
     // Load the names of any Common Table Expressions
-    Object.values(listener.parsedSql.parsedQueries).forEach((parsedQuery) =>
-      parsedQuery._setCommonTableExpressionNames()
-    );
-
+    for (const parsedQuery of listener.parsedSql.parsedQueries.values()) {
+      parsedQuery._setCommonTableExpressionNames();
+    }
     // Set any errors
     for (const error of (parser.errorHandler as TrackingErrorStrategy).errors) {
       error.token.setValue(sqlScript);
       const parsedQuery = listener.parsedSql.getQueryAtLocation(error.token.location.startIndex);
-      if (parsedQuery === null) {
+      if (!parsedQuery) {
         // Nothing to add the error to
         continue;
       }

@@ -20,7 +20,7 @@ import { SQLSurveyor, ParsedQuery, AutocompleteOptionType, SQLAutocomplete } fro
 import { OutputColumn } from '../autocomplete/models/OutputColumn';
 
 function getAllOutputColumns(query: ParsedQuery): OutputColumn[] {
-  return [...query.outputColumns, ...Object.values(query.subqueries).flatMap(getAllOutputColumns)];
+  return [...query.outputColumns, ...[...query.subqueries.values()].flatMap(getAllOutputColumns)];
 }
 
 function optionTypeSortOrder(type: AutocompleteOptionType): number {
@@ -70,6 +70,9 @@ export class GraphSQLProvider
     const surveyor = new SQLSurveyor();
     const parsedStatement = surveyor.survey(statement);
 
+    // const osurveyor = new OriginalSurveyor(SQLDialect.PLpgSQL);
+    // const oparsedStatement = osurveyor.survey(statement);
+
     const tableNames: string[] = this.layout ? [...this.layout.tables.keys()] : [];
     const columnNames: string[] = this.layout
       ? [...this.layout.tables.entries()].flatMap(([table_name, table]) =>
@@ -102,6 +105,7 @@ export class GraphSQLProvider
     const autocomplete = new SQLAutocomplete(tableNames, columnNames);
 
     const suggestions = autocomplete.autocomplete(statement, offset);
+
     suggestions.forEach((opt) => {
       if (opt.value) {
         const completion = new CompletionItem(opt.value);

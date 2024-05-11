@@ -1,22 +1,21 @@
 import { TokenLocation } from '../models/TokenLocation';
 import { ParsedSql } from '../models/ParsedSql';
-import { SQLSurveyorOptions } from '../SQLSurveyorOptions';
+import { Options } from '../Autocomplete';
 import { ParserRuleContext } from 'antlr4ts';
 
 export class BaseSqlQueryListener {
   input: string;
-  options?: SQLSurveyorOptions;
+  options?: Options;
   tableNameLocations: Map<string, TokenLocation[]>;
   tableAlias: Map<string, string[]>;
 
   parsedSql: ParsedSql;
 
-  constructor(input: string, options?: SQLSurveyorOptions) {
+  constructor(input: string, options?: Options) {
     this.input = input;
     this.options = options;
     this.tableNameLocations = new Map();
     this.tableAlias = new Map();
-
     this.parsedSql = new ParsedSql();
   }
 
@@ -31,7 +30,8 @@ export class BaseSqlQueryListener {
       ctx._start.line,
       stopLine,
       ctx._start.startIndex,
-      stopIndex
+      stopIndex,
+      ctx._start.tokenIndex
     );
     return queryLocation;
   }

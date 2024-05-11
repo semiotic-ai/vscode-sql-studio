@@ -3,12 +3,20 @@ export class TokenLocation {
   stopIndex: number;
   lineStart: number;
   lineEnd: number;
+  streamIndex: number;
 
-  constructor(lineStart: number, lineEnd: number, startIndex: number, stopIndex: number) {
+  constructor(
+    lineStart: number,
+    lineEnd: number,
+    startIndex: number,
+    stopIndex: number,
+    streamIndex: number
+  ) {
     this.lineStart = lineStart;
     this.lineEnd = lineEnd;
     this.startIndex = startIndex;
     this.stopIndex = stopIndex;
+    this.streamIndex = streamIndex;
   }
 
   getToken(input: string): string {
@@ -16,6 +24,12 @@ export class TokenLocation {
   }
 
   static clone(token: TokenLocation): TokenLocation {
-    return new TokenLocation(token.lineStart, token.lineEnd, token.startIndex, token.stopIndex);
+    return new TokenLocation(
+      token.lineStart,
+      token.lineEnd,
+      token.startIndex,
+      token.stopIndex,
+      token.streamIndex
+    );
   }
 }

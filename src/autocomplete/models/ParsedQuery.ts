@@ -5,7 +5,6 @@ import { TokenLocation } from './TokenLocation';
 import { Token } from './Token';
 import { ParsingError } from './ParsingError';
 import { TokenType } from './TokenType';
-import { NoUndefinedVariablesRule } from 'graphql';
 
 export class ParsedQuery {
   query: string;

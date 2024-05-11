@@ -2,7 +2,6 @@ import {
   Alias_clauseContext,
   Function_callContext,
   Indirection_varContext,
-  PostgresParser,
   Select_stmtContext,
   Select_stmt_no_parensContext,
   Select_sublistContext,
@@ -129,7 +128,8 @@ export class PostgresQueryListener extends BaseSqlQueryListener implements Postg
           columnLocation.lineStart,
           columnLocation.lineEnd,
           tableNameOrAliasStartIndex,
-          tableNameOrAliasStopIndex
+          tableNameOrAliasStopIndex,
+          columnLocation.streamIndex
         );
         parsedQuery._addTableNameLocation(tableNameOrAlias, tableNameOrAliasLocation);
       } else {
@@ -174,7 +174,8 @@ export class PostgresQueryListener extends BaseSqlQueryListener implements Postg
             columnLocation.lineStart,
             columnLocation.lineEnd,
             columnLocation.startIndex,
-            columnLocation.startIndex + tableNameOrAliasStopIndex - 1
+            columnLocation.startIndex + tableNameOrAliasStopIndex - 1,
+            columnLocation.streamIndex
           );
           parsedQuery._addTableNameLocation(tableNameOrAlias, tableNameOrAliasLocation);
         }

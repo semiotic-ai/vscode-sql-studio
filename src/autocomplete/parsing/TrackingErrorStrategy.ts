@@ -58,7 +58,8 @@ export class TrackingErrorStrategy extends DefaultErrorStrategy {
         recognizer.currentToken.line,
         recognizer.currentToken.line,
         recognizer.currentToken.startIndex,
-        recognizer.currentToken.stopIndex
+        recognizer.currentToken.stopIndex,
+        recognizer.currentToken.tokenIndex
       )
     );
     if (token.location.startIndex > token.location.stopIndex) {

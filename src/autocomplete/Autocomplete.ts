@@ -1,17 +1,8 @@
-import { CommonTokenStream, Parser, Token } from 'antlr4ts';
 import { CodeCompletionCore } from './parsing/CodeCompletionCore';
-import { SimpleSQLTokenizer } from './models/SimpleSQLTokenizer';
-
-import { PredictionMode } from 'antlr4ts/atn';
 import { Layout } from '../graphtables/layout';
-import { TrackingErrorStrategy } from './parsing/TrackingErrorStrategy';
-import { ParsedSql } from './models/ParsedSql';
-import { TokenLocation } from './models/TokenLocation';
 import { ParsedQuery } from './models/ParsedQuery';
 import { OutputColumn } from './models/OutputColumn';
-import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker';
 import { PostgresScript } from './postgres/PostgresScript';
-import { BaseSqlQueryListener } from './parsing/BaseSqlQueryListener';
 
 export interface Options {
   logErrors: boolean;
@@ -40,6 +31,8 @@ function getAllOutputColumns(query: ParsedQuery): OutputColumn[] {
 
 export class Autocomplete {
   _options?: Options;
+  _tableNames: string[] = [];
+  _columnNames: string[] = [];
   _layout?: Layout;
 
   constructor(options?: Options) {
@@ -47,33 +40,42 @@ export class Autocomplete {
   }
 
   updateLayout(layout?: Layout): void {
+    this._tableNames = [];
+    this._columnNames = [];
     this._layout = layout;
+
+    if (layout) {
+      const uniqueColumnNames = new Set<string>();
+
+      for (const [tableName, table] of layout.tables) {
+        this._tableNames.push(tableName);
+        for (const columnName of table.columns.keys()) {
+          uniqueColumnNames.add(columnName);
+          uniqueColumnNames.add(`${tableName}.${columnName}`);
+        }
+      }
+
+      this._columnNames = [...uniqueColumnNames];
+    }
   }
 
   suggest(sqlScript: string, atIndex?: number): Suggestion[] {
     const script = new PostgresScript(sqlScript);
 
-    const parsedStatement = script.ParsedStatement;
+    const tableNames: string[] = this._tableNames.slice();
+    const columnNames: string[] = this._columnNames.slice();
 
-    const tableNames: string[] = this._layout ? [...this._layout.tables.keys()] : [];
-
-    const columnNames: string[] = this._layout
-      ? [...this._layout.tables.entries()].flatMap(([table_name, table]) =>
-          [...table.columns.keys()].map((column_name) => `${table_name}.${column_name}`)
-        )
-      : [];
-
-    [...parsedStatement.parsedQueries.values()].forEach((query) => {
+    [...script.ParsedStatement.parsedQueries.values()].forEach((query) => {
       [...query.getAllReferencedTables().values()].forEach((table) => {
-        const originalTable = this._layout?.tables.get(table.tableName);
-        table.aliases.forEach((alias) => {
-          if (originalTable) {
+        for (const alias of table.aliases) {
+          const tableName = table.tableName.toLowerCase();
+          if (this._layout?.tables.has(tableName)) {
             tableNames.push(alias);
-            [...originalTable.columns.keys()].forEach((column_name) => {
-              columnNames.push(`${alias}.${column_name}`);
-            });
+            for (const columnName of this._layout?.tables.get(tableName)?.columns.keys() || []) {
+              columnNames.push(`${alias}.${columnName}`);
+            }
           }
-        });
+        }
       });
 
       getAllOutputColumns(query).forEach((column) => {
@@ -147,32 +149,29 @@ export class Autocomplete {
           }
         }
       }
+
+      const candidate = tokenString.toLowerCase();
+
       if (isTableCandidatePosition) {
-        for (const tableName of this._layout?.tables.keys() || []) {
-          if (tableName.startsWith(tokenString.toLowerCase())) {
+        for (const tableName of tableNames) {
+          if (tableName.startsWith(candidate)) {
             suggestions.unshift(new Suggestion(SuggestionType.TABLE, tableName));
           }
-        }
-        if (suggestions.length === 0 || suggestions[0].type !== SuggestionType.TABLE) {
-          // If none of the table options match, still identify this as a potential table location
-          suggestions.unshift(new Suggestion(SuggestionType.TABLE));
+          if (suggestions.length === 0 || suggestions[0].type !== SuggestionType.TABLE) {
+            // If none of the table options match, still identify this as a potential table location
+            suggestions.unshift(new Suggestion(SuggestionType.TABLE));
+          }
         }
       }
       if (isColumnCandidatePosition) {
-        for (const tableName of this._layout?.tables.keys() || []) {
-          for (const columnName of this._layout?.tables.get(tableName)?.columns.keys() || []) {
-            if (columnName.toUpperCase().startsWith(tokenString.toUpperCase())) {
-              suggestions.unshift(new Suggestion(SuggestionType.COLUMN, columnName));
-            }
-            const columnSchemaName = `${tableName}.${columnName}`;
-            if (columnSchemaName.toUpperCase().startsWith(tokenString.toUpperCase())) {
-              suggestions.unshift(new Suggestion(SuggestionType.COLUMN, columnSchemaName));
-            }
+        for (const columnName of columnNames) {
+          if (columnName.startsWith(candidate)) {
+            suggestions.unshift(new Suggestion(SuggestionType.COLUMN, columnName));
           }
-        }
-        if (suggestions.length === 0 || suggestions[0].type !== SuggestionType.COLUMN) {
-          // If none of the column options match, still identify this as a potential column location
-          suggestions.unshift(new Suggestion(SuggestionType.COLUMN));
+          if (suggestions.length === 0 || suggestions[0].type !== SuggestionType.COLUMN) {
+            // If none of the column options match, still identify this as a potential column location
+            suggestions.unshift(new Suggestion(SuggestionType.COLUMN));
+          }
         }
       }
     }

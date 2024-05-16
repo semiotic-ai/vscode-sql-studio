@@ -46,9 +46,6 @@ Subgraphs that are not SQL-enabled are shown with this symbol.
 Notice that the circle is blue for SQL-enabled subgraphs and red for subgraphs that aren't.
 That's your clue.
 
-There's one more distinction we need to make.
-There are SQL-enabled and SQL-disabled subgraphs.
-There are also selected subgraphs and unselected subgraphs.
 When you select a subgraph, the gray part turns green.
 
 ![sql_subgraph_selected](./resources/sql_subgraph_sel.png)

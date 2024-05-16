@@ -14,6 +14,10 @@ module.exports = {
             release: 'patch'
           },
           {
+            type: 'docs',
+            release: 'patch'
+          },
+          {
             type: 'build',
             scope: 'deps',
             release: 'patch'
@@ -45,6 +49,10 @@ module.exports = {
             {
               type: 'refactor',
               section: 'Code Refactoring'
+            },
+            {
+              type: 'docs',
+              section: 'Documentation'
             },
             {
               type: 'build',

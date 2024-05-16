@@ -4,7 +4,7 @@ The SQL studio enables developers to query SQL-enabled subgraphs on The Graph.
 
 ## Demo
 
-![Demo](https://sql.semiotic.ai/studio.gif)
+![Demo](./images/studio.gif)
 
 1. Open the extension on the *Activity Bar*
 2. Select the `Uniswap V3 Ethereum` subgraph by clicking on it.

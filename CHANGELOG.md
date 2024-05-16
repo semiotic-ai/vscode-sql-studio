@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.13.4](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.13.3...v0.13.4) (2024-05-16)
+
+
+### Documentation
+
+* reword explorer docs for clarity ([7a7c32b](https://github.com/semiotic-ai/vscode-sql-studio/commit/7a7c32bdf8a8fb097b17173d0db8ef06519dbb88))
+* update readme ([8fe2148](https://github.com/semiotic-ai/vscode-sql-studio/commit/8fe214820f24efda85352952d1f871d03fe7609b))
+* upload demo gif to repo ([a3cf4bc](https://github.com/semiotic-ai/vscode-sql-studio/commit/a3cf4bcac412f316af8b276e00e856a8e53fc6f7))
+
 ## [0.13.3](https://github.com/semiotic-ai/vscode-sql-studio/compare/v0.13.2...v0.13.3) (2024-05-03)
 
 

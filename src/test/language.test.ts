@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { GraphSQLProvider } from '../providers/language';
-import { Layout, Table, Column, Relation, ScalarType, TypeKind } from '../graphtables/layout';
-import { DBType } from '../graphtables/db';
+import { Layout, Table, Column, Relation, ScalarType, TypeKind } from '@semiotic-labs/graph-tables';
+import { DBType } from '@semiotic-labs/graph-tables/dist/types/db';
 
 suite('GraphSQLProvider Completion', () => {
   test('Should suggest SELECT when user enters sel', async () => {

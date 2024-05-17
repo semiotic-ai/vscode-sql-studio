@@ -1,5 +1,6 @@
 import {
   CancellationToken,
+  CancellationTokenSource,
   CompletionContext,
   CompletionItem,
   CompletionItemKind,
@@ -13,7 +14,7 @@ import {
   TextDocument
 } from 'vscode';
 
-import { Layout } from '../graphtables/layout';
+import { Layout } from '@semiotic-labs/graph-tables';
 
 import { Autocomplete, Suggestion, SuggestionType } from '../autocomplete';
 
@@ -23,10 +24,12 @@ function optionTypeSortOrder(type: SuggestionType): number {
       return 0;
     case SuggestionType.TABLE:
       return 1;
-    case SuggestionType.KEYWORD:
+    case SuggestionType.FUNCTION:
       return 2;
-    default:
+    case SuggestionType.KEYWORD:
       return 3;
+    default:
+      return 4;
   }
 }
 
@@ -34,6 +37,38 @@ export class GraphSQLProvider
   implements SignatureHelpProvider, CompletionItemProvider<CompletionItem>
 {
   private autocomplete: Autocomplete = new Autocomplete();
+
+  private _getCompletions(statement: string, offset: number): CompletionItem[] {
+    const suggestions = this.autocomplete.suggest(statement, offset);
+
+    const result = new Set<CompletionItem>();
+
+    suggestions.forEach((opt) => {
+      if (opt.value) {
+        const completion = new CompletionItem(opt.value);
+        switch (opt.type) {
+          case 'KEYWORD':
+            completion.kind = CompletionItemKind.Keyword;
+            break;
+          case 'FUNCTION':
+            completion.kind = CompletionItemKind.Function;
+            break;
+          case 'TABLE':
+            completion.kind = CompletionItemKind.Class;
+            break;
+          case 'COLUMN':
+            completion.kind = CompletionItemKind.Field;
+            break;
+          default:
+            completion.kind = CompletionItemKind.Variable;
+        }
+        const typeOrder = optionTypeSortOrder(opt.type);
+        completion.sortText = `${typeOrder} ${opt.value}`;
+        result.add(completion);
+      }
+    });
+    return [...result];
+  }
 
   /**
    * Provides completion items for SQL queries within a text document. When the trigger character '.' is encountered,
@@ -62,32 +97,7 @@ export class GraphSQLProvider
 
     const offset = document.offsetAt(position);
 
-    const suggestions = this.autocomplete.suggest(statement, offset);
-
-    const result = new Set<CompletionItem>();
-
-    suggestions.forEach((opt) => {
-      if (opt.value) {
-        const completion = new CompletionItem(opt.value);
-        switch (opt.type) {
-          case 'KEYWORD':
-            completion.kind = CompletionItemKind.Keyword;
-            break;
-          case 'TABLE':
-            completion.kind = CompletionItemKind.Class;
-            break;
-          case 'COLUMN':
-            completion.kind = CompletionItemKind.Field;
-            break;
-          default:
-            completion.kind = CompletionItemKind.Variable;
-        }
-        const typeOrder = optionTypeSortOrder(opt.type);
-        completion.sortText = `${typeOrder} ${opt.value}`;
-        result.add(completion);
-      }
-    });
-    return [...result];
+    return this._getCompletions(statement, offset);
   }
 
   resolveCompletionItem?(

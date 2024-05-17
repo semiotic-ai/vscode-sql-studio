@@ -23,8 +23,7 @@
         "returns": "xml",
         "parameters": {
           "comment": "text"
-        },
-        "antlr": ["XMLCOMMENT LEFT_PAREN vex RIGHT_PAREN"]
+        }
       }
     ],
     "xmlconcat": [

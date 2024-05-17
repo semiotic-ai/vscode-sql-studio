@@ -309,6 +309,7 @@
     "yaml-loader": "^0.8.0"
   },
   "dependencies": {
+    "@semiotic-labs/graph-tables": "^1.0.0",
     "@vscode/codicons": "^0.0.35",
     "antlr4ts": "^0.5.0-alpha.4",
     "graphql": "^16.8.1",

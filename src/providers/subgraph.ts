@@ -6,7 +6,7 @@ import {
   getSubgraphs,
   searchSubgraphById
 } from '../service';
-import { ColumnType, Layout, TypeKind, Column, Table } from '../graphtables/layout';
+import { ColumnType, Layout, TypeKind } from '@semiotic-labs/graph-tables';
 import path from 'path';
 
 const PAGE_SIZE = 20;

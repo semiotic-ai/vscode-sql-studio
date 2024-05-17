@@ -19,23 +19,59 @@ interface IFunctionsGroup {
 
 const digits = Array.from('0123456789');
 
+function SpellName(name: string): string {
+  return Array.from(name)
+    .map((c) => (digits.includes(c) ? `'${c}'` : c === '_' ? 'UNDERLINE' : c))
+    .join(' ');
+}
+
 function WriteLexer(groups: IFunctionsGroup[]) {
   const lexer = fs.createWriteStream(path.join(__dirname, 'grammar', 'FunctionsLexer.g4'));
   lexer.write('lexer grammar FunctionsLexer;\n');
+  lexer.write('\n');
   lexer.write('import AlphabetLexer, SymbolsLexer, KeywordsLexer;\n');
   lexer.write('\n');
-  new Set(
-    groups
-      .map((group) => [...group.keywords.keys()])
-      .flat()
-      .sort()
-  ).forEach((keyword) => {
-    const name = keyword.toUpperCase();
-    const value = Array.from(name)
-      .map((c) => (digits.includes(c) ? `'${c}'` : c === '_' ? 'UNDERLINE' : c))
-      .join(' ');
-    lexer.write(`${name} :${value};\n`);
+
+  const keywords: Set<string> = new Set();
+  const functions: Set<string> = new Set();
+
+  groups.forEach((group) => {
+    for (const [keyword, signatures] of group.keywords.entries()) {
+      const name = keyword.toUpperCase();
+      if (signatures.length > 0) {
+        functions.add(name);
+      } else {
+        keywords.add(name);
+      }
+    }
   });
+
+  const functions_array = Array.from(functions);
+
+  const first_function = functions_array[0];
+  const last_function = functions_array[functions_array.length - 1];
+
+  lexer.write(`
+@members {
+
+  private _tags: any[] = [];
+  /* This field stores the tags which are used to detect the end of a dollar-quoted string literal.
+  */
+
+  public static isFunction(value:number): boolean {
+      return value >= PostgresLexer.${first_function} && value <= PostgresLexer.${last_function};
+  }
+}
+  `);
+
+  for (const keyword of keywords) {
+    lexer.write(`\n${keyword}: ${SpellName(keyword)};`);
+  }
+
+  for (const keyword of functions) {
+    lexer.write(`\n${keyword}: ${SpellName(keyword)};`);
+  }
+
   lexer.close();
 }
 
@@ -44,27 +80,26 @@ function WriteParser(groups: IFunctionsGroup[]) {
   parser.write('parser grammar FunctionsParser;\n');
   parser.write('\n');
 
-  const functions = groups.reduce((map, group) => {
-    for (const [keyword, signatures] of group.keywords) {
-      const antlrs = signatures
-        .map((signature) => signature.antlr?.join('\n') || '')
-        .filter((antlr) => antlr.length > 0)
-        .join('\n\t|');
+  const simple_functions: Set<string> = new Set();
+  const complex_functions: Map<string, string> = new Map();
 
-      if (antlrs.length > 0) {
-        map.set(`function_${group.name}_${keyword}`, antlrs);
+  for (const group of groups) {
+    for (const [keyword, signatures] of group.keywords) {
+      const name = keyword.toUpperCase();
+      for (const signature of signatures) {
+        if (signature.antlr && signature.antlr.length > 0) {
+          complex_functions.set(name, signature.antlr.join('\n'));
+        } else if (!simple_functions.has(name)) {
+          simple_functions.add(keyword.toUpperCase());
+        }
       }
     }
+  }
 
-    return map;
-  }, new Map<string, string>());
-
-  functions.forEach((antlrs, prefix) => {
-    parser.write(`\n${prefix}: ${antlrs};`);
-  });
-
-  parser.write(`\n\nfunctions_all: ${[...functions.keys()].join('\n\t|')};`);
-
+  parser.write(`function_names: ${[...simple_functions].join('\n\t|')};`);
+  parser.write(`\n\n`);
+  parser.write(`function_custom: ${[...complex_functions.values()].join('\n\t|')};`);
+  parser.write(`\n\n`);
   parser.close();
 }
 

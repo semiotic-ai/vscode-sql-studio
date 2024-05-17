@@ -1,5 +1,5 @@
 import { CodeCompletionCore } from './parsing/CodeCompletionCore';
-import { Layout } from '../graphtables/layout';
+import { Layout } from '@semiotic-labs/graph-tables';
 import { ParsedQuery } from './models/ParsedQuery';
 import { OutputColumn } from './models/OutputColumn';
 import { PostgresScript } from './postgres/PostgresScript';
@@ -11,6 +11,7 @@ export interface Options {
 
 export enum SuggestionType {
   KEYWORD = 'KEYWORD',
+  FUNCTION = 'FUNCTION',
   COLUMN = 'COLUMN',
   TABLE = 'TABLE'
 }
@@ -60,6 +61,13 @@ export class Autocomplete {
   }
 
   suggest(sqlScript: string, atIndex?: number): Suggestion[] {
+    const indexToAutocomplete = (atIndex ? atIndex : sqlScript.length) - 1;
+    const suggestions: Suggestion[] = [];
+
+    if (indexToAutocomplete < 0) {
+      return [];
+    }
+
     const script = new PostgresScript(sqlScript);
 
     const tableNames: string[] = this._tableNames.slice();
@@ -86,15 +94,7 @@ export class Autocomplete {
     });
 
     const core = new CodeCompletionCore(script.parser);
-    core.showDebugOutput = true;
-    core.showResult = true;
     core.ignoredTokens = new Set(script.TokensToIgnore);
-    let indexToAutocomplete = sqlScript.length;
-    if (atIndex) {
-      indexToAutocomplete = atIndex;
-    }
-
-    const suggestions: Suggestion[] = [];
 
     const query = script.ParsedStatement.getQueryAtLocation(indexToAutocomplete);
     const token = query?.getTokenAtLocation(indexToAutocomplete);
@@ -137,7 +137,10 @@ export class Autocomplete {
             (candidateTokenValue.startsWith(tokenString.toUpperCase()) &&
               suggestions.find((option) => option.value === candidateTokenValue) === undefined)
           ) {
-            suggestions.push(new Suggestion(SuggestionType.KEYWORD, candidateTokenValue));
+            const suggestionType = script.isFunction(candidateToken[0])
+              ? SuggestionType.FUNCTION
+              : SuggestionType.KEYWORD;
+            suggestions.push(new Suggestion(suggestionType, candidateTokenValue));
           }
         }
         for (const rule of candidates.rules) {

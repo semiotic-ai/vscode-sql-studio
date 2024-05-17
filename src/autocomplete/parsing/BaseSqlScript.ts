@@ -46,6 +46,7 @@ export abstract class BaseSqlScript {
   public abstract get PreferredRulesForTable(): number[];
   public abstract get PreferredRulesForColumn(): number[];
   public abstract get TokensToIgnore(): number[];
+  public abstract isFunction(typeId: number): boolean;
 
   protected _getTokens(errorListeners?: ANTLRErrorListener<any>[]): CommonTokenStream {
     const stream = CharStreams.fromString(this.value);

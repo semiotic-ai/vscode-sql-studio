@@ -2,7 +2,7 @@ import { BaseSqlScript } from '../parsing/BaseSqlScript';
 import { PostgresParser } from './PostgresParser';
 import { PostgresLexer } from './PostgresLexer';
 import { PostgresQueryListener } from './PostgresQueryListener';
-import { CharStream, Lexer, Parser, TokenStream } from 'antlr4ts';
+import { CharStream, Lexer, Parser, Token, TokenStream } from 'antlr4ts';
 import { ParseTree } from 'antlr4ts/tree/ParseTree';
 import { BaseSqlQueryListener } from '../parsing/BaseSqlQueryListener';
 import { TokenType } from '../models/TokenType';
@@ -13,7 +13,7 @@ const PreferedRulesForTable: number[] = [
 ];
 const PreferedRulesForColumn: number[] = [PostgresParser.RULE_indirection_var];
 const TokensToIgnore: number[] = [
-  PostgresParser.DOT,
+  //  PostgresParser.DOT,
   PostgresParser.COMMA,
   PostgresParser.SEMI_COLON,
   PostgresParser.DOUBLE_DOT,
@@ -86,5 +86,9 @@ export class PostgresScript extends BaseSqlScript {
 
   public get TokensToIgnore(): number[] {
     return TokensToIgnore;
+  }
+
+  public isFunction(tokenId: number): boolean {
+    return PostgresLexer.isFunction(tokenId);
   }
 }
